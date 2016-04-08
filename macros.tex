@@ -1,0 +1,132 @@
+% (tweaks)
+\definecolor{darkred}{rgb}{0.5451, 0.0, 0.0}
+\definecolor{darkgreen}{rgb}{0.0, 0.3922, 0.0}
+
+\def\blue#1{\textcolor{blue}{#1}}
+\def\darkblue#1{\textcolor{blue}{#1}}
+\def\red#1{\textcolor{red}{#1}}
+\def\darkred#1{\textcolor{darkred}{#1}}
+\def\green#1{\textcolor{green}{#1}}
+\def\darkgreen#1{\textcolor{darkgreen}{#1}}
+\def\yellow#1{\textcolor{yellow}{#1}}
+\definecolor{burntorange}{HTML}{BF5700}
+\def\orange#1{\textcolor{burntorange}{#1}}
+\def\gray#1{\textcolor{gray}{#1}}
+\def\darkgray#1{\textcolor{darkgray}{#1}}
+
+\newcommand\sys[1]{\textsc{#1}}
+\newcommand\w[1]{\textit{\darkgreen{#1}}}
+\newcommand\ww[1]{\textit{#1}}
+\newcommand{\indentitem}{\setlength\itemindent{25pt}}
+
+\newcommand\denote[1]{\ensuremath{\llbracket\ww{#1}\rrbracket}}
+
+\newcommand\forward{\ensuremath{\sqsubseteq}}
+\newcommand\nforward{\ensuremath{\not\sqsubseteq}}
+\newcommand\reverse{\ensuremath{\sqsupseteq}}
+\newcommand\alternate{\ensuremath{\downharpoonleft\hspace{-1.25mm}\upharpoonright}}
+\newcommand\cover{\ensuremath{\smallsmile}}
+\newcommand\equivalent{\ensuremath{\equiv}}
+\newcommand\negate{\ensuremath{\curlywedge}}
+\newcommand\independent{\ensuremath{\#}}
+\newcommand\tagUp[1]{#1\ensuremath{^\uparrow}}
+\newcommand\tagDown[1]{#1\ensuremath{^\downarrow}}
+\newcommand\join{\ensuremath{\bowtie}}
+
+\newcommand\h[1]{\textbf{#1}}
+\newcommand\hh[1]{\textbf{\textcolor[rgb]{0.5,0,0}{#1}}}
+\def\ent#1{\text{\small{\textsc{#1}}}}
+\def\typ#1{\textit{#1}}
+%\makeatletter
+%\newcommand{\xRightarrow}[2][]{\ext@arrow 0359\Rightarrowfill@{#1}{#2}}
+%\makeatother
+
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\newcommand{\xmark}{\textrm{\ding{55}}}
+%\newcommand{\valid}{\ensuremath{\Rightarrow}}
+%\newcommand{\invalid}{\ensuremath{\Rightarrow\lnot}}
+\newcommand{\valid}{\ensuremath{\Leftarrow}}
+\newcommand{\invalid}{\reflectbox{\ensuremath{\Rightarrow\lnot}}}
+\newcommand{\noop}{\textcolor{white}{NOOP}}
+\newcommand{\noopTab}{\begin{tabular}{c} \textcolor{white}{NOOP} \\ \textcolor{white}{NOOP} \end{tabular}}
+
+\newcommand\true[1]{\darkgreen{\checkmark\textit{#1}}}
+\newcommand\false[1]{\darkred{\xmark$~\,$\textit{#1}}}
+\newcommand\unknown[1]{?\orange{\textit{#1}}}
+
+\newcommand{\verticalcenter}[1]{\begingroup
+\setbox0=\hbox{#1}%
+\parbox{\wd0}{\box0}\endgroup}
+
+
+%
+% KBP MACROS
+%
+% A variable, abstracted (e.g., x)
+\def\var#1{\ensuremath{\mathbf{{#1}}}}
+% A variable instance (e.g., Obama)
+\def\vari#1{\ensuremath{#1}}
+
+
+% Aliases
+\def\reverb{ReVerb}
+\def\hydra{Stanford KBP}
+\def\sys#1{#1}
+\def\knowbot{\sys{Knowbot}}
+
+
+% KBP Specific
+% An entity
+\def\ent#1{\text{\small{\textsc{#1}}}}
+
+% An extraction, e.g., "Obama born_in Hawaii"
+\newcommand\extr[3]{\mbox{\ent{#1}\ $~$\rel{#2}\ $~$\ent{#3}}}
+\newcommand\triple[3]{(\mbox{\ent{#1}; $~$\rel{#2}; $~$\ent{#3}})}
+% A clause in a logical form, e.g., "born_in(Obama, Hawaii)"
+\newcommand\clause[3]{\mbox{\rel{#2}\ensuremath{(#1, #3)}}}
+
+\newcommand\subj[1]{\textcolor{darkblue}{#1}}
+\newcommand\obj[1]{\textcolor{burntorange}{#1}}
+\newcommand\rel[1]{\textrm{#1}}
+
+\def\blue#1{\textcolor{blue}{#1}}
+\def\red#1{\textcolor{red}{#1}}
+\def\green#1{\textcolor{green}{#1}}
+\def\yellow#1{\textcolor{yellow}{#1}}
+
+\newcommand\posterline{
+  \begin{center}
+    \noindent\rule{10cm}{0.4pt}
+  \end{center}
+}
+
+\newcommand\entailmentExample[2]{
+\vspace{2mm}
+\noindent \hspace{-0.5em}\begin{tabular}{lp{0.41\textwidth}}
+\textbf{P}: & \hspace*{-1mm}\textit{#1} \\
+\textbf{H}: & \hspace*{-1mm}\textit{#2}
+\end{tabular}
+\vspace{2mm}
+}
+
+\tikzset{
+    invisible/.style={opacity=0},
+    visible on/.style={alt=#1{}{invisible}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+  }
+
+\newenvironment{lquote}{%
+  \list{}{%
+    \rightmargin0pt}%
+    \item\relax
+  }
+{\endlist}
+
+\newcommand\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw=darkred,inner sep=2pt] (char) {#1};}
+}
+\newcommand\noncircled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw=white,inner sep=2pt] (char) {#1};}
+}

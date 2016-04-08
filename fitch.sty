@@ -1,0 +1,227 @@
+% Macros for Fitch-style natural deduction. 
+% Author: Peter Selinger, University of Ottawa
+% Created: Jan 14, 2002
+% Modified: Feb 8, 2005
+% Version: 0.5
+% Copyright: (C) 2002-2005 Peter Selinger
+% Filename: fitch.sty
+% Documentation: fitchdoc.tex
+% URL: http://quasar.mathstat.uottawa.ca/~selinger/fitch/
+
+% License:
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2, or (at your option)
+% any later version.
+%
+% This program is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+% General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software Foundation, 
+% Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+% USAGE EXAMPLE:
+% 
+% The following is a simple example illustrating the usage of this
+% package.  For detailed instructions and additional functionality, see
+% the user guide, which can be found in the file fitchdoc.tex.
+% 
+% \[
+% \begin{nd}
+%   \hypo{1}  {P\vee Q}   
+%   \hypo{2}  {\neg Q}                         
+%   \open                              
+%   \hypo{3a} {P}
+%   \have{3b} {P}        \r{3a}
+%   \close                   
+%   \open
+%   \hypo{4a} {Q}
+%   \have{4b} {\neg Q}   \r{2}
+%   \have{4c} {\bot}     \ne{4a,4b}
+%   \have{4d} {P}        \be{4c}
+%   \close                             
+%   \have{5}  {P}        \oe{1,3a-3b,4a-4d}                 
+% \end{nd}
+% \]
+
+{\chardef\x=\catcode`\*
+\catcode`\*=11
+\global\let\nd*astcode\x}
+\catcode`\*=11
+
+% References
+
+\newcount\nd*ctr
+\def\nd*render{\expandafter\ifx\expandafter\nd*x\nd*base\nd*x\the\nd*ctr\else\nd*base\ifnum\nd*ctr<0\the\nd*ctr\else\ifnum\nd*ctr>0+\the\nd*ctr\fi\fi\fi}
+\expandafter\def\csname nd*-\endcsname{}
+
+\def\nd*num#1{\nd*numo{\nd*render}{#1}\global\advance\nd*ctr1}
+\def\nd*numopt#1#2{\nd*numo{$#1$}{#2}}
+\def\nd*numo#1#2{\edef\x{#1}\mbox{$\x$}\expandafter\global\expandafter\let\csname nd*-#2\endcsname\x}
+\def\nd*ref#1{\expandafter\let\expandafter\x\csname nd*-#1\endcsname\ifx\x\relax%
+  \errmessage{Undefined natdeduction reference: #1}\else\mbox{$\x$}\fi}
+\def\nd*noop{}
+\def\nd*set#1#2{\ifx\relax#1\nd*noop\else\global\def\nd*base{#1}\fi\ifx\relax#2\relax\else\global\nd*ctr=#2\fi}
+\def\nd*reset{\nd*set{}{1}}
+\def\nd*refa#1{\nd*ref{#1}}
+\def\nd*aux#1#2{\ifx#2-\nd*refa{#1}--\def\nd*c{\nd*aux{}}%
+  \else\ifx#2,\nd*refa{#1}, \def\nd*c{\nd*aux{}}%
+  \else\ifx#2;\nd*refa{#1}; \def\nd*c{\nd*aux{}}%
+  \else\ifx#2.\nd*refa{#1}. \def\nd*c{\nd*aux{}}%
+  \else\ifx#2)\nd*refa{#1})\def\nd*c{\nd*aux{}}%
+  \else\ifx#2(\nd*refa{#1}(\def\nd*c{\nd*aux{}}%
+  \else\ifx#2\nd*end\nd*refa{#1}\def\nd*c{}%
+  \else\def\nd*c{\nd*aux{#1#2}}%
+  \fi\fi\fi\fi\fi\fi\fi\nd*c}
+\def\ndref#1{\nd*aux{}#1\nd*end}
+
+% Layer A
+
+% define various dimensions (explained in fitchdoc.tex):
+\newlength{\nd*dim} 
+\newdimen\nd*depthdim
+\newdimen\nd*hsep
+\newdimen\ndindent
+\ndindent=1em
+% user command to redefine dimensions
+\def\nddim#1#2#3#4#5#6#7#8{\nd*depthdim=#3\relax\nd*hsep=#6\relax%
+\def\nd*height{#1}\def\nd*thickness{#8}\def\nd*initheight{#2}%
+\def\nd*indent{#5}\def\nd*labelsep{#4}\def\nd*justsep{#7}}
+% set initial dimensions
+\nddim{4.5ex}{3.5ex}{1.5ex}{1em}{1.6em}{.5em}{2.5em}{.2mm}
+
+\def\nd*v{\rule[-\nd*depthdim]{\nd*thickness}{\nd*height}}
+\def\nd*t{\rule[-\nd*depthdim]{0mm}{\nd*height}\rule[-\nd*depthdim]{\nd*thickness}{\nd*initheight}}
+\def\nd*i{\hspace{\nd*indent}} 
+\def\nd*s{\hspace{\nd*hsep}}
+\def\nd*g#1{\nd*f{\makebox[\nd*indent][c]{$#1$}}}
+\def\nd*f#1{\raisebox{0pt}[0pt][0pt]{$#1$}}
+\def\nd*u#1{\makebox[0pt][l]{\settowidth{\nd*dim}{\nd*f{#1}}%
+    \addtolength{\nd*dim}{2\nd*hsep}\hspace{-\nd*hsep}\rule[-\nd*depthdim]{\nd*dim}{\nd*thickness}}\nd*f{#1}}
+
+% Lists
+
+\def\nd*push#1#2{\expandafter\gdef\expandafter#1\expandafter%
+  {\expandafter\nd*cons\expandafter{#1}{#2}}}
+\def\nd*pop#1{{\def\nd*nil{\gdef#1{\nd*nil}}\def\nd*cons##1##2%
+    {\gdef#1{##1}}#1}}
+\def\nd*iter#1#2{{\def\nd*nil{}\def\nd*cons##1##2{##1#2{##2}}#1}}
+\def\nd*modify#1#2#3{{\def\nd*nil{\gdef#1{\nd*nil}}\def\nd*cons##1##2%
+    {\advance#2-1 ##1\advance#2 1 \ifnum#2=1\nd*push#1{#3}\else%
+      \nd*push#1{##2}\fi}#1}}
+
+\def\nd*cont#1{{\def\nd*t{\nd*v}\def\nd*v{\nd*v}\def\nd*g##1{\nd*i}%
+    \def\nd*i{\nd*i}\def\nd*nil{\gdef#1{\nd*nil}}\def\nd*cons##1##2%
+    {##1\expandafter\nd*push\expandafter#1\expandafter{##2}}#1}}
+
+% Layer B
+
+\newcount\nd*n
+\def\nd*beginb{\begingroup\nd*reset\gdef\nd*stack{\nd*nil}\nd*push\nd*stack{\nd*t}%
+  \begin{array}{l@{\hspace{\nd*labelsep}}l@{\hspace{\nd*justsep}}l}}
+\def\nd*resumeb{\begingroup\begin{array}{l@{\hspace{\nd*labelsep}}l@{\hspace{\nd*justsep}}l}}
+\def\nd*endb{\end{array}\endgroup}
+\def\nd*hypob#1#2{\nd*f{\nd*num{#1}}&\nd*iter\nd*stack\relax\nd*cont\nd*stack\nd*s\nd*u{#2}&}
+\def\nd*haveb#1#2{\nd*f{\nd*num{#1}}&\nd*iter\nd*stack\relax\nd*cont\nd*stack\nd*s\nd*f{#2}&}
+\def\nd*havecontb#1#2{&\nd*iter\nd*stack\relax\nd*cont\nd*stack\nd*s\nd*f{\hspace{\ndindent}#2}&}
+\def\nd*hypocontb#1#2{&\nd*iter\nd*stack\relax\nd*cont\nd*stack\nd*s\nd*u{\hspace{\ndindent}#2}&}
+
+\def\nd*openb{\nd*push\nd*stack{\nd*i}\nd*push\nd*stack{\nd*t}}
+\def\nd*closeb{\nd*pop\nd*stack\nd*pop\nd*stack}
+\def\nd*guardb#1#2{\nd*n=#1\multiply\nd*n by 2 \nd*modify\nd*stack\nd*n{\nd*g{#2}}}
+
+% Layer C
+
+\def\nd*clr{\gdef\nd*cmd{}\gdef\nd*typ{\relax}}
+\def\nd*sto#1#2#3{\gdef\nd*typ{#1}\gdef\nd*byt{}%
+  \gdef\nd*cmd{\nd*typ{#2}{#3}\nd*byt\\}}
+\def\nd*chtyp{\expandafter\ifx\nd*typ\nd*hypocontb\def\nd*typ{\nd*havecontb}\else\def\nd*typ{\nd*haveb}\fi}
+\def\nd*hypoc#1#2{\nd*chtyp\nd*cmd\nd*sto{\nd*hypob}{#1}{#2}}
+\def\nd*havec#1#2{\nd*cmd\nd*sto{\nd*haveb}{#1}{#2}}
+\def\nd*hypocontc#1{\nd*chtyp\nd*cmd\nd*sto{\nd*hypocontb}{}{#1}}
+\def\nd*havecontc#1{\nd*cmd\nd*sto{\nd*havecontb}{}{#1}}
+\def\nd*by#1#2{\ifx\nd*x#2\nd*x\gdef\nd*byt{\mbox{#1}}\else\gdef\nd*byt{\mbox{#1, \ndref{#2}}}\fi}
+
+% multi-line macros
+\def\nd*mhypoc#1#2{\nd*mhypocA{#1}#2\\\nd*stop\\}
+\def\nd*mhypocA#1#2\\{\nd*hypoc{#1}{#2}\nd*mhypocB}
+\def\nd*mhypocB#1\\{\ifx\nd*stop#1\else\nd*hypocontc{#1}\expandafter\nd*mhypocB\fi}
+\def\nd*mhavec#1#2{\nd*mhavecA{#1}#2\\\nd*stop\\}
+\def\nd*mhavecA#1#2\\{\nd*havec{#1}{#2}\nd*mhavecB}
+\def\nd*mhavecB#1\\{\ifx\nd*stop#1\else\nd*havecontc{#1}\expandafter\nd*mhavecB\fi}
+\def\nd*mhypocontc#1{\nd*mhypocB#1\\\nd*stop\\}
+\def\nd*mhavecontc#1{\nd*mhavecB#1\\\nd*stop\\}
+
+\def\nd*beginc{\nd*beginb\nd*clr}
+\def\nd*resumec{\nd*resumeb\nd*clr}
+\def\nd*endc{\nd*cmd\nd*endb}
+\def\nd*openc{\nd*cmd\nd*clr\nd*openb}
+\def\nd*closec{\nd*cmd\nd*clr\nd*closeb}
+\let\nd*guardc\nd*guardb
+
+% Layer D
+
+% macros with optional arguments spelled-out
+\def\nd*hypod[#1][#2]#3[#4]#5{\ifx\relax#4\relax\else\nd*guardb{1}{#4}\fi\nd*mhypoc{#3}{#5}\nd*set{#1}{#2}}
+\def\nd*haved[#1][#2]#3[#4]#5{\ifx\relax#4\relax\else\nd*guardb{1}{#4}\fi\nd*mhavec{#3}{#5}\nd*set{#1}{#2}}
+\def\nd*havecont#1{\nd*mhavecontc{#1}}
+\def\nd*hypocont#1{\nd*mhypocontc{#1}}
+\def\nd*base{undefined}
+\def\nd*opend[#1]#2{\nd*cmd\nd*clr\nd*openb\nd*guard{#1}#2}
+\def\nd*close{\nd*cmd\nd*clr\nd*closeb}
+\def\nd*guardd[#1]#2{\nd*guardb{#1}{#2}}
+
+% Handling of optional arguments.
+
+\def\nd*optarg#1#2#3{\ifx[#3\def\nd*c{#2#3}\else\def\nd*c{#2[#1]{#3}}\fi\nd*c}
+\def\nd*optargg#1#2#3{\ifx[#3\def\nd*c{#1#3}\else\def\nd*c{#2{#3}}\fi\nd*c}
+
+\def\nd*five#1{\nd*optargg{\nd*four{#1}}{\nd*two{#1}}}
+\def\nd*four#1[#2]{\nd*optarg{0}{\nd*three{#1}[#2]}}
+\def\nd*three#1[#2][#3]#4{\nd*optarg{}{#1[#2][#3]{#4}}}
+\def\nd*two#1{\nd*three{#1}[\relax][]}
+
+\def\nd*have{\nd*five{\nd*haved}}
+\def\nd*hypo{\nd*five{\nd*hypod}}
+\def\nd*open{\nd*optarg{}{\nd*opend}}
+\def\nd*guard{\nd*optarg{1}{\nd*guardd}}
+
+\def\nd*init{%
+  \let\open\nd*open%
+  \let\close\nd*close%
+  \let\hypo\nd*hypo%
+  \let\have\nd*have%
+  \let\hypocont\nd*hypocont%
+  \let\havecont\nd*havecont%
+  \let\by\nd*by%
+  \let\guard\nd*guard%
+  \def\ii{\by{$\Rightarrow$I}}%
+  \def\ie{\by{$\Rightarrow$E}}%
+  \def\Ai{\by{$\forall$I}}%
+  \def\Ae{\by{$\forall$E}}%
+  \def\Ei{\by{$\exists$I}}%
+  \def\Ee{\by{$\exists$E}}%
+  \def\ai{\by{$\wedge$I}}%
+  \def\ae{\by{$\wedge$E}}%
+  \def\ai{\by{$\wedge$I}}%
+  \def\ae{\by{$\wedge$E}}%
+  \def\oi{\by{$\vee$I}}%
+  \def\oe{\by{$\vee$E}}%
+  \def\ni{\by{$\neg$I}}%
+  \def\ne{\by{$\neg$E}}%
+  \def\be{\by{$\bot$E}}%
+  \def\nne{\by{$\neg\neg$E}}%
+  \def\r{\by{R}}%
+}
+
+\newenvironment{nd}{\begingroup\nd*init\nd*beginc}{\nd*endc\endgroup}
+\newenvironment{ndresume}{\begingroup\nd*init\nd*resumec}{\nd*endc\endgroup}
+
+\catcode`\*=\nd*astcode
+
+% End of file fitch.sty
+

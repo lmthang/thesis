@@ -1,0 +1,69 @@
+\documentclass[12pt]{report}
+\usepackage{suthesis}
+%\documentstyle[12pt,suthesis]{report}
+
+% -- Imports --
+% (general libraries)
+\usepackage{times,latexsym,amsfonts,amssymb,amsmath,graphicx,url,bbm,rotating}
+\usepackage{enumitem,multirow,hhline,stmaryrd,bussproofs,mathtools,siunitx,arydshln}
+\usepackage{booktabs,xcolor,csquotes}
+% (custom libraries)
+\usepackage{fitch}
+% (inline references)
+\usepackage[square,sort,comma,numbers]{natbib}
+% (tikz)
+\usepackage{tikz}
+\usetikzlibrary{shapes.arrows,chains,positioning,automata,trees,calc}
+\usetikzlibrary{patterns}
+\usetikzlibrary{decorations.pathmorphing,decorations.markings}
+% (tikz dependency tree)
+\usepackage{tikz-dependency,pifont}
+% (print algorithms)
+\usepackage[ruled,lined,linesnumbered]{algorithm2e}
+% (custom)
+\input std-macros.tex
+\input macros.tex	
+% (paper compilation hacks)
+\def\newcite#1{\citet{#1}}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.4}
+
+
+
+% -- Document --
+\begin{document}
+
+% Title
+\title{Neural Machine Translation}
+\author{Minh-Thang Luong}
+\principaladviser{Christopher D. Manning}
+\firstreader{Dan Jurafsky}
+\secondreader{Andrew Ng}
+\thirdreader{Quoc V. Le}
+
+% Preface
+\beforepreface
+%\input preface.tex
+%\input ack.tex
+\afterpreface
+
+
+% -- Sections --
+%% Introduction
+\input intro.tex
+\cite{luong13,luong15,luong15attn,li15,luong15iwslt,luong16iclr,luong16}
+
+%
+%% Related Work
+%\input related.tex
+
+%% Conclusion
+%\input conclude.tex
+
+
+% -- Appendix --
+\appendix
+
+
+\bibliographystyle{plainnat}
+\bibliography{ref}
+\end{document}
