@@ -27,7 +27,13 @@
 \def\newcite#1{\citet{#1}}
 \definecolor{darkblue}{rgb}{0.0,0.0,0.4}
 
-
+% Thang
+\usepackage{epigraph}
+\renewcommand{\epigraphsize}{\small}
+\setlength{\epigraphwidth}{0.8\textwidth}
+\newcommand{\error}[1]{{\color{red} #1}}
+\newcommand{\ngram}{$n$-gram}
+\newcommand{\word}[1]{``#1''}
 
 % -- Document --
 \begin{document}
@@ -48,15 +54,36 @@
 
 
 % -- Sections --
-%% Introduction
+\chapter{Introduction}
+\label{c:intro}
 \input intro.tex
-\cite{luong13,luong15,luong15attn,li15,luong15iwslt,luong16iclr,luong16}
 
-%
-%% Related Work
-%\input related.tex
+\chapter{Background}
+\label{c:background}
+%\input background.tex
 
-%% Conclusion
+\chapter{``Copy'' Mechanisms}
+%\chapter{The Sentence Length Problem}
+\label{c:copy}
+%\input copy.tex
+
+\chapter{Attention Mechanisms}
+%\chapter{The Sentence Length Problem}
+\label{c:attention}
+%\input attention.tex
+
+\chapter{Hybrid Neural Machine Translation} % Word-Character 
+%\chapter{The Language Complexity Problem}
+\label{c:hybrid}
+%\input hybrid.tex
+
+\chapter{Towards the Future of NMT}
+\label{c:future}
+%\input future.tex
+
+
+\chapter{Conclusion}
+\label{c:conclude}
 %\input conclude.tex
 
 
