@@ -4,7 +4,7 @@
 
 % -- Imports --
 % (general libraries)
-\usepackage{times,latexsym,amsfonts,amssymb,amsmath,graphicx,url,bbm,rotating}
+\usepackage{times,latexsym,amsfonts,amssymb,amsmath,graphicx,bbm,rotating}
 \usepackage{enumitem,multirow,hhline,stmaryrd,bussproofs,mathtools,siunitx,arydshln}
 \usepackage{booktabs,xcolor,csquotes}
 % (custom libraries)
@@ -29,11 +29,14 @@
 
 % Thang
 \usepackage{epigraph}
+\usepackage[hyphens]{url} % to split on hyphens for long urls
+\usepackage{hyperref}
 \renewcommand{\epigraphsize}{\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
 \newcommand{\error}[1]{{\color{red} #1}}
 \newcommand{\ngram}{$n$-gram}
 \newcommand{\word}[1]{``#1''}
+\newcommand{\unk}{$<$\texttt{unk}$>$}
 
 % -- Document --
 \begin{document}
@@ -62,7 +65,7 @@
 \label{c:background}
 \input{2-background.tex}
 
-\chapter{``Copy'' Mechanisms}
+\chapter{Copy Mechanisms}
 \label{c:copy}
 \input{3-copy.tex}
 
@@ -70,11 +73,11 @@
 \label{c:attention}
 \input{4-attention.tex}
 
-\chapter{Hybrid Neural Machine Translation}
+\chapter{Hybrid Models}
 \label{c:hybrid}
 \input{5-hybrid.tex}
 
-\chapter{Towards the Future of NMT}
+\chapter{NMT Future}
 \label{c:future}
 \input{6-future.tex}
 
