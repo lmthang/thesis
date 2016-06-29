@@ -30,9 +30,10 @@ path of % development
 MT which crosses through techniques that are used extensively in
 commercial MT systems. 
 
+\section{Machine Translation Development}
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/mt} % , angle=-90
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/mt.eps} % , angle=-90
 \caption[A general setup of machine translation]{{\bf Machine translation} (MT) -- a general setup of MT. Systems
 build translation models from parallel corpora to translate new unseen
 sentences, e.g., \word{She loves cute cats}.}
@@ -60,7 +61,8 @@ likely to go with one another.
 
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0 0]{img/phrasemt} % , angle=-90
+\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0
+0]{img/phrasemt.eps} % , angle=-90
 \caption[Phrase-based machine translation]{{\bf Phrase-based machine translation} (MT) -- example of how phrase-based
 MT systems translate a source sentence \word{She loves cute cats} into a target sentence
 \word{Elle aime les chats mignons}: sentences are split into chunks and phrases
@@ -97,7 +99,7 @@ uncertainty in predicting next words (see Figure~\ref{f:nnjm}).\footnote{In
 target words and 11 source words, effectively building a $15$-gram LM.}
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/nnjm} % , angle=-90
+\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/nnjm.eps} % , angle=-90
 \caption[Source-conditioned neural language model]{{\bf Source-conditioned neural language model} (NLM) -- example of a source-conditioned
 NLM proposed by \newcite{devlin14}. To evaluate a how likely a next word
 \word{rive} is, the model not only relies on previous target words (context)
@@ -146,7 +148,8 @@ this process in Figure~\ref{f:nmt}.
 
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/nmt_basic} % , angle=-90
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0
+0]{img/nmt_basic.eps} % , angle=-90
 \caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
 architecture proposed by \newcite{sutskever14} for
 translating a source sentence \word{I am a student} into a target sentence
@@ -166,7 +169,8 @@ sequences while not having to
 explicitly store any gigantic
 phrase tables or language models as in the case of standard MT.
 
-Despite all these advantages and potentials, the early NMT architecture
+\section{Thesis Outline}
+Despite all the aforementioned advantages and potentials, the early NMT architecture
 \cite{sutskever14,cho14} still has many drawbacks. In this thesis, I will
 highlight three problems pertaining to the existing NMT model, namely the
 {\it vocabulary size}, the {\it sentence length}, and the {\it

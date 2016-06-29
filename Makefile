@@ -1,10 +1,16 @@
 all: thesis.pdf
 
 clean:
-	rm -f *~ *.bak *.bbl *.aux *.log *.dvi *.ps *.blg *.out thesis.pdf
+	rm -f *~ *.bak *.bbl *.aux *.log *.dvi *.pdf *.ps *.blg *.out
 
-thesis.pdf: *.bib *.tex img/*.eps
-	pdflatex thesis.tex
+thesis.pdf: thesis.ps
+	ps2pdf thesis.ps thesis.pdf
+
+thesis.ps: thesis.dvi
+	dvips -t a4 -o thesis.ps thesis.dvi 
+
+thesis.dvi: thesis.bib *.tex img/*.eps 
+	-latex thesis.tex
 	bibtex thesis
-	pdflatex thesis.tex
-	pdflatex thesis.tex
+	latex thesis.tex
+	latex thesis.tex

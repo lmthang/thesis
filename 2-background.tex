@@ -1,0 +1,277 @@
+In this chapter, we provide background knowledge on two main topics: recurrent
+neural networks (RNNs) and neural machine translation (NMT).
+We first go through the basics of RNNs, explaining how they can be used to model sentences. 
+Then we delve into details of one particular type of RNNs, the Long Short-term Memory, that makes training RNNs easier.
+Given RNNs as a building block, we discuss NMT together with tips and tricks for better training and testing NMT.
+
+\section{Recurrent Neural Network}
+\begin{figure}[tbh!]
+\centering
+%\psgrid
+\rput(7.1,2.6){{\color{lightblue} $\MB{W_{hh}}$}}
+\rput(8.6,1.0){{\color{lightgreen} $\MB{W_{xh}}$}}
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
+\caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
+architecture proposed by \newcite{sutskever14} for
+translating a source sentence \word{I am a student} into a target sentence
+\word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
+} 
+\label{f:rnn}
+\end{figure}
+
+RNN \cite{elman90} is the model that takes as input a sequence of signals $x_1,
+x_2, ..., x_n \in \mathbb{R}^{d}$ and processes them in the order they are
+given. RNN maintains a sequence of latent states $h_1, h_2, ..., h_n$, which it
+computes by a recurrent function
+
+\begin{align}
+\MB{h_t} = \sigma \open{\rnn
+\begin{bmatrix}
+  \MB{x_t} \\
+  \MB{h_{t-1}}
+ \end{bmatrix}
+}
+\end{align}
+
+Here, $\rnn$ is the RNN parameter matrix, which decomposes into ``input''
+connections $\MB{W}_xh$ and ``recurrent'' connections $\MB{W}_hh$.
+\begin{align}
+\rnn = [\MB{W_{xh}} \MB{W_{hh}}]
+\end{align}
+
+\subsection{Vanishing Gradient Problem}
+\begin{align}
+\MB{h}_t = \sigma \open{
+\MB{W_{xh}}\MB{x}_t + \MB{W_{hh}}\MB{h}_{t-1}
+}
+\end{align}
+
+\begin{align}
+\fracder{\MB{h}_t}{\MB{h}_{t-1}} = \diag\open{\sigma'(\ldots)}\tp{\MB{W_{hh}}}
+\end{align}
+
+\begin{align}
+\norm{\fracder{\MB{h}_t}{\MB{h}_{t-1}}} & \leq \norm{\diag\open{\sigma'(\ldots)}} 
+\norm{\tp{\MB{W_{hh}}}} \\ 
+& \leq \gamma \lambda_1
+\end{align}
+
+\begin{align}
+\norm{\fracder{\MB{h}_t}{\MB{h}_{t-k}}} \leq \open{\gamma \lambda_1}^{k}
+\rightarrow 0 & \quad \text{ if } \lambda_1 < \frac{1}{\gamma}
+\end{align}
+
+\begin{align}
+\fracder{\MB{c}_t}{\MB{c}_{t-1}} = \MB{I}
+\end{align}
+
+\subsection{Long Short-Term Memory}
+We use the formulation of \cite{zaremba14}.
+For a single LSTM block at layer $l$ and time $t$, the new hidden state $\hlt$ and memory cell $\clt$ are calculated from $\MB{h_t^{l-1}}$, $\MB{h_{t-1}^l}$ and $\MB{c_{t-1}^l}$ like so:
+\begin{align}
+\label{eqn:LSTMdef1}
+\begin{pmatrix}
+\ilt \\
+\flt \\
+\olt \\
+\glt
+\end{pmatrix}
+&= 
+\begin{pmatrix}
+\sigm \\
+\sigm \\
+\sigm \\
+\tanh
+\end{pmatrix}
+\MB{T}_{4n \times 2n}
+\begin{bmatrix}
+  \MB{h_t^{l-1}} \\
+  \MB{h_{t-1}^l}
+ \end{bmatrix} \\
+\clt &= \flt \circ \MB{c_{t-1}^l} + \ilt \circ \glt \\
+\hlt &= \olt \circ \tanh(\clt)
+\end{align}
+where $\sigm$ and $\tanh$ are applied element-wise, $\circ$ denotes element-wise multiplication, 
+and $\MB{T}_{4n \times 2n}$ is a $4n \times 2n$ matrix of weights that depends on $l$ but not $t$.\footnote{Note: Sometimes these equations are written omitting the superscript $l$ and writing $\MB{h_t^{l-1}}$ as $x_t$, but for the purposes of deriving the back-propagation equations, we need to refer to the layer $l$ explicitly.}
+If $l=1$ then $\MB{h_t^{l-1}}$ is the input vector $x_t$.
+If $t=1$ then $\MB{h_{t-1}^l}$ and $\MB{c_{t-1}^l}$ are taken to be zero.
+
+An LSTM block at layer $l \in \{1, \dots L\}$ and time $t \in \{1, \dots T\}$ consists of:
+\begin{itemize}
+\item The hidden state $\hlt \in \mathbb{R}^n$
+\item The memory cell $\clt \in \mathbb{R}^n$
+\item The input gate $\ilt \in [0,1]^n$
+\item The forget gate $\flt \in [0,1]^n$
+\item The output gate $\olt \in [0,1]^n$
+\item The input modulation gate $\glt \in [0,1]^n$
+\end{itemize}
+We call $n$ the LSTM block size.
+
+\subsection{LSTM Backpropation}
+$\MB{\delta_{c^{(2)}}}$
+
+$\MB{\delta_{h^{(2)}}}$
+
+$\MB{\delta_{c^{(1)}}}$
+
+$\MB{\delta_{h^{(1)}}}$
+
+$\MB{\delta_{c}} \pluseq \MB{\delta_{h}}\MB{o_t}\tanh'(\MB{c_t}) $
+
+$\MB{\delta_{c}} = \MB{\delta_{c}} \circ \MB{f_t} $
+
+$\MB{\delta_{h}} \pluseq \text{upper grad}$
+
+
+\section{Neural Machine Translation}
+\begin{figure}[tbh!]
+\centering
+\includegraphics[width=0.8\textwidth, clip=true, trim= 0 0 0
+0]{img/nmt_very_details.eps} % , angle=-90
+\caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
+architecture proposed by \newcite{sutskever14} for
+translating a source sentence \word{I am a student} into a target sentence
+\word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
+} 
+\label{f:nmt_details}
+\end{figure}
+
+
+Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
+a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
+It accomplishes such goal through the {\it encoder-decoder} framework \cite{sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
+for each source sentence. Based on that source representation,
+the {\it decoder} generates a translation, one target word at a time, and hence, decomposes the conditional probability as:
+\begin{equation}
+\log p(\tgt{}|\src{}) = \sum_{j=1}^m \nolimits \log
+p\open{\tgt{j}|\tgt{<j},\src{},\MB{s}}
+\end{equation}
+
+A natural choice to model such a decomposition in the decoder is to use a
+recurrent neural network (RNN) architecture, which most of the recent NMT work have in common. They,
+however, differ in terms of the RNN architectures used and how the encoder computes the source representation $\MB{s}$.
+%, e.g., vanilla RNN, long-short term memory (LSTM) \cite{lstm97} or gated recurrent units \cite{cho14}
+
+Kalchbrenner and Blunsom \cite{kal13} used an RNN with the vanilla RNN unit for the decoder and a
+convolutional neural network for encoding the source. On
+the other hand, Sutskever et al. \cite{sutskever14} and Luong et al.
+\cite{luong15,luong15attn} built deep RNNs with the Long Short-Term Memory (LSTM) unit
+\cite{lstm97} for both the encoder and the decoder. Cho et al., \cite{cho14}, Bahdanau et al.,
+\cite{bog15}, and Jean et al. \cite{jean15,mono15} all adopted an
+LSTM-inspired hidden unit, the gated recurrent unit (GRU), and used bidirectional
+RNNs for the encoder.
+%\footnote{They all used a single RNN layer except for the latter two
+%works which utilized a bidirectional RNN for the encoder.}
+
+In more details, considering the top recurrent layer in a deep RNN architecture, one can compute the probability of decoding each target word $y_j$ as:
+\begin{equation}
+p\left(\tgt{j}|\tgt{<j},\src{},\MB{s}\right) = \softmax\open{\hd{j}}
+\end{equation}
+%with $g$ being the transformation function that outputs a vocabulary-sized
+%vector.\footnote{One can provide $g$ with other inputs such as the currently
+%predicted word $\tgt{j}$ as in \cite{bog15}.} 
+with $\hd{j}$ being the current target hidden state computed as:
+\begin{equation}
+\label{e:rnn}
+\hd{j} = f(\hd{j-1}, \tgt{j-1}, \MB{s})
+\end{equation}
+Here, $f$ derives the current state given the previous state
+$\hd{j-1}$, the
+current input (often the previous word $\tgt{t-1}$), and optionally, the source
+representation $\MB{s}$.
+$f$ can be a vanilla RNN unit, a GRU, or an LSTM. 
+The early NMT approach  \cite{kal13,sutskever14,cho14,luong15} uses the last source hidden state
+$\MB{s}=\hb{n}$ once to initialize the decoder hidden state and sets $\MB{s}=[\text{ }]$ in
+\eq{e:rnn}.
+
+\subsection{Training}
+The training objective is formulated as follows:
+\begin{equation}
+J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
+\label{e:j_t}
+\end{equation}
+with $\mathbb{D}$ being our parallel training corpus.
+
+mention bucketing and batching
+
+\subsection{Testing}
+
+mention beam-search, ensemble
+
+\begin{figure}[tbh!]
+\centering
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0
+0]{img/nmt_test.eps} % , angle=-90
+\caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
+architecture proposed by \newcite{sutskever14} for
+translating a source sentence \word{I am a student} into a target sentence
+\word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
+} 
+\label{f:nmt_details}
+\end{figure}
+
+
+%\section{Backward Propagation}
+%\input{2-backwardprop}
+
+%\section{Other Recurrent Units}
+%Different recurrent units:
+%
+%GRU \cite{cho14}
+%\begin{align}
+%\begin{pmatrix}
+%\MB{z_t} \\
+%\MB{r_t} \\
+%\end{pmatrix}
+%&= 
+%\begin{pmatrix}
+%\sigm \\
+%\sigm \\
+%\end{pmatrix}
+%\MB{T}_{2n \times 2n}
+%\begin{bmatrix}
+%  \MB{x_t} \\
+%  \MB{h_{t-1}}
+% \end{bmatrix} \\ 
+%\MB{\hat{h}_t} &= \tanh(\MB{W} \MB{x_t} + \MB{r_t} \circ \MB{U}\MB{h_{t-1}}) \\
+%\MB{h_t} &= \MB{z_t} \circ \MB{h_{t-1}} + (1-\MB{z_t}) \circ \MB{\hat{h}_t}
+%\end{align}
+%
+%My unit (maybe we should try to implement this!)
+%\begin{align}
+%\begin{pmatrix}
+%\MB{i_t} \\
+%\MB{f_t} \\
+%\MB{\hat{h}_t} \\
+%\end{pmatrix}
+%&= 
+%\begin{pmatrix}
+%\sigm \\
+%\sigm \\
+%\tanh
+%\end{pmatrix}
+%\MB{T}_{3n \times 2n}
+%\begin{bmatrix}
+%  \MB{x_t} \\
+%  \MB{h_{t-1}}
+% \end{bmatrix} \\
+%\MB{h_t} &= \MB{f_t} \circ \MB{h_{t-1}} + \MB{i_t} \circ \MB{\hat{h}_t}
+%\end{align}
+
+%\subsection{Attention}
+%Content-based
+%\begin{align}
+%\al = Attend(\hd{t-1}, \MB{\bar{h}}_{1 \ldots S}) 
+%\end{align}
+%
+%Location-based
+%\begin{align}
+%\al = Attend(\hd{t-1}, \MB{a}_{t-1})
+%\end{align}
+%
+%Hybrid
+%\begin{align}
+%\al = Attend(\hd{t-1}, \MB{a}_{t-1}, \MB{\bar{h}}_{1 \ldots S})
+%\end{align}
+
+

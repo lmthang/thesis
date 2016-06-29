@@ -27,16 +27,91 @@
 \def\newcite#1{\citet{#1}}
 \definecolor{darkblue}{rgb}{0.0,0.0,0.4}
 
-% Thang
+%% Thang
 \usepackage{epigraph}
 \usepackage[hyphens]{url} % to split on hyphens for long urls
 \usepackage{hyperref}
+\usepackage{pstricks} % for overlay latex on top of images
+
 \renewcommand{\epigraphsize}{\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
+
+\definecolor{lightgreen}{HTML}{44B178}
+\definecolor{lightblue}{HTML}{3B8CDA}
 \newcommand{\error}[1]{{\color{red} #1}}
 \newcommand{\ngram}{$n$-gram}
 \newcommand{\word}[1]{``#1''}
 \newcommand{\unk}{$<$\texttt{unk}$>$}
+\newcommand{\eos}{$<$\texttt{eos}$>$}
+\newcommand{\eq}[1]{Eq.~(\ref{#1})}
+
+% math operators
+%\DeclareMathOperator*{\argmax}{\arg\,\max}
+%\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\trace}{Tr}
+\DeclareMathOperator{\sigm}{sigm}
+\DeclareMathOperator{\softmax}{softmax}
+
+% math
+\newcommand{\MB}[1]{\mbox{\boldmath{$#1$}}} % boldface for matrix and vectors
+% derivative fractions
+\newcommand{\parfrac}[1]{\frac{\partial}{\partial #1}} 
+% fraction derivatives
+\newcommand{\fracder}[2]{\frac{\partial #1}{\partial #2}}
+% sum and product
+\newcommand{\sumkn}{\sum_{k=1}^{n}} %I use this when deriving backprop eqns. n is the LSTM block size and k is a better choice than i because it won't get confused with the input gate
+% plus equal
+\newcommand{\pluseq}{\mathrel{+}=}
+% transpose
+\newcommand{\tp}[1]{\MB{#1}^\top}
+% round bracket
+\newcommand{\open}[1]{\left(#1\right)}
+% norm
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+% NMT
+\newcommand{\tgt}[1]{y_{#1}} % target word
+\newcommand{\src}[1]{x_{#1}} % source word
+\newcommand{\al}{\MB{a}_{t}} % align
+\newcommand{\hi}{\MB{h}_{t}} % hidden top
+\newcommand{\his}{\MB{\bar{h}}_{s}} % hidden top source
+\newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
+\newcommand{\hb}[1]{\MB{\bar{h}}_{#1}} % hidden source
+\newcommand{\rnn}{\MB{T}_{d \times 2d}} % hidden top
+\newcommand{\lstm}{\MB{T}_{4d \times 2d}} % hidden top
+
+
+%% Abi
+\usepackage{amsthm} %for the proof environment
+%theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{claim}{Claim}
+\newtheorem{corollary}{Corollary}
+
+% lstm
+\newcommand{\ilt}{\MB{i^l_t}}
+\newcommand{\flt}{\MB{f^l_t}}
+\newcommand{\olt}{\MB{o^l_t}}
+\newcommand{\glt}{\MB{\hat{h}^l_t}}
+\newcommand{\hlt}{\MB{h^l_t}}
+\newcommand{\clt}{\MB{c^l_t}}
+
+\newcommand{\dilt}{\MB{\delta_i^l(t)}}
+\newcommand{\dflt}{\MB{\delta_f^l(t)}}
+\newcommand{\dolt}{\MB{\delta_o^l(t)}}
+\newcommand{\dglt}{\MB{\delta_{\hat{h}}^l(t)}}
+\newcommand{\dhlt}{\MB{\delta_h^l(t)}}
+\newcommand{\dclt}{\MB{\delta_c^l(t)}}
+
+\newcommand{\zilt}{z_i^l(t)}
+\newcommand{\zflt}{z_f^l(t)}
+\newcommand{\zolt}{z_o^l(t)}
+\newcommand{\zglt}{z_{\hat{h}}^l(t)}
+\newcommand{\zhlt}{z_h^l(t)}
+\newcommand{\zclt}{z_c^l(t)}
+
 
 % -- Document --
 \begin{document}
