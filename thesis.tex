@@ -29,12 +29,19 @@
 
 %% Thang
 \usepackage{epigraph}
-\usepackage[hyphens]{url} % to split on hyphens for long urls
-\usepackage{hyperref}
-\usepackage{pstricks} % for overlay latex on top of images
-
 \renewcommand{\epigraphsize}{\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
+\usepackage{pstricks} % for overlay latex on top of images
+
+% to split on hyphens for long urls
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\makeatother
+% the below works for pdflatex
+%\usepackage[hyphens]{url} 
+%\usepackage{hyperref}
+
 
 \definecolor{lightgreen}{HTML}{44B178}
 \definecolor{lightblue}{HTML}{3B8CDA}
