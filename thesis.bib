@@ -39,7 +39,7 @@
 
 @article{ling15char,
   author       = {Wang Ling and Isabel Trancoso and Chris Dyer and Alan Black},
-  journaltitle = {arXiv preprint arXiv:1511.04586},
+  journal = {arXiv preprint arXiv:1511.04586},
   title        = {Character-based Neural Machine Translation},
   year         = {2015},
 }
@@ -67,7 +67,7 @@
 
 @article{gulcehre2015using,
   author       = {Gulcehre, Caglar and Firat, Orhan and Xu, Kelvin and Cho, Kyunghyun and Barrault, Loic and Lin, Huei-Chi and Bougares, Fethi and Schwenk, Holger and Bengio, Yoshua},
-  journaltitle = {arXiv preprint arXiv:1503.03535},
+  journal = {arXiv preprint arXiv:1503.03535},
   title        = {On Using Monolingual Corpora in Neural Machine Translation},
   year         = {2015},
 }
@@ -116,7 +116,7 @@
 
 @article{forcada97,
   author       = {Mikel L. Forcada and Ram\'{o}n \~{N}eco},
-  journaltitle = {Biological and Artificial Computation: From Neuroscience to
+  journal = {Biological and Artificial Computation: From Neuroscience to
 Technology},
   publisher = {Springer},
   pages        = {453--462},
@@ -184,16 +184,15 @@ translation},
 }
 @article{graves14,
   author       = {A. Graves and G. Wayne and I. Danihelka},
-  journaltitle = {arXiv preprint arXiv:1410.5401},
+  journal = {arXiv preprint arXiv:1410.5401},
   title        = {Neural Turing Machines},
   year         = {2014},
 }
 
 @article{zaremba14,
   author       = {Wojciech Zaremba and Ilya Sutskever and Oriol Vinyals},
-  journaltitle = {CoRR},
+  journal = {arXiv preprint arXiv:1409.2329},
   title        = {Recurrent Neural Network Regularization},
-  volume       = {abs/1409.2329},
   year         = {2014},
 }
 
@@ -213,29 +212,36 @@ translation},
 }
 
 @article{razvan,
-  author       = {R. Pascanu and T. Mikolov and Y. Bengio},
-  journaltitle = {arXiv preprint arXiv:1211.5063},
+  author       = {R. Pascanu and Tom{\'{a}}{\v{s}} Mikolov and Y. Bengio},
+  journal = {arXiv preprint arXiv:1211.5063},
   title        = {On the difficulty of training recurrent neural networks},
   year         = {2012},
 }
 
 @inproceedings{mikolovLM,
-  author    = {Mikolov, Tomas and Zweig, Geoffrey},
+  author    = {Mikolov, Tom{\'{a}}{\v{s}} and Zweig, Geoffrey},
   booktitle = {SLT},
   title     = {Context dependent recurrent neural network language model},
   year      = {2012},
 }
 
 @inproceedings{MikolovKBCK11,
-  author    = {Mikolov, Tomas and Kombrink, Stefan and Burget, Lukas and Cernocký, Jan and Khudanpur, Sanjeev},
+  author    = {Mikolov, Tom{\'{a}}{\v{s}} and Kombrink, Stefan and Burget, Lukas and Cernocký, Jan and Khudanpur, Sanjeev},
   booktitle = {ICASSP},
   title     = {Extensions of recurrent neural network language model},
   year      = {2011},
 }
 
+@InProceedings{Sutskever11,
+  author =    {Ilya Sutskever and James Martens and Geoffrey Hinton},
+  title =     {Generating Text with Recurrent Neural Networks },
+  booktitle = {ICML},
+  year =      {2011},
+}
+
 @inproceedings{MikolovKBCK10,
-  author    = {Mikolov, Tomas and Martin Karafiát and Burget, Lukas and Cernocký, Jan and Khudanpur, Sanjeev},
-  booktitle = {INTERSPEECH},
+  author    = {Mikolov, Tom{\'{a}}{\v{s}} and Martin Karafiát and Burget, Lukas and Cernocký, Jan and Khudanpur, Sanjeev},
+  booktitle = {Interspeech},
   title     = {Recurrent neural network based language model},
   year      = {2010},
 }
@@ -243,7 +249,7 @@ translation},
 
 @article{lstm97,
   author       = {Hochreiter, Sepp and Schmidhuber, J\"{u}rgen},
-  journaltitle = {Neural Computation},
+  journal = {Neural Computation},
   number       = {8},
   pages        = {1735--1780},
   title        = {Long Short-Term Memory},
@@ -268,15 +274,6 @@ translation},
   title     = {{chrF: character n-gram F-score for automatic MT evaluation}},
   year      = {2015},
 }
-
-% ACL'14 best paper award, joint neural LM
-@inproceedings{devlin14,
-  author    = {J. Devlin and R. Zbib and Z. Huang and T. Lamar and R. Schwartz and J. Makhoul},
-  booktitle = {ACL},
-  title     = {Fast and Robust Neural Network Joint Models for Statistical Machine Translation},
-  year      = {2014},
-}
-
 
 % Winning entry in WMT'15 for English-Czech
 @inproceedings{bojar15wmt,
@@ -318,6 +315,21 @@ translation},
   title        = {statmt.org},
   year         = {2014},
 }
+
+% ACL'14 best paper award, joint neural LM
+@inproceedings{devlin14,
+  author    = {Jacob Devlin and Rabih Zbib and Zhongqiang Huang and Thomas Lamar and Richard Schwartz and John Makhoul},
+  booktitle = {ACL},
+  title     = {Fast and Robust Neural Network Joint Models for Statistical Machine Translation},
+  year      = {2014},
+}
+
+@inproceedings{Auli13,
+  author = {Auli, Michael and Galley, Michel and Quirk, Chris and Zweig, Geoffrey},
+  booktitle = {ACL},
+  title = {Joint Language and Translation Modeling with Recurrent Neural Networks.},
+  year = 2013
+}
 @inproceedings{green-EtAl:2013:ACL2013,
   author    = {Green, Spence and Wang, Sida and Cer, Daniel and Manning, Christopher D.},
   booktitle = {ACL},
@@ -340,12 +352,19 @@ translation},
 }
 
 @article{mikolov13mt,
-  author       = {Tomas Mikolov and Quoc V. Le and Ilya Sutskever},
+  author       = {Tom{\'{a}}{\v{s}} Mikolov and Quoc V. Le and Ilya Sutskever},
   ee           = {http://arxiv.org/abs/1309.4168},
-  journaltitle = {CoRR},
+  journal = {CoRR},
   title        = {Exploiting Similarities among Languages for Machine Translation},
   volume       = {abs/1309.4168},
   year         = {2013},
+}
+
+@inproceedings{heafield13,
+  author = {Kenneth Heafield and Ivan Pouzyrevsky and Jonathan H. Clark and Philipp Koehn},
+  title = {Scalable Modified {Kneser-Ney} Language Model Estimation},
+  year = {2013},
+  booktitle = {ACL},
 }
 
 @inproceedings{Schwenk12continuous,
@@ -362,6 +381,14 @@ translation},
   year      = {2012},
 }
 
+
+@inproceedings{Pauls2011,
+ author = {Pauls, Adam and Klein, Dan},
+ title = {Faster and Smaller N-gram Language Models},
+ booktitle = {ACL},
+ year = {2011},
+} 
+
 % kenlm
 @inproceedings{kenlm,
   author = {Kenneth Heafield},
@@ -372,7 +399,7 @@ translation},
 
 % Phrasal
 @inproceedings{cer10phrasal,
-  author    = {D. Cer and M. Galley and D. Jurafsky and C. D. Manning},
+  author    = {Daniel Cer and Michel Galley and Daniel Jurafsky and Christopher D. Manning},
   booktitle = {ACL, Demonstration Session},
   title     = {Phrasal: A statistical machine translation toolkit for exploring new model features},
   year      = {2010},
@@ -385,6 +412,14 @@ translation},
   title     = {cdec: A decoder, alignment, and learning framework for finite-state and context-free translation models},
   year      = {2010},
 }
+
+@inproceedings{irstlm,
+  author = {Federico, Marcello and Bertoldi, Nicola and Cettolo, Mauro},
+  booktitle = {Interspeech},
+  title = {{IRSTLM}: an open source toolkit for handling large scale language models},
+  year = 2008
+}
+
 
 @article{schwenk07,
  author = {Schwenk, Holger},
@@ -413,7 +448,7 @@ translation},
 % Hiero
 @article{chiang07hiero,
   author       = {David Chiang},
-  journaltitle = {Computational Linguistics},
+  journal = {Computational Linguistics},
   number       = {2},
   pages        = {201-228},
   title        = {Hierarchical phrase-based translation},
@@ -436,6 +471,13 @@ translation},
   year      = {2006},
 }
 
+@inproceedings{Teh2006,
+ author = {Teh, Yee Whye},
+ title = {A Hierarchical {Bayesian} Language Model Based on {Pitman-Yor} Processes},
+ booktitle = {ACL},
+ year = {2006},
+} 
+
 
 @inproceedings{Koehn:2003:SMT,
   author    = {Koehn, Philipp and Och, Franz Josef and Marcu, Daniel},
@@ -446,7 +488,7 @@ translation},
 
 @article{och03,
   author       = {Och, Franz Josef and Ney, Hermann},
-  journaltitle = {Computational Linguistics},
+  journal = {Computational Linguistics},
   number       = {1},
   pages        = {19-51},
   title        = {A Systematic Comparison of Various Statistical Alignment Models},
@@ -454,10 +496,28 @@ translation},
   year         = {2003},
 }
 
+% SRILM
+@inproceedings{srilm,
+    author = "Stolcke, Andreas",
+    title = "{SRILM} -- An Extensible Language Modeling Toolkit",
+    booktitle = "ICSLP",
+    year = "2002",
+}
+
+@inproceedings{Rosenfeld2000,
+  author = {Rosenfeld, Ronald},
+  booktitle = {IEEE},
+  pages = {1270-1278},
+  title = {Two decades of statistical language modeling: Where do we go from
+  here?},
+  volume = 88,
+  year = 2000
+}
+
 % "the" SMT paper
 @article{Brown:1993:MSM,
   author       = {Brown, Peter F. and Pietra, Vincent J. Della and Pietra, Stephen A. Della and Mercer, Robert L.},
-  journaltitle = {Computational Linguistics},
+  journal = {Computational Linguistics},
   month        = {06},
   number       = {2},
   pages        = {263--311},
@@ -490,6 +550,16 @@ translation},
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Deep Learning / ML %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
+@misc{karpathy15rnn,
+  title = {The Unreasonable Effectiveness of Recurrent Neural Networks},
+  author = {Andrej Karpathy},
+  type = {Blog},
+  year = {2015},
+  howpublished =
+  {\url{http://karpathy.github.io/2015/05/21/rnn-effectiveness/}},
+  note = {Accessed: 2016-07-05}
+}
+  
 @inproceedings{bhsne,
   author    = {Laurens van der Maaten},
   booktitle = {ICLR},
@@ -507,14 +577,29 @@ translation},
 
 @article{hinton12,
   author       = {G. Hinton and L. Deng and D. Yu and G. Dahl and A. Mohamed and N. Jaitly and A. Senior and V. Vanhoucke and P. Nguyen and T. Sainath and B. Kingsbury},
-  journaltitle = {IEEE Signal Processing Magazine},
+  journal = {IEEE Signal Processing Magazine},
   title        = {Deep Neural Networks for Acoustic Modeling in Speech Recognition},
   year         = {2012},
 }
 
+@PHDTHESIS{mikolov12,
+   author = {Tom{\'{a}}{\v{s}} Mikolov},
+   school = {Brno University of Technology},
+   title = {Statistical Language Models Based on Neural Networks},
+   year = {2012},
+}
+
+@phdthesis{sutskever12,
+  author      = {Ilya Sutskever},
+  school = {University of Toronto},
+  title       = {Training Recurrent Neural Networks},
+  year        = {2012},
+}
+
+
 @article{gutmann12nce,
   author       = {Michael Gutmann and Aapo Hyvärinen},
-  journaltitle = {JMLR},
+  journal = {JMLR},
   pages        = {307-361},
   title        = {Noise-Contrastive Estimation of Unnormalized Statistical Models, with Applications to Natural Image Statistics},
   volume       = {13},
@@ -523,7 +608,7 @@ translation},
 
 @article{duchi11adagrad,
   author       = {John C. Duchi and Elad Hazan and Yoram Singer},
-  journaltitle = {JMLR},
+  journal = {JMLR},
   pages        = {2121-2159},
   title        = {Adaptive Subgradient Methods for Online Learning and Stochastic Optimization},
   volume       = {12},
@@ -546,7 +631,7 @@ translation},
 
 @article{goller:ieeenn00,
   author       = {Goller, C. and Küchler, A.},
-  journaltitle = {IEEE Transactions on Neural Networks},
+  journal = {IEEE Transactions on Neural Networks},
   pages        = {347--352},
   title        = {Learning Task-Dependent Distributed Representations by Backpropagation Through Structure},
   volume       = {1},
@@ -594,7 +679,7 @@ translation},
 % LDA
 @article{Blei:2003:LDA,
   author       = {Blei, David M. and Ng, Andrew Y. and Jordan, Michael I.},
-  journaltitle = {Journal of Machine Learning Research},
+  journal = {Journal of Machine Learning Research},
   pages        = {993--1022},
   title        = {Latent Dirichlet Allocation},
   volume       = {3},
@@ -604,7 +689,7 @@ translation},
 % PTB
 @article{Marcus:1993:BLA,
   author       = {Marcus, Mitchell P. and Marcinkiewicz, Mary Ann and Santorini, Beatrice},
-  journaltitle = {Computational Linguistics},
+  journal = {Computational Linguistics},
   number       = {2},
   pages        = {313--330},
   title        = {Building a Large Annotated Corpus of English: The Penn Treebank},
@@ -615,7 +700,7 @@ translation},
 % Brown clustering
 @article{Brown:1992:CNG,
   author       = {Brown, Peter F. and deSouza, Peter V. and Mercer, Robert L. and Pietra, Vincent J. Della and Lai, Jenifer C.},
-  journaltitle = {Computational Linguistics},
+  journal = {Computational Linguistics},
   number       = {4},
   pages        = {467--479},
   title        = {Class-based N-gram Models of Natural Language},
@@ -661,7 +746,7 @@ translation},
 @article{rafal16,
   author       = {Rafal Jozefowicz and Oriol Vinyals and Mike Schuster and Noam Shazeer
     and Yonghui Wu},
-  journaltitle = {arXiv preprint arXiv:1602.02410},
+  journal = {arXiv preprint arXiv:1602.02410},
   title        = {Exploring the Limits of Language Modeling},
   year         = {2016},
 }
@@ -720,7 +805,7 @@ translation},
 }
 
 @inproceedings{mikolov13iclr,
-  author    = {Tomas Mikolov and Kai Chen and Greg Corrado and Jeffrey Dean},
+  author    = {Tom{\'{a}}{\v{s}} Mikolov and Kai Chen and Greg Corrado and Jeffrey Dean},
   booktitle = {ICLR},
   title     = {Efficient Estimation of Word Representations in Vector Space},
   year      = {2013},
@@ -734,7 +819,7 @@ translation},
 }
 
 @inproceedings{mikolov13nips,
-  author    = {Tomas Mikolov and Ilya Sutskever and Kai Chen and Greg Corrado and Jeffrey Dean},
+  author    = {Tom{\'{a}}{\v{s}} Mikolov and Ilya Sutskever and Kai Chen and Greg Corrado and Jeffrey Dean},
   booktitle = {NIPS},
   title     = {Distributed Representations of Words and Phrases and their Compositionality},
   year      = {2013},
@@ -748,7 +833,7 @@ translation},
 }
 
 @inproceedings{mikolov13regularities,
-  author    = {Mikolov, Tomas and Yih, Wen-tau and Zweig, Geoffrey},
+  author    = {Mikolov, Tom{\'{a}}{\v{s}} and Yih, Wen-tau and Zweig, Geoffrey},
   booktitle = {NAACL-HLT},
   title     = {Linguistic Regularities in Continuous Space Word Representations},
   year      = {2013},
@@ -770,7 +855,7 @@ translation},
 
 @article{Collobert2011jmlr,
   author       = {R. Collobert and J. Weston and L. Bottou and M. Karlen and K. Kavukcuoglu and P. Kuksa},
-  journaltitle = {JMLR},
+  journal = {JMLR},
   pages        = {2493--2537},
   title        = {Natural Language Processing (Almost) from Scratch},
   volume       = {12},
@@ -841,6 +926,16 @@ translation},
   year      = {2008},
 }
 
+@article{Bengio08,
+  author = {Bengio, Yoshua and Sen\'{e}cal, Jean-S\'{e}bastien},
+  journal = {IEEE Trans. Neural Networks},
+  number = 4,
+  pages = {713-722},
+  title = {Adaptive Importance Sampling to Accelerate Training of a Neural Probabilistic Language Model.},
+  volume = 19,
+  year = 2008
+}
+
 @inproceedings{Mnih2007,
   author    = {Mnih, Andriy and Hinton, Geoffrey},
   booktitle = {ICML},
@@ -849,34 +944,20 @@ translation},
 }
 
 @inproceedings{Morin2005,
-  author    = {Morin, Frederic},
+  author    = {Morin, Frederic and Bengio, Yoshua},
   booktitle = {AISTATS},
-  title     = {Hierarchical probabilistic neural network language model. {AI}STATS'05},
+  title     = {Hierarchical probabilistic neural network language model},
   year      = {2005},
 }
 
 @article{Bengio2003,
-  author       = {Bengio, Y. and Ducharme, R. and Vincent, P. and Janvin, C.},
-  journaltitle = {JMLR},
+  author       = {Yoshua Bengio and R\'{e}jean Ducharme and Pascal Vincent and Christian Jauvin},
+  journal = {JMLR},
   pages        = {1137--1155},
   title        = {A neural probabilistic language model},
   volume       = {3},
   year         = {2003},
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -905,7 +986,7 @@ translation},
 
 @article{ando05,
   author       = {Ando, Rie Kubota and Zhang, Tong},
-  journaltitle = {JMLR},
+  journal = {JMLR},
   pages        = {1817--1853},
   title        = {A Framework for Learning Predictive Structures from Multiple Tasks and Unlabeled Data},
   volume       = {6},
@@ -956,7 +1037,7 @@ translation},
 
 @article{argyriou08,
   author       = {Argyriou, Andreas and Evgeniou, Theodoros and Pontil, Massimiliano},
-  journaltitle = {Machine Learning},
+  journal = {Machine Learning},
   number       = {3},
   pages        = {243--272},
   title        = {Convex multi-task feature learning},
@@ -980,7 +1061,7 @@ translation},
 
 @article{yuan12,
   author       = {Xiao{-}Tong Yuan and Xiaobai Liu and Shuicheng Yan},
-  journaltitle = {{IEEE} Transactions on Image Processing},
+  journal = {{IEEE} Transactions on Image Processing},
   number       = {10},
   title        = {Visual Classification With Multitask Joint Sparse Representation},
   volume       = {21},
@@ -996,7 +1077,7 @@ translation},
 
 @article{zhang12convex,
   author       = {Zhang, Yu and Yeung, Dit-Yan},
-  journaltitle = {CoRR},
+  journal = {CoRR},
   title        = {A Convex Formulation for Learning Task Relationships in Multi-Task Learning},
   volume       = {abs/1203.3536},
   year         = {2012},
@@ -1025,14 +1106,14 @@ translation},
 
 @article{lounici09,
   author       = {Lounici, K. and Pontil, M. and Tsybakov, A. B. and Van De Geer, S.},
-  journaltitle = {COLT},
+  journal = {COLT},
   title        = {{Taking advantage of sparsity in multi-task learning}},
   year         = {2009},
 }
 
 @article{caruana97,
   author       = {Caruana, Rich},
-  journaltitle = {Machine Learning},
+  journal = {Machine Learning},
   number       = {1},
   pages        = {41--75},
   title        = {Multitask Learning},
@@ -1074,7 +1155,7 @@ translation},
 
 @article{Kim:2004:LTL,
   author       = {Kim, Woosung and Khudanpur, Sanjeev},
-  journaltitle = {Transactions on Asian Language Information Processing},
+  journal = {Transactions on Asian Language Information Processing},
   month        = {06},
   number       = {2},
   pages        = {94--112},
@@ -1093,7 +1174,7 @@ translation},
 
 @article{Turney:2010:FMV,
   author       = {Turney, Peter D. and Pantel, Patrick},
-  journaltitle = {Journal of Artificial Intelligence Research},
+  journal = {Journal of Artificial Intelligence Research},
   number       = {1},
   pages        = {141--188},
   title        = {From Frequency to Meaning: Vector Space Models of Semantics},
@@ -1131,7 +1212,7 @@ translation},
 
 @article{tackstrom-etal-2013,
   author       = {Oscar T\"{a}ckstr\"{o}m and Dipanjan Das and Slav Petrov and Ryan McDonald and Joakim Nivre},
-  journaltitle = {Transactions of the Association for Computational Linguistics},
+  journal = {Transactions of the Association for Computational Linguistics},
   pages        = {1-12},
   title        = {Token and Type Constraints for Cross-Lingual Part-of-Speech Tagging},
   volume       = {1},
@@ -1140,7 +1221,7 @@ translation},
 
 @article{Pado:2009:crossSRL,
   author       = {Pad\'{o}, Sebastian and Lapata, Mirella},
-  journaltitle = {Journal of Artificial Intelligence Research},
+  journal = {Journal of Artificial Intelligence Research},
   number       = {1},
   pages        = {307--340},
   title        = {Cross-lingual Annotation Projection of Semantic Roles},
@@ -1150,7 +1231,7 @@ translation},
 
 @article{LevowOR05:crossIR,
   author       = {Levow, Gina-Anne and Oard, Douglas W. and Resnik, Philip},
-  journaltitle = {Information Processing and Management},
+  journal = {Information Processing and Management},
   number       = {3},
   pages        = {523-547},
   title        = {Dictionary-based techniques for cross-language information retrieval},
@@ -1280,7 +1361,7 @@ translation},
 
 @article{miller-91,
   author       = {Miller, George A. and Charles, Walter G.},
-  journaltitle = {Language and Cognitive Processes},
+  journal = {Language and Cognitive Processes},
   number       = {1},
   pages        = {1--28},
   title        = {{Contextual correlates of semantic similarity}},
@@ -1290,7 +1371,7 @@ translation},
 
 @article{FinkelsteinGMRSWR02ws353,
   author       = {Finkelstein, Lev and Gabrilovich, Evgeniy and Matias, Yossi and Rivlin, Ehud and Solan, Zach and Wolfman, Gadi and Ruppin, Eytan},
-  journaltitle = {ACM Transactions on Information Systems},
+  journal = {ACM Transactions on Information Systems},
   number       = {1},
   pages        = {116-131},
   title        = {Placing search in context: the concept revisited},
@@ -1301,7 +1382,7 @@ translation},
 @article{Rubenstein:1965:CCS,
   author       = {Rubenstein, Herbert and Goodenough, John B.},
   issue_date   = {Oct. 1965},
-  journaltitle = {Communications of the ACM},
+  journal = {Communications of the ACM},
   number       = {10},
   pages        = {627--633},
   title        = {Contextual correlates of synonymy},
@@ -1311,7 +1392,7 @@ translation},
 
 @article{Rohde06animproved,
   author       = {Douglas L. T. Rohde and Laura M. Gonnerman and David C. Plaut},
-  journaltitle = {Communications of the ACM},
+  journal = {Communications of the ACM},
   pages        = {627--633},
   title        = {An improved model of semantic similarity based on lexical co-occurence},
   volume       = {8},
@@ -1320,14 +1401,14 @@ translation},
 
 @article{Miller1995,
   author       = {Miller, G.A.},
-  journaltitle = {Communications of the ACM},
+  journal = {Communications of the ACM},
   title        = {{WordNet: A Lexical Database for English}},
   year         = {1995},
 }
 
 @article{nelson2005wha,
   author       = {Nelson, D.L. and Dyrdal, G.M. and Goodmon, L.B.},
-  journaltitle = {Psychon Bull Rev},
+  journal = {Psychon Bull Rev},
   number       = {4},
   pages        = {711-719},
   title        = {What is preexisting strength? Predicting free association probabilities, similarity ratings, and cued recall probabilities.},
@@ -1360,7 +1441,7 @@ translation},
 %%% Uncategorized %%%
 @article{jan14,
   author       = {Jan Chorowski and Dzmitry Bahdanau and Kyunghyun Cho and Yoshua Bengio},
-  journaltitle = {CoRR},
+  journal = {CoRR},
   title        = {End-to-end Continuous Speech Recognition using Attention-based Recurrent {NN:} First Results},
   volume       = {abs/1412.1602},
   year         = {2014},
@@ -1368,7 +1449,7 @@ translation},
 
 @article{fraser07,
   author       = {Fraser, Alexander and Marcu, Daniel},
-  journaltitle = {Computational Linguistics},
+  journal = {Computational Linguistics},
   number       = {3},
   pages        = {293--303},
   title        = {Measuring Word Alignment Quality for Statistical Machine Translation},
@@ -1433,7 +1514,7 @@ translation},
 @article{Creutz:2007,
   author       = {Creutz, Mathias and Lagus, Krista},
   issue        = {1},
-  journaltitle = {ACM Transactions on Speech and Language Processing},
+  journal = {ACM Transactions on Speech and Language Processing},
   pages        = {3:1--3:34},
   title        = {Unsupervised models for morpheme segmentation and morphology learning},
   volume       = {4},
@@ -1463,7 +1544,7 @@ translation},
 
 @article{plunkett91ushaped,
   author       = {Plunkett, K. and Marchman, V.},
-  journaltitle = {Cognition},
+  journal = {Cognition},
   number       = {1},
   pages        = {43--102},
   priority     = {3},

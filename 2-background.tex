@@ -1,28 +1,75 @@
-In this chapter, we provide background knowledge on two main topics: recurrent
-neural networks (RNNs) and neural machine translation (NMT).
+\epigraph{For Neural Machine Translation, it all started from language
+modeling.}{Thang Luong.}
+
+Language modeling plays an
+indispensable role in ensuring that machine translation systems produce fluent target
+sentences and has always been an active area of research.
+Despite much effort in improving traditional \ngram{} language models
+\cite{rosenfeld2000,srilm,teh2006,irstlm,kenlm,pauls2011,heafield13},
+traditional LMs inherently can only handle short
+contexts of a few words. Approaches to building \nlmtext{} (\nlms) using
+feed-forward networks such as those initiated by \newcite{Bengio2003} and
+enhanced by others \cite{Morin2005,Bengio08,MnihHinton2009,MnihTeh2012} have %,Mnih2007
+addressed that drawback to model longer contexts.
+% worked great compared to traditional \ngram{} language models. 
+Still, \nlms{} can only capture fixed-length contexts and is
+incapable of handling variable-length sequences, which is the case for sentences.
+Recurrent neural networks (RNNs) come in handy as a powerful and expressive
+architecture to handle sequential data and have successfully been applied to the
+language modeling task \cite{MikolovKBCK10,MikolovKBCK11,mikolovLM}.
+By viewing RNNs as generative models \cite{Sutskever11} that can produce texts 
+and by pushing another step towards conditioning RNNs on source sentences, recent works
+\cite{kal13,sutskever14,cho14} have started a new line of resesarch in machine translation, namely Neural
+Machine Translation (NMT). NMT is technically a source-conditioned \nlm{} that
+can be trained end-to-end.
+
+%A key aspect of machine translation is to be able to produce fluent and
+%native-sounding target sentences. In this regard, 
+%For machine translation systems to produce fluent target sentences, 
+
+%Early success of feed-forward \nlms{} has led to widespread adoption of \nlms{}
+%as an additional component in the machine translation pipeline
+%such as \cite{schwenk07,vaswani13decode,luong15nlm}, inter alia.
+%\cite{Schwenk12continuous,Son:2012:CST,Auli13,devlin14}
+
+%in machine translation is to able to model the target language
+%accurately and effectively so that fluent and coherence translations can be
+%produced. 
+%As one of the main goals of machine translation is to be able to produce fluent
+%and coherent target sentences, better language modeling has been a core area in
+%MT research.
+%An important part in the machine translation pipeline is the ability to model language
+%coherence at the target side. 
+%As such, a significant amount of effort in
+%improving MT has centered around enhancing language modeling -- more specifically, the need to capture long-range
+%dependencies better. We start out with efforts to scale up traditional \ngram{} language models 
+
+In this chapter, we provide background knowledge on two main topics, RNN and NMT.
 We first go through the basics of RNNs, explaining how they can be used to model sentences. 
 Then we delve into details of one particular type of RNNs, the Long Short-term Memory, that makes training RNNs easier.
 Given RNNs as a building block, we discuss NMT together with tips and tricks for better training and testing NMT.
 
 \section{Recurrent Neural Network}
+Recurrent Neural Network (RNN) \cite{elman90} is the model that takes as input a
+sequence of vectors $x_1,
+x_2, ..., x_n \in \mathbb{R}^{d}$ and processes them in the order they are
+given. RNN maintains a sequence of hidden states $h_1, h_2, ..., h_n$, which it
+computes by a recurrent function.
+
 \begin{figure}[tbh!]
 \centering
 %\psgrid
 \rput(7.1,2.6){{\color{lightblue} $\MB{W_{hh}}$}}
 \rput(8.6,1.0){{\color{lightgreen} $\MB{W_{xh}}$}}
 \includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
-\caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
-architecture proposed by \newcite{sutskever14} for
-translating a source sentence \word{I am a student} into a target sentence
-\word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
+\caption[Recurrent neural networks]{{\bf Recurrent neural networks} -- example of a recurrent
+neural network that processes a sequence of input words \word{I am a student} to
+build up hidden representations as input symbols are consumed. The recurrent
+$\MB{W_{hh}}$ and feed-forward $\MB{W_{xh}}$ parameters are shared across
+timesteps.
 } 
 \label{f:rnn}
 \end{figure}
-
-RNN \cite{elman90} is the model that takes as input a sequence of signals $x_1,
-x_2, ..., x_n \in \mathbb{R}^{d}$ and processes them in the order they are
-given. RNN maintains a sequence of latent states $h_1, h_2, ..., h_n$, which it
-computes by a recurrent function
 
 \begin{align}
 \MB{h_t} = \sigma \open{\rnn
@@ -38,6 +85,10 @@ connections $\MB{W}_xh$ and ``recurrent'' connections $\MB{W}_hh$.
 \begin{align}
 \rnn = [\MB{W_{xh}} \MB{W_{hh}}]
 \end{align}
+
+For more details on RNNs, we refer readers to the following resources
+\cite{sutskever12,mikolov12,karpathy15rnn}.
+
 
 \subsection{Vanishing Gradient Problem}
 \begin{align}
