@@ -49,8 +49,10 @@
 \newcommand{\ngram}{$n$-gram}
 \newcommand{\word}[1]{``#1''}
 \newcommand{\unk}{$<$\texttt{unk}$>$}
+\newcommand{\sos}{$<$\texttt{sos}$>$}
 \newcommand{\eos}{$<$\texttt{eos}$>$}
 \newcommand{\eq}[1]{Eq.~(\ref{#1})}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
 \newcommand{\nlmtext}{neural probabilistic language models}
 \newcommand{\nlm}{NPLM}
 \newcommand{\nlms}{NPLMs}
@@ -58,8 +60,10 @@
 % math operators
 %\DeclareMathOperator*{\argmax}{\arg\,\max}
 %\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\e}{e}
 \DeclareMathOperator{\trace}{Tr}
 \DeclareMathOperator{\sigm}{sigm}
+\DeclareMathOperator{\sigmoid}{sigmoid}
 \DeclareMathOperator{\softmax}{softmax}
 
 % math
@@ -75,9 +79,24 @@
 % transpose
 \newcommand{\tp}[1]{\MB{#1}^\top}
 % round bracket
-\newcommand{\open}[1]{\left(#1\right)}
+%\newcommand{\open}[1]{\left(#1\right)}
+\newcommand{\paren}[1]{\left(#1\right)}
 % norm
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+% grad
+\newcommand{\grad}[1]{\nabla #1}
+
+%%% math commands %%%
+% variables 
+\usepackage{bm}
+\newcommand{\x}[1]{\bm{x}_{#1}}
+\newcommand{\y}[1]{\bm{y}_{#1}}
+\newcommand{\W}[1]{\bm{W}_{#1}}
+\newcommand{\hid}[1]{\bm{h}_{#1}}
+\newcommand{\inR}[1]{\in \mathbb{R}^{#1}}
+\newcommand{\yrange}[2]{y_{\overline{#1,#2}}}
+\newcommand{\ytop}[1]{y^{(#1)}}
+\newcommand{\thetav}{\bm{\theta}}
 
 % NMT
 \newcommand{\tgt}[1]{y_{#1}} % target word
@@ -173,7 +192,58 @@
 
 % -- Appendix --
 \appendix
+\chapter{Miscellaneous}
+\begin{lemma}
+\label{l:diag_mul}
+Let $\bm{v}$, $\bm{z}$ be any vectors and $\odot$ be element-wise vector multiplication, we have:
+\begin{align}
+\diag (\bm{v}) \cdot \bm{z} = \bm{v} \odot \bm{z}
+\end{align}
+\end{lemma}
 
+\begin{lemma}
+Let $l$ be a scalar value that was computed using a vector $\bm{v}$ in which we
+already knew how to compute the gradients of $\fracder{l}{\bm{v}}$. Given that
+$\bm{v} = f(\bm{Wh})$, chain rules in vector calculus can be applied to arrive at the
+following formulae:
+\begin{align}
+\fracder{s}{\bm{h}} = \tp{\bm{W}}\paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}}
+\\
+\fracder{s}{\bm{W}} = \paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}}\tp{\bm{h}} 
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Let $\bm{z} = \bm{Wh}$, we have the following derivations: %applying chain rules in vector calculus, 
+\begin{align*}
+\fracder{s}{\bm{h}} &= \fracder{\bm{z}}{\bm{h}} \cdot \fracder{\bm{v}}{\bm{z}}
+\cdot \fracder{s}{\bm{v}} && \text{[Vector calculus chain rules]}\\
+&= \fracder{\bm{Wh}}{\bm{h}} \cdot \fracder{f(\bm{z})}{\bm{z}}
+\cdot \fracder{s}{\bm{v}} \\
+&=\tp{\bm{W}} \cdot \diag \paren{f'(\bm{z})} \cdot \fracder{s}{\bm{v}} \\
+&=\tp{\bm{W}}\paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}} &&
+\text{[Lemma~\ref{l:diag_mul}]}
+\end{align*}
+
+Let $\bm{w}_i^{\top}$ be the i$^{\text{th}}$ row vector of matrix $\bm{W}$ and
+$v_i, z_i$ be the i$^{\text{th}}$ elements of vectors $\bm{v}, \bm{z}$, we
+have:
+\begin{align*}
+\fracder{s}{\bm{w}_i} &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
+\cdot \fracder{s}{v_i} && \text{[Vector calculus chain rules]}\\
+&= \fracder{\bm{w}_i^{\top}\bm{h}}{\bm{w}_i} \cdot f'(z_i) \cdot \fracder{s}{v_i} \\
+&= \bm{h} \cdot f'(z_i) \cdot \fracder{s}{v_i} \\ 
+\fracder{s}{\bm{w}_i^{\top}} &= \paren{f'(z_i) \cdot \fracder{s}{v_i}} \cdot
+\tp{\bm{h}} && \text{[Tranposing]} \\
+\fracder{s}{\bm{W}} &= \paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}}\tp{\bm{h}}
+&& \text{[Concatenating row derivatives]}
+\end{align*}
+
+
+\end{proof}
+
+%\chapter{LSTM Backpropagation}
+%\input{2-backwardprop}
 
 \bibliographystyle{plainnat}
 \bibliography{thesis}
