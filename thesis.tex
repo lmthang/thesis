@@ -52,6 +52,7 @@
 \newcommand{\sos}{$<$\texttt{sos}$>$}
 \newcommand{\eos}{$<$\texttt{eos}$>$}
 \newcommand{\eq}[1]{Eq.~(\ref{#1})}
+\newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\figref}[1]{Figure~\ref{#1}}
 \newcommand{\nlmtext}{neural probabilistic language models}
 \newcommand{\nlm}{NPLM}
@@ -77,7 +78,7 @@
 % plus equal
 \newcommand{\pluseq}{\mathrel{+}=}
 % transpose
-\newcommand{\tp}[1]{\MB{#1}^\top}
+\newcommand{\tp}[1]{#1^\top}
 % round bracket
 %\newcommand{\open}[1]{\left(#1\right)}
 \newcommand{\paren}[1]{\left(#1\right)}
@@ -91,6 +92,10 @@
 \usepackage{bm}
 \newcommand{\x}[1]{\bm{x}_{#1}}
 \newcommand{\y}[1]{\bm{y}_{#1}}
+\newcommand{\z}[1]{\bm{z}_{#1}}
+\newcommand{\s}[1]{\bm{s}_{#1}}
+\newcommand{\prob}[1]{\bm{p}_{#1}}
+\newcommand{\der}[1]{d\bm{#1}}
 \newcommand{\W}[1]{\bm{W}_{#1}}
 \newcommand{\hid}[1]{\bm{h}_{#1}}
 \newcommand{\inR}[1]{\in \mathbb{R}^{#1}}
@@ -106,7 +111,8 @@
 \newcommand{\his}{\MB{\bar{h}}_{s}} % hidden top source
 \newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
 \newcommand{\hb}[1]{\MB{\bar{h}}_{#1}} % hidden source
-\newcommand{\rnn}{\MB{T}_{d \times 2d}} % hidden top
+%\newcommand{\rnn}{\MB{T}_{d \times 2d}} % RNN
+\newcommand{\rnn}{\MB{T}_{\text{rnn}}} % RNN
 \newcommand{\lstm}{\MB{T}_{4d \times 2d}} % hidden top
 
 
@@ -195,52 +201,63 @@
 \chapter{Miscellaneous}
 \begin{lemma}
 \label{l:diag_mul}
-Let $\bm{v}$, $\bm{z}$ be any vectors and $\odot$ be element-wise vector multiplication, we have:
+Let $\bm{u}$, $\bm{v}$ be any vectors and $\odot$ be element-wise vector multiplication, we have:
 \begin{align}
-\diag (\bm{v}) \cdot \bm{z} = \bm{v} \odot \bm{z}
+\diag (\bm{u}) \cdot \bm{v} = \bm{u} \odot \bm{v}
 \end{align}
 \end{lemma}
 
 \begin{lemma}
-Let $l$ be a scalar value that was computed using a vector $\bm{v}$ in which we
-already knew how to compute the gradients of $\fracder{l}{\bm{v}}$. Given that
-$\bm{v} = f(\bm{Wh})$, chain rules in vector calculus can be applied to arrive at the
-following formulae:
+\label{l:chain_rule}
+Let $l$ be a loss value that  in which we
+already knew how to compute its gradient $\der{v}$ with respect to a vector $\bm{v}$. Given that
+$\bm{v} = f(\bm{Wh})$, the gradients $\der{h}, \der{W}$ of the loss $l$ with respect to the vector
+$\bm{h}$ and the matrix $\bm{W}$ can be derived as follows:
 \begin{align}
-\fracder{s}{\bm{h}} = \tp{\bm{W}}\paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}}
+\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \odot \der{v}}
 \\
-\fracder{s}{\bm{W}} = \paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}}\tp{\bm{h}} 
+\der{W} = \paren{f'(\bm{Wh}) \odot \der{v}} \cdot \tp{\bm{h}} 
 \end{align}
 \end{lemma}
 
 \begin{proof}
 Let $\bm{z} = \bm{Wh}$, we have the following derivations: %applying chain rules in vector calculus, 
 \begin{align*}
-\fracder{s}{\bm{h}} &= \fracder{\bm{z}}{\bm{h}} \cdot \fracder{\bm{v}}{\bm{z}}
-\cdot \fracder{s}{\bm{v}} && \text{[Vector calculus chain rules]}\\
+\der{h} &= \fracder{\bm{z}}{\bm{h}} \cdot \fracder{\bm{v}}{\bm{z}}
+\cdot \der{v} && \text{[Vector calculus chain rules]}\\
 &= \fracder{\bm{Wh}}{\bm{h}} \cdot \fracder{f(\bm{z})}{\bm{z}}
-\cdot \fracder{s}{\bm{v}} \\
-&=\tp{\bm{W}} \cdot \diag \paren{f'(\bm{z})} \cdot \fracder{s}{\bm{v}} \\
-&=\tp{\bm{W}}\paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}} &&
-\text{[Lemma~\ref{l:diag_mul}]}
+\cdot \der{v} \\
+&=\tp{\bm{W}} \cdot \diag \paren{f'(\bm{z})} \cdot \der{v} \\
+&=\tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \odot \der{v}} &&
+\text{[\lemmaref{l:diag_mul}]}
 \end{align*}
 
-Let $\bm{w}_i^{\top}$ be the i$^{\text{th}}$ row vector of matrix $\bm{W}$ and
-$v_i, z_i$ be the i$^{\text{th}}$ elements of vectors $\bm{v}, \bm{z}$, we
-have:
+Let $\tp{\bm{w}_i}$ be the i$^{\text{th}}$ row vector of matrix $\bm{W}$ and
+$v_i, z_i$ be the i$^{\text{th}}$ elements of vectors $\bm{v}, \bm{z}$. Also
+denoting $\der{w}_i, dv_i$ to be the gradients of $l$ with respect to $\bm{w}_i,
+v_i$, we have:
 \begin{align*}
-\fracder{s}{\bm{w}_i} &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
-\cdot \fracder{s}{v_i} && \text{[Vector calculus chain rules]}\\
-&= \fracder{\bm{w}_i^{\top}\bm{h}}{\bm{w}_i} \cdot f'(z_i) \cdot \fracder{s}{v_i} \\
-&= \bm{h} \cdot f'(z_i) \cdot \fracder{s}{v_i} \\ 
-\fracder{s}{\bm{w}_i^{\top}} &= \paren{f'(z_i) \cdot \fracder{s}{v_i}} \cdot
+d\bm{w}_i &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
+\cdot dv_i && \text{[Vector calculus chain rules]}\\
+&= \fracder{\tp{\bm{w}_i}\bm{h}}{\bm{w}_i} \cdot f'(z_i) \cdot dv_i \\
+&= \bm{h} \cdot f'(z_i) \cdot dv_i \\ 
+d\tp{\bm{w}_i} &= \paren{f'(z_i) \cdot dv_i} \cdot
 \tp{\bm{h}} && \text{[Tranposing]} \\
-\fracder{s}{\bm{W}} &= \paren{f'(\bm{Wh}) \odot \fracder{s}{\bm{v}}}\tp{\bm{h}}
+\der{W} &= \paren{f'(\bm{Wh}) \odot \der{v}} \cdot \tp{\bm{h}}
 && \text{[Concatenating row derivatives]}
 \end{align*}
-
-
 \end{proof}
+
+\begin{corollary}
+\label{c:chain_rule}
+As a special case of \lemmaref{l:chain_rule}, when $f$ is an identity function,
+i.e., $\bm{v} = \bm{Wh}$, we have:
+\begin{align}
+\der{h} = \tp{\bm{W}} \cdot \der{v}
+\\
+\der{W} = \der{v} \cdot \tp{\bm{h}} 
+\end{align}
+\end{corollary}
 
 %\chapter{LSTM Backpropagation}
 %\input{2-backwardprop}

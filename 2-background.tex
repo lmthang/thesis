@@ -43,7 +43,7 @@ Given RNNs as a building block, we discuss NMT together with tips and tricks for
 Recurrent Neural Network (RNNs) \cite{elman90} are models that help understand
 the temporal aspect as well as build up representations for sequential data
 using a dynamic memory structure. At the surface form, an RNN takes as input a sequence of vectors $\x{1},
-\x{2}, \ldots, \x{n} \inR{d}$ and processes them one by one. For each
+\x{2}, \ldots, \x{n}$ and processes them one by one. For each
 new input $\x{i}$, an RNN updates its memory to produce a hidden state
 $\hid{i}$ which one can think of as a representation for the partial sequence
 $\x{\overline{1,i}}$. %$\x{1},\ldots, \x{i}$. 
@@ -54,12 +54,19 @@ relationship within a fixed-length sequence. The key secret sauce is in the
 recurrence formula of an RNN that defines how its hidden state is updated. At
 its simplest form, a ``vanilla'' RNN defines its recurrence function as:
 \begin{align}
-\MB{h}_t &= f\paren{\x{t}, \hid{t-1}} \label{e:abstract_rnn} \\
-&= \sigma \paren{\W{xh}\x{t} + \W{hh}\hid{t-1}} \label{e:vanilla_rnn}
+\hid{t} &= f\paren{\x{t}, \hid{t-1}} \label{e:abstract_rnn}
 \end{align}
 In the above formula, $f$ is an abstract function that computes a new hidden state given the current input $\x{t}$ and the
-previous hidden state $\hid{t-1}$. We provide in \eq{e:vanilla_rnn} one popular choice
-of $f$ with $\sigma$ being a non-linear function such as $\sigmoid$ or $\tanh$.
+previous hidden state $\hid{t-1}$. The starting state $\hid{0}$ is often set to
+$\bm{0}$ though it can take any value as we will see later in the context
+of NMT decoders. A popular choice of $f$ is provided below with $\sigma$ being a
+non-linear function such as $\sigmoid$ or $\tanh$.\footnote{There could also be
+an optional bias term in \eq{e:vanilla_rnn}.}
+\begin{align}
+%\z{t} &= \W{xh}\x{t} + \W{hh}\hid{t-1} \label{e:vanilla_rnn} \\
+\hid{t} &= \sigma(\W{xh}\x{t} + \W{hh}\hid{t-1} \label{e:vanilla_rnn}) %\z{t})
+\end{align}
+
 At each timestep $t$, an RNN can (optionally) emit an output symbol
 $y_t$ which can either be discrete or real-valued. For the discrete scenario,
 which is often the case for languages, a probability distribution $\bm{p}$ over a 
@@ -68,28 +75,28 @@ follows\footnote{For the real-valued case, we refer readers to mixture density
 models \cite{bishop94} which have been applied to RNN training, e.g., for
 hand-writing synthesis \cite{graves13c}.}:
 \begin{align}
-\bm{s} &= \W{hy}\hid{t} \label{e:score} \\
-\bm{p} &= \softmax(\bm{s}) \label{e:prob}
+\s{t} &= \W{hy}\hid{t} \label{e:score} \\
+\prob{t} &= \softmax(\s{t}) \label{e:prob}
 \end{align}
 Here, we introduce a new set of weights $\W{hy} \inR{|Y| \times d}$, with $d$ being the dimension of the RNN hidden
-state, to compute a score vector $\bm{s}$, or {\it logits}, over
+state, to compute a score vector $\s{t}$, or {\it logits}, over
 different individual classes. Often, with a large output set $Y$, the
 matrix-vector multiplication in \eq{e:score} is a major computational
 bottleneck in RNNs, which results in several challenges for neural language modeling
-and machine translation that we will mention later. 
-
+and machine translation that we will address in later chapters. 
 The $\softmax$ function transforms the score
-vector $\bm{s}$ into a vector of probability $\bm{p}$, which is defined for each specific
+vector $\s{t}$ into a probability vector $\prob{t}$, which is defined for each specific
 element $y \in Y$ as below.
-For convenience, we overload our notations to use $p(y)$ and $s(y)$ to refer to entries in
-the vectors $\bm{p}$ and $\bm{s}$ that correspond to $y$.
+For convenience, we overload our notations to use $\prob{t}(y)$ and $\s{t}(y)$ to refer to entries in
+the vectors $\prob{t}$ and $\s{t}$ that correspond to $y$.
 \begin{align}
-p(y) = \frac{\e^{s(y)}}{\sum_{y' \in Y} \e^{s(y')}}
+\prob{t}(y) = \frac{\e^{\s{t}(y)}}{\sum_{y' \in Y} \e^{\s{t}(y')}}
 \label{e:softmax}
 \end{align}
 
-With the above formulae, we have completely defined the RNN weight set $\theta\!=\!\{\W{xh},
-\W{hh}, \W{hy}\}$, which consists of {\it input} connections $\W{xh}$, {\it
+With the above formulae, we have completely defined the RNN weight set $\thetav$
+%=\!\{\W{xh}, \W{hh}, \W{hy}\}$, 
+which consists of {\it input} connections $\W{xh}$, {\it
 recurrent} connections $\W{hh}$, and {\it output}
 connections $\W{hy}$. These weights are shared across
 timesteps as illustrated in Figure~\ref{f:rnn} \error{Draw a picture on
@@ -124,11 +131,26 @@ a large weight matrix $\W{xh}$ and there is no notion of similarity between
 words. In practice, low-dimensional dense representations for words, or {\it
 word embeddings}, are often used to address these problems. Specifically, an
 embedding matrix
-$\W{e} \inR{d \times |V|}$ is looked up for each word $x_i$ to retrieve a
-representation $\x{i} \inR{d}$. As a result, a simple RNN applied to language
+$\W{e} \inR{d_e \times |V|}$ is looked up for each word $x_i$ to retrieve a
+representation $\x{i} \inR{d_e}$. As a result, a simple RNN applied to language
 modeling will generally have $\theta = \{\W{xh}, \W{hh}, \W{hy}, \W{e}\}$ as its
 weights as illustrated in Figure~\ref{f:rlm} \error{Draw an RNN with
 embedding}.
+
+\begin{figure}[tbh!]
+\centering
+%\psgrid
+\rput(7.1,2.6){{\color{lightblue} $\MB{W_{hh}}$}}
+\rput(8.6,1.0){{\color{lightgreen} $\MB{W_{xh}}$}}
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
+\caption[Recurrent language models]{{\bf Recurrent language models} -- example of a recurrent
+neural network that processes a sequence of input words \word{I am a student} to
+build up hidden representations as input symbols are consumed. The recurrent
+$\MB{W_{hh}}$ and feed-forward $\MB{W_{xh}}$ weights are shared across
+timesteps.
+} 
+\label{f:rlm}
+\end{figure}
 
 In language modeling (LM), the task is to specify a probability distribution over
 sequences of symbols (often, words) so that one can judge if a sequence of
@@ -184,64 +206,139 @@ a learning rate is given below:
 \thetav \longleftarrow \thetav - \eta \grad{J(\thetav)} %\fracder{J(\thetav)}{\thetav}
 \end{align}
 
-\paragraph{Backpropagation} To compute the gradients for the loss $J(\thetav)$,
-we first need to compute the derivative of predicting $y_t$ at timestep $t$. We
-will now work out the gradients with respect to $\W{hy}$ and $\hid{t}$, i.e., up
-to \eq{e:score}. The remaining derivations will depend on the choice of the RNN
-hidden unit $f$ defined in \eq{e:abstract_rnn}.
-\begin{align*}
-\fracder{\log p(y_t)}{\thetav} &= \parfrac{\thetav} \paren{s(y_t) - \log \sum_{y'}
-e^{s(y')}} && \text{[From \eq{e:softmax}]} \\
-&= \fracder{\bm{s}}{\thetav} \cdot \parfrac{\bm{s}} \paren{s(y_t) - \log \sum_{y'}
-e^{s(y')}} && \text{[Chain rule in vector calculus]} \\
-\end{align*}
-
-Computing per-coordinate gradient, we have:
+\paragraph{Single-timestep Backpropagation} To compute the gradients for the loss $J(\thetav)$,
+we first need to be able to derive the gradients of the per-timestep loss $l_t
+=\log \prob{t}(y_t)$ with respect to both the RNN weights
+$\{\W{xh}, \W{hh}, \W{hy}\}$ and the inputs $\{\x{t}, \hid{t-1}\}$. We denote
+these gradients as $\{d\W{xh}, d\W{hh}, d\W{hy}, d\x{t}, d\hid{t-1}\}$
+respectively and define intermediate gradients $d\s{t}, d\hid{t}$ similarly. 
+Starting with the loss $l_t$, we employ backpropagation through structures
+\cite{goller:ieeenn00} to derive each gradient one by one in the following
+order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
+\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$.
+First, from \eq{e:softmax}, we have:
 \begin{align}
- \parfrac{s(y)} \paren{s(y_t) - \log \sum_{y'} e^{s(y')}} =
+d\s{t} = \fracder{\l_t}{\s{t}} = \parfrac{\s{t}} \paren{\s{t}(y_t) - \log \sum_{y'}
+e^{\s{t}(y')}}
+\end{align}
+
+Computing per-coordinate gradient $\s{t}(y)$ gives:
+\begin{align}
+ \parfrac{\s{t}(y)} \paren{\s{t}(y_t) - \log \sum_{y'} e^{\s{t}(y')}} =
   \begin{cases}
-   1 - p(y_t) & y = y_t \\
-   -p(y) & y \neq y_t
+   1 - \prob{t}(y_t) & y = y_t \\
+   -\prob{t}(y) & y \neq y_t
   \end{cases}
 \end{align}
-Here, $\bm{p}$ is the probability distribution defined in \eq{e:prob} and the
-above gradients can be concisely written in vector form as $\bm{1}_{y_t} -
-\bm{p}$. We should note that $\bm{p}$ has been calculated in the forward pass,
+
+The above gradients can be concisely written in vector form as:
+\begin{align}
+d\s{t} = \bm{1}_{y_t} - \prob{t}
+\end{align}
+
+Here, $\prob{t}$ is the probability distribution defined in \eq{e:prob} and has been calculated in the forward pass,
 so we simply reuse it. $\bm{1}_{y_t}$ is a one-hot vector with 1 at position
-$y_t$. Combining the above formulae, we simplify:
+$y_t$. 
+Applying Corollary~\ref{c:chain_rule}, noting that $\s{t} = \W{hy}\hid{t}$ in \eq{e:score}, we
+arrive at:
 \begin{align}
-\fracder{\log p(y_t)}{\thetav} &= \fracder{\bm{s}}{\thetav} \cdot (\bm{1}_{y_t}
-- \bm{p})
+% h_t
+d\hid{t} &=  \tp{\W{hy}} \cdot d\s{t}\\
+% W_hy
+d\W{hy} &=  d\s{t} \cdot \tp{\hid{t}}
 \end{align}
 
-With respect to $\W{hy}$, we have:
+At this point, we have derived part of the backpropation procedure which can be
+applied to any hidden unit type, e.g., the aforementioned vanilla RNN or the
+LSTM unit that we will describe shortly in the next section. 
 
-With respect to $\hid{t}$, we have:
+{\it Vanilla RNN Backpropagation} \indent 
+%For the vanilla RNN formulation in \eq{e:vanilla_rnn}, we further backpropagate
+%the loss as follows.
+%For simplicity and convenience, one can set the embedding size to be equal to the
+%hidden size, so $\W{xh}, \W{hh} \inR{d \times d}$. We can further 
+First of all, we can simplify the notation to have $\rnn\!=\![\MB{W_{xh}}
+\MB{W_{hh}}]$ and $\z{t}\!=\![\x{t};
+\hid{t-1}]$, so the RNN formulation in \eq{e:vanilla_rnn} % \inR{2d}
+becomes:
 \begin{align}
-\fracder{\log p(y_t)}{\hid{t}} &= \fracder{\bm{s}}{\hid{t}} \cdot (\bm{1}_{y_t}
-- \bm{p}) \\
- &= \fracder{\W{hy}\hid{t}}{\hid{t}} \cdot (\bm{1}_{y_t} - \bm{p}) \\
- &= \bm{W}^{\top}_{hy}(\bm{1}_{y_t} - \bm{p})
+\MB{h_t} = \sigma \paren{\rnn \z{t}}
 \end{align}
 
+Applying \lemmaref{l:chain_rule}, we have:
+\begin{align}
+% z_t
+d\z{t} &=  \tp{\rnn} \cdot
+\paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \label{e:grad_zt} \\
+% T_dx2d 
+d\rnn &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\z{t}} \label{e:grad_rnn}
+\end{align}
 
-\error{Write derivative lemma}
+This is one of the {\it tricks} that we use to better utilize GPUs by creating
+larger matrices and vectors, i.e., $\rnn$ and $\z{t}$. From \eq{e:grad_zt} and
+\eq{e:grad_rnn}, one can easily extract the following gradients:
+(a) $d\x{t}$ -- embedding gradients which we use to sparsely update the embedding weights $\W{e}$, (b) $d\hid{t-1}$
+ -- gradients of the previous hidden state, which is needed by the
+ backpropagation-through-time algorithm that we will discuss next, and (c) $d\W{xh}$ as well
+as $d\W{hh}$ -- the RNN input and recurrent connections.\footnote{One can also
+separately derive these gradients as follows:
+\begin{align*}
+% x_t
+d\x{t} &=  \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}\\
+% h_{t-1}
+d\hid{t-1} &=  \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}
+\label{e:d_hh}\\
+% W_xh 
+d\W{xh} &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\x{t}} \\
+% W_hh 
+d\W{hh} &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\hid{t-1}}
+\end{align*}
+}
 
-\begin{figure}[tbh!]
-\centering
-%\psgrid
-\rput(7.1,2.6){{\color{lightblue} $\MB{W_{hh}}$}}
-\rput(8.6,1.0){{\color{lightgreen} $\MB{W_{xh}}$}}
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
-\caption[Recurrent language models]{{\bf Recurrent language models} -- example of a recurrent
-neural network that processes a sequence of input words \word{I am a student} to
-build up hidden representations as input symbols are consumed. The recurrent
-$\MB{W_{hh}}$ and feed-forward $\MB{W_{xh}}$ weights are shared across
-timesteps.
-} 
-\label{f:rlm}
-\end{figure}
+\paragraph{Backpropagation Through Time (BPTT)}
+Having defined a single-timestep backpropagation procedure, we are now ready to
+go through the BPTT algorithm \cite{Rumelhart:1986:LPT,werbos1990}. Inspired by 
+\newcite{sutskever12}, we summarize the BPTT algorithm for RNNs below with the
+following remarks: (a) Lines 3, 5, 6, 7 accumulate the gradients of RNN weights
+$\{\W{hy}, \W{xh}, \W{hh}, \W{e}\}$ over time; (b) In line 7, $d\x{t}$ refers to
+gradients of words participating in the current mini-batch which we use to
+sparsely update $\W{e}$. For more advanced architectures, such as multi-layer
+RNNs, $d\x{t}$ is used to send gradients down to the below layers; and (c) Line
+4 accumulates gradients for the current hidden state $\hid{t}$ by considering two paths,
+a ``vertical'' one from  the loss and a ``recurrent'' one from the timestep
+$t+1$ which was set in Line 8.
 
+\begin{algorithm}
+\For{$t=T \rightarrow 1$}
+{
+\tcp{Output backprop}
+% d_s
+$d\s{t} \leftarrow \bm{1}_{y_t} - \prob{t}$
+
+% W_hy
+$d\W{hy} \leftarrow d\W{hy} + d\s{t} \cdot \tp{\hid{t}}$
+
+% h_t
+$d\hid{t} \leftarrow d\hid{t} + \tp{\W{hy}} \cdot d\s{t}$
+
+\tcp{RNN backprop}
+% W_xh 
+$d\W{xh} \leftarrow d\W{xh} + \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\x{t}}$
+
+% W_hh 
+$d\W{hh} \leftarrow d\W{hh} + \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\hid{t-1}}$
+
+\tcp{Input backprop}
+% x_t
+$d\x{t} \leftarrow \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}$
+
+% h_{t-1}
+$d\hid{t-1} \leftarrow \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}$
+}
+\caption{BPTT algorithm for ``vanilla'' RNNs}
+\end{algorithm}
+
+\subsection{Better Training RNNs}
 For simplicity and convenience, one can set the embedding size to be equal to the
 hidden size, so $\W{xh}, \W{hh} \inR{d \times d}$. We can further simplify the
 notation to have $\rnn = [\MB{W_{xh}} \MB{W_{hh}}]$, so \eq{e:vanilla_rnn}
@@ -256,7 +353,6 @@ becomes:
 \end{align}
 
 
-\subsection{Better Training RNNs}
 \paragraph{Vanishing Gradient Problem}
 
 \cite{pascanu13}
