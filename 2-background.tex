@@ -286,8 +286,7 @@ separately derive these gradients as follows:
 % x_t
 d\x{t} &=  \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}\\
 % h_{t-1}
-d\hid{t-1} &=  \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}
-\label{e:d_hh}\\
+d\hid{t-1} &=  \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}\\
 % W_xh 
 d\W{xh} &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\x{t}} \\
 % W_hh 
@@ -302,11 +301,11 @@ go through the BPTT algorithm \cite{Rumelhart:1986:LPT,werbos1990}. Inspired by
 following remarks: (a) Lines 3, 5, 6, 7 accumulate the gradients of RNN weights
 $\{\W{hy}, \W{xh}, \W{hh}, \W{e}\}$ over time; (b) In line 7, $d\x{t}$ refers to
 gradients of words participating in the current mini-batch which we use to
-sparsely update $\W{e}$. For more advanced architectures, such as multi-layer
-RNNs, $d\x{t}$ is used to send gradients down to the below layers; and (c) Line
+sparsely update $\W{e}$;\footnote{In multi-layer
+RNNs, $d\x{t}$ is used to send gradients down to the below layers.} and (c) Line
 4 accumulates gradients for the current hidden state $\hid{t}$ by considering two paths,
-a ``vertical'' one from  the loss and a ``recurrent'' one from the timestep
-$t+1$ which was set in Line 8.
+a ``vertical'' one from  the current loss at time $t$ and a ``recurrent'' one from the timestep
+$t+1$ which was set in Line 8 earlier.
 
 \begin{algorithm}
 \For{$t=T \rightarrow 1$}
@@ -339,24 +338,55 @@ $d\hid{t-1} \leftarrow \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{
 \end{algorithm}
 
 \subsection{Better Training RNNs}
-For simplicity and convenience, one can set the embedding size to be equal to the
-hidden size, so $\W{xh}, \W{hh} \inR{d \times d}$. We can further simplify the
-notation to have $\rnn = [\MB{W_{xh}} \MB{W_{hh}}]$, so \eq{e:vanilla_rnn}
-becomes:
-\begin{align}
-\MB{h_t} = \sigma \paren{\rnn
-\begin{bmatrix}
-  \MB{x_t} \\
-  \MB{h_{t-1}}
- \end{bmatrix}
-}
-\end{align}
+%For simplicity and convenience, one can set the embedding size to be equal to the
+%hidden size, so $\W{xh}, \W{hh} \inR{d \times d}$. We can further simplify the
+%notation to have $\rnn = [\MB{W_{xh}} \MB{W_{hh}}]$, so \eq{e:vanilla_rnn}
+%becomes:
+%\begin{align}
+%\MB{h_t} = \sigma \paren{\rnn
+%\begin{bmatrix}
+%  \MB{x_t} \\
+%  \MB{h_{t-1}}
+% \end{bmatrix}
+%}
+%\end{align}
 
 
-\paragraph{Vanishing Gradient Problem}
+%\paragraph{Exploding and Vanishing Gradients}
+Even though computing RNN gradients is straightforward once 
+the BPTT algorithm has been plotted out, training is inherently difficult due to the nonlinear
+iterative nature of RNNs. Among all reasons, 
+the two classic problems of RNNs that often arise when dealing with very long sequences are the {\it
+exploding} and {\it vanishing} gradients as
+described by \newcite{Bengio-trnn94}. In short, exploding gradients refer to the
+phenomenon that the gradients become exponentially large as we backpropagate
+over time, making learning unstable. Vanishing gradients, on the
+other hand, is the opposite problem when the gradients go exponentially fast
+towards zero, turning BPTT into truncated BPTT that is unable to capture long-range
+dependencies in sequences. 
 
-\cite{pascanu13}
+Let us try to explain the aforementioned problems informally and 
+refer readers to more rigorous and in-depth analyses in \cite{Bengio-trnn94,lstm97,MartensS11,pascanu13}.
+The main cause of these two problems all lies in Line 8 of the BPTT
+algorithm, in which we can rewrite the assignment as
+$d\hid{t-1} = \tp{\W{hh}} \cdot \diag\paren{\sigma'(\rnn \z{t})} \cdot
+d\hid{t}$. We can try to understand the behavior of RNNs over time by assuming
+no contribution of the intermediate losses in Line 4
+for a moment. Given such an assumption, a signal sent from the current hidden state over K
+steps will become 
+$d\hid{t-K} = \prod_{i=1}^{K} \paren{\tp{\W{hh}} \cdot \diag\paren{\sigma'(\rnn
+\z{t-i+1})}} \cdot
+d\hid{t}$. Assuming that the non-linear function $\sigma$ is bounded, e.g.,
+$\sigm$ and $\tanh$, and behaves ``nicely'', what we need to deal with now is
+the multiplication of the recurrent matrix over time.
+This leads to the fact that the behavior of RNNs is often governed by the characteristics of the recurrent matrix
+$\W{hh}$ and most analyses examine in terms of the largest eigen value of
+$\W{hh}$ as well as the norms of these signals. Roughly speaking, if the largest eigen value
+is large enough, exploding gradients will be likely to happen. On the contrary,
+if the largest eigen value is below a certain threshold, vanishing gradients
+will occur as clearly explained by \newcite{pascanu13}.
 
+\error{Discuss LSTM}
 \begin{align}
 \MB{h}_t = \sigma \paren{
 \MB{W_{xh}}\MB{x}_t + \MB{W_{hh}}\MB{h}_{t-1}
@@ -400,7 +430,7 @@ For a single LSTM block at layer $l$ and time $t$, the new hidden state $\hlt$ a
 \sigm \\
 \tanh
 \end{pmatrix}
-\MB{T}_{4n \times 2n}
+\lstm
 \begin{bmatrix}
   \MB{h_t^{l-1}} \\
   \MB{h_{t-1}^l}
@@ -424,7 +454,7 @@ An LSTM block at layer $l \in \{1, \dots L\}$ and time $t \in \{1, \dots T\}$ co
 \end{itemize}
 We call $n$ the LSTM block size.
 
-\subsection{LSTM Backpropation}
+\paragraph{LSTM Backpropation}
 $\MB{\delta_{c^{(2)}}}$
 
 $\MB{\delta_{h^{(2)}}}$
