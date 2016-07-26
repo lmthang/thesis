@@ -40,7 +40,7 @@
 \makeatother
 % the below works for pdflatex
 %\usepackage[hyphens]{url} 
-%\usepackage{hyperref}
+\usepackage{hyperref}
 
 
 \definecolor{lightgreen}{HTML}{44B178}
@@ -94,6 +94,7 @@
 \newcommand{\y}[1]{\bm{y}_{#1}}
 \newcommand{\z}[1]{\bm{z}_{#1}}
 \newcommand{\s}[1]{\bm{s}_{#1}}
+\newcommand{\mem}[1]{\bm{c}_{#1}}
 \newcommand{\prob}[1]{\bm{p}_{#1}}
 \newcommand{\der}[1]{d\bm{#1}}
 \newcommand{\W}[1]{\bm{W}_{#1}}
@@ -200,6 +201,7 @@
 % -- Appendix --
 \appendix
 \chapter{Miscellaneous}
+\label{c:misc}
 \begin{lemma}
 \label{l:diag_mul}
 Let $\bm{u}$, $\bm{v}$ be any vectors and $\odot$ be element-wise vector multiplication, we have:

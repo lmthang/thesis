@@ -215,7 +215,9 @@ respectively and define intermediate gradients $d\s{t}, d\hid{t}$ similarly.
 Starting with the loss $l_t$, we employ backpropagation through structures
 \cite{goller:ieeenn00} to derive each gradient one by one in the following
 order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
-\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$.
+\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. To simplify the math, we will utlize
+several lemmas and corollaries provided in Appendix~\ref{c:misc}.
+
 First, from \eq{e:softmax}, we have:
 \begin{align}
 d\s{t} = \fracder{\l_t}{\s{t}} = \parfrac{\s{t}} \paren{\s{t}(y_t) - \log \sum_{y'}
@@ -358,7 +360,7 @@ the BPTT algorithm has been plotted out, training is inherently difficult due to
 iterative nature of RNNs. Among all reasons, 
 the two classic problems of RNNs that often arise when dealing with very long sequences are the {\it
 exploding} and {\it vanishing} gradients as
-described by \newcite{Bengio-trnn94}. In short, exploding gradients refer to the
+described by \newcite{Bengio-trnn94}. In short, exploding gradients refers to the
 phenomenon that the gradients become exponentially large as we backpropagate
 over time, making learning unstable. Vanishing gradients, on the
 other hand, is the opposite problem when the gradients go exponentially fast
@@ -368,11 +370,11 @@ dependencies in sequences.
 Let us try to explain the aforementioned problems informally and 
 refer readers to more rigorous and in-depth analyses in \cite{Bengio-trnn94,lstm97,MartensS11,pascanu13}.
 The main cause of these two problems all lies in Line 8 of the BPTT
-algorithm, in which we can rewrite the assignment as
+algorithm which can be rewritten as
 $d\hid{t-1} = \tp{\W{hh}} \cdot \diag\paren{\sigma'(\rnn \z{t})} \cdot
-d\hid{t}$. We can try to understand the behavior of RNNs over time by assuming
-no contribution of the intermediate losses in Line 4
-for a moment. Given such an assumption, a signal sent from the current hidden state over K
+d\hid{t}$ (see \lemmaref{l:diag_mul}). We can try to understand the behavior of RNNs over time by assuming
+for a moment that there is no contribution from intermediate losses, i.e., Line 4
+is ``ignored''. Given such an assumption, a signal backpropagated from the current hidden state over K
 steps will become 
 $d\hid{t-K} = \prod_{i=1}^{K} \paren{\tp{\W{hh}} \cdot \diag\paren{\sigma'(\rnn
 \z{t-i+1})}} \cdot
@@ -386,34 +388,63 @@ is large enough, exploding gradients will be likely to happen. On the contrary,
 if the largest eigen value is below a certain threshold, vanishing gradients
 will occur as clearly explained by \newcite{pascanu13}.
 
-\error{Discuss LSTM}
-\begin{align}
-\MB{h}_t = \sigma \paren{
-\MB{W_{xh}}\MB{x}_t + \MB{W_{hh}}\MB{h}_{t-1}
-}
-\end{align}
-
-\begin{align}
-\fracder{\MB{h}_t}{\MB{h}_{t-1}} = \diag\paren{\sigma'(\ldots)}\tp{\MB{W_{hh}}}
-\end{align}
-
-\begin{align}
-\norm{\fracder{\MB{h}_t}{\MB{h}_{t-1}}} & \leq \norm{\diag\paren{\sigma'(\ldots)}} 
-\norm{\tp{\MB{W_{hh}}}} \\ 
-& \leq \gamma \lambda_1
-\end{align}
-
-\begin{align}
-\norm{\fracder{\MB{h}_t}{\MB{h}_{t-k}}} \leq \paren{\gamma \lambda_1}^{k}
-\rightarrow 0 & \quad \text{ if } \lambda_1 < \frac{1}{\gamma}
-\end{align}
-
-\begin{align}
-\fracder{\MB{c}_t}{\MB{c}_{t-1}} = \MB{I}
-\end{align}
+\paragraph{Gradient Clipping} In practice, it is generally easy to cope with the exploding gradient problem by
+applying different forms of gradient clipping. The first approach was proposed by
+\newcite{mikolov12} through the form of temporal {\it element-wise} clipping. At
+each timestep during backpropagation, any elements of $d\bm{h}$ that are greater
+than a positive threshold $\tau$ or smaller than -$\tau$ will be set
+to $\tau$ or -$\tau$ respectively. One can also perform gradient {\it norm}
+clipping as suggested by \newcite{pascanu13}. The idea is simple: given a final
+gradient vector $\bm{g}$ computed per mini-batch, if its norm
+$||\bm{g}||$ is greater than a threshold
+$\tau$, then we will use the following scaled gradient $\frac{\tau}{||\bm{g}||} \bm{g}$
+instead. The latter approach has been widely used in many systems nowadays and
+can also be used in conjunction with the former. We take the combined approach
+in our implementations described later in this thesis. 
 
 \paragraph{Long Short-Term Memory}
-We use the formulation of \cite{zaremba14}.
+The vanishing gradient problem, on the other hand, is more challenging to
+tackle. There have been many proposed approaches to alleviate the problem such
+as skip connections \cite{waibel90,lin96}, hierarchical
+architectures \cite{el96}, leaky integrators \cite{Jaeger2007}, and
+regularization \cite{pascanu13}, to name a few; also, see \cite{bengio13} for a
+comparison of some of these techniques. Among all, Long Short-term
+Memory (LSTM), invented by \newcite{lstm97}, appears to be one of the most
+widely adopted solutions to the vanishing gradient problem.
+Graves and colleagues deserve credit for popularizing LSTM through a series of
+work \cite{graves05,graves09,graves13c}. 
+The key idea of LSTM
+is to augment RNNs with linear {\it memory} units that allow the gradient to
+flow smoothly through time. In addition, there are gating units that control how
+much an RNN wants to reuse memory ({\it forget} gates), receive input signal ({\it
+input} gates), and extract information ({\it output} gates) at each timestep.
+There are many implementation instances of LSTM, differing in terms of
+whether and which biases are used, how gates are built, etc; however, it turns
+out that these different choices do not matter much for most cases
+\cite{jozefowicz15,greff15}. As such, in this section and through out this
+thesis, we will stick to the formulation described in \cite{zaremba14}.
+
+Instead of jumping directly into the detailed formulation, let us provide intuitions
+on how to gradually build up an LSTM architecture. First, we can construct a
+simple memory unit as follows:
+\begin{align}
+\mem{t} &= \mem{t-1} + \sigma(\W{xh}\x{t} + \W{hh}\hid{t-1}
+\label{e:simple_mem}) \\
+\hid{t} &= \mem{t}
+\end{align}
+
+This architecture can be viewed as a form of ``leaky'' integration 
+mentioned in \cite{sutskever12,bengio13} since it is equivalent to $\hid{t} =
+\hid{t-1} + \sigma(\W{xh}\x{t} + \W{hh}\hid{t-1})$. Training this
+network over long sequences is extremely easy since among the exponentially many backpropagation
+paths, there is a path through all the memory units $\mem{t}$ that is
+guaranteed to not vanish since $d\mem{t} = d\mem{t-1}$ along that path. 
+
+However sometimes, we might want to pay more attention to the memory or the
+input
+To add more power or flexibility to this architecture
+%However, as noted by \newcite{sutskever12}, 
+
 For a single LSTM block at layer $l$ and time $t$, the new hidden state $\hlt$ and memory cell $\clt$ are calculated from $\MB{h_t^{l-1}}$, $\MB{h_{t-1}^l}$ and $\MB{c_{t-1}^l}$ like so:
 \begin{align}
 \label{eqn:LSTMdef1}
