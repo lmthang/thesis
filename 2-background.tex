@@ -189,6 +189,7 @@ to minimize the negative log-likelihood, or the {\it cross-entropy} loss, of the
 J(\thetav) &= \sum_{i=1}^{N} -\log p\paren{\ytop{i}} \\ 
 &= \sum_{i=1}^{N} \sum_{t=1}^{m_i} -\log p\paren{\ytop{i}_t |
 \ytop{i}_{<t}}
+\label{e:objective}
 \end{align}
 
 RNN learning is often done using mini-batch stochastic gradient descent (SGD) algorithms in
@@ -245,9 +246,9 @@ Applying Corollary~\ref{c:chain_rule}, noting that $\s{t} = \W{hy}\hid{t}$ in \e
 arrive at:
 \begin{align}
 % h_t
-d\hid{t} &=  \tp{\W{hy}} \cdot d\s{t}\\
+d\hid{t} &=  \tp{\W{hy}} \cdot d\s{t} \label{e:grad_ht}\\
 % W_hy
-d\W{hy} &=  d\s{t} \cdot \tp{\hid{t}}
+d\W{hy} &=  d\s{t} \cdot \tp{\hid{t}} \label{e:grad_Why}
 \end{align}
 
 At this point, we have derived part of the backpropation procedure which can be
@@ -264,16 +265,16 @@ First of all, we can simplify the notation to have $\rnn\!=\![\MB{W_{xh}}
 \hid{t-1}]$, so the RNN formulation in \eq{e:vanilla_rnn} % \inR{2d}
 becomes:
 \begin{align}
-\MB{h_t} = \sigma \paren{\rnn \z{t}}
+\MB{h_t} = \sigma \paren{\rnn \z{t}} \label{e:rnn_simplified}
 \end{align}
 
 Applying \lemmaref{l:chain_rule}, we have:
 \begin{align}
 % z_t
 d\z{t} &=  \tp{\rnn} \cdot
-\paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \label{e:grad_zt} \\
+\paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \label{e:grad_zt} \\
 % T_dx2d 
-d\rnn &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\z{t}} \label{e:grad_rnn}
+d\rnn &=  \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\z{t}} \label{e:grad_rnn}
 \end{align}
 
 This is one of the {\it tricks} that we use to better utilize GPUs by creating
@@ -284,16 +285,16 @@ larger matrices and vectors, i.e., $\rnn$ and $\z{t}$. From \eq{e:grad_zt} and
  backpropagation-through-time algorithm that we will discuss next, and (c) $d\W{xh}$ as well
 as $d\W{hh}$ -- the RNN input and recurrent connections.\footnote{One can also
 separately derive these gradients as follows:
-\begin{align*}
+\begin{align}
 % x_t
-d\x{t} &=  \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}\\
+d\x{t} &=  \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \label{e:grad_xt}\\
 % h_{t-1}
-d\hid{t-1} &=  \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}\\
+d\hid{t-1} &=  \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}}\\
 % W_xh 
-d\W{xh} &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\x{t}} \\
+d\W{xh} &=  \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\x{t}} \\
 % W_hh 
-d\W{hh} &=  \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\hid{t-1}}
-\end{align*}
+d\W{hh} &=  \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\hid{t-1}} \label{e:grad_Whh}
+\end{align}
 }
 
 \paragraph{Backpropagation Through Time (BPTT)}
@@ -324,37 +325,22 @@ $d\hid{t} \leftarrow d\hid{t} + \tp{\W{hy}} \cdot d\s{t}$
 
 \tcp{RNN backprop}
 % W_xh 
-$d\W{xh} \leftarrow d\W{xh} + \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\x{t}}$
+$d\W{xh} \leftarrow d\W{xh} + \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\x{t}}$
 
 % W_hh 
-$d\W{hh} \leftarrow d\W{hh} + \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}} \cdot \tp{\hid{t-1}}$
+$d\W{hh} \leftarrow d\W{hh} + \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\hid{t-1}}$
 
 \tcp{Input backprop}
 % x_t
-$d\x{t} \leftarrow \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}$
+$d\x{t} \leftarrow \tp{\W{xh}} \cdot \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}}$
 
 % h_{t-1}
-$d\hid{t-1} \leftarrow \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \odot d\hid{t}}$
+$d\hid{t-1} \leftarrow \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}}$
 }
 \caption{BPTT algorithm for ``vanilla'' RNNs}
 \end{algorithm}
 
 \subsection{Better Training RNNs}
-%For simplicity and convenience, one can set the embedding size to be equal to the
-%hidden size, so $\W{xh}, \W{hh} \inR{d \times d}$. We can further simplify the
-%notation to have $\rnn = [\MB{W_{xh}} \MB{W_{hh}}]$, so \eq{e:vanilla_rnn}
-%becomes:
-%\begin{align}
-%\MB{h_t} = \sigma \paren{\rnn
-%\begin{bmatrix}
-%  \MB{x_t} \\
-%  \MB{h_{t-1}}
-% \end{bmatrix}
-%}
-%\end{align}
-
-
-%\paragraph{Exploding and Vanishing Gradients}
 Even though computing RNN gradients is straightforward once 
 the BPTT algorithm has been plotted out, training is inherently difficult due to the nonlinear
 iterative nature of RNNs. Among all reasons, 
@@ -406,7 +392,8 @@ in our implementations described later in this thesis.
 The vanishing gradient problem, on the other hand, is more challenging to
 tackle. There have been many proposed approaches to alleviate the problem such
 as skip connections \cite{waibel90,lin96}, hierarchical
-architectures \cite{el96}, leaky integrators \cite{Jaeger2007}, and
+architectures \cite{el96}, leaky integrators \cite{Jaeger2007}, second-order
+methods \cite{MartensS11}, and
 regularization \cite{pascanu13}, to name a few; also, see \cite{bengio13} for a
 comparison of some of these techniques. Among all, Long Short-term
 Memory (LSTM), invented by \newcite{lstm97}, appears to be one of the most
@@ -428,7 +415,7 @@ Instead of jumping directly into the detailed formulation, let us provide intuit
 on how to gradually build up an LSTM architecture. First, we can construct a
 simple memory unit as follows:
 \begin{align}
-\mem{t} &= \mem{t-1} + \sigma(\W{xh}\x{t} + \W{hh}\hid{t-1}
+\mem{t} &= \mem{t-1} + \sigma\paren{\W{xh}\x{t} + \W{hh}\hid{t-1}}
 \label{e:simple_mem}) \\
 \hid{t} &= \mem{t}
 \end{align}
@@ -436,23 +423,44 @@ simple memory unit as follows:
 This architecture can be viewed as a form of ``leaky'' integration 
 mentioned in \cite{sutskever12,bengio13} since it is equivalent to $\hid{t} =
 \hid{t-1} + \sigma(\W{xh}\x{t} + \W{hh}\hid{t-1})$. Training this
-network over long sequences is extremely easy since among the exponentially many backpropagation
-paths, there is a path through all the memory units $\mem{t}$ that is
+network over long sequences is easy since among the exponentially many backpropagation
+paths, there is exactly one path that goes through all the memory units
+$\mem{i}$ ($i=\overline{1,T}$) and is
 guaranteed to not vanish since $d\mem{t} = d\mem{t-1}$ along that path. 
 
-However sometimes, we might want to pay more attention to the memory or the
-input
-To add more power or flexibility to this architecture
-%However, as noted by \newcite{sutskever12}, 
-
-For a single LSTM block at layer $l$ and time $t$, the new hidden state $\hlt$ and memory cell $\clt$ are calculated from $\MB{h_t^{l-1}}$, $\MB{h_{t-1}^l}$ and $\MB{c_{t-1}^l}$ like so:
+Such architecture, however, does not account for the fact that certain inputs,
+e.g., function words or punctuations,
+are, sometimes, not relevant to the task at hand and should be downweighted.
+Occasionally, we might also want
+to reset the memory, e.g., at the beginning of each sentence in a
+paragraph. To add more flexibility and power to this architecture, the LSTM adds
+forget, input, and output gates as follows:
 \begin{align}
-\label{eqn:LSTMdef1}
+\mem{t} &= \fg \edot \mem{t-1} + \ig \edot \sigma\paren{\W{xh}\x{t} +
+\W{hh}\hid{t-1}} \\
+\hid{t} &= \og \edot \sigma\paren{\mem{t}} \label{e:lstm_output})
+\end{align}
+We note that, in \eq{e:lstm_output}, 
+the memory cell $\mem{t}$ is passed through a nonlinear function $\sigma$ before the output
+gate $\og$ is used to extract relevant information in the hope for better
+information retrieval.
+%or the cell 
+%before extracting information for $\hid{t}$ using the output gate $\og$,
+%we introduce some non-linearity through $\sigma$ to better retrieve information
+%from the memory or the cell $\mem{t}$. 
+As an evidence, \newcite{greff15} have
+shown that such a output nonlinearity is critical to the performance of an LSTM. Moving on, to ensure that the
+gates are adaptive, we build them from the information given by the current
+input $\x{t}$ and the previous hidden state $\hid{t-1}$. We also want the gates to be in $[0, 1]$,
+so $\sigm$ will be used. All
+of these desiderata lead to the below LSTM formulation described in
+\cite{zaremba14} in which $\sigma$ is chosen to be $\tanh$:
+\begin{align}
 \begin{pmatrix}
-\ilt \\
-\flt \\
-\olt \\
-\glt
+\ig \\
+\fg \\
+\og \\
+\hg
 \end{pmatrix}
 &= 
 \begin{pmatrix}
@@ -461,45 +469,163 @@ For a single LSTM block at layer $l$ and time $t$, the new hidden state $\hlt$ a
 \sigm \\
 \tanh
 \end{pmatrix}
-\lstm
 \begin{bmatrix}
-  \MB{h_t^{l-1}} \\
-  \MB{h_{t-1}^l}
- \end{bmatrix} \\
-\clt &= \flt \circ \MB{c_{t-1}^l} + \ilt \circ \glt \\
-\hlt &= \olt \circ \tanh(\clt)
+\W{xi} \W{hi} \\
+\W{xf} \W{hf} \\
+\W{xo} \W{ho} \\
+\W{xh} \W{hh}
+\end{bmatrix}
+\begin{bmatrix}
+  \x{t} \\
+  \hid{t-1}
+\end{bmatrix} \label{e:lstm_detailed}\\
+\mem{t} &= \fg \edot \mem{t-1} + \ig \edot \hg \label{e:lstm_cell}\\
+\hid{t} &= \og \edot \tanh(\mem{t}) \label{e:lstm_detailed_output}
 \end{align}
-where $\sigm$ and $\tanh$ are applied element-wise, $\circ$ denotes element-wise multiplication, 
-and $\MB{T}_{4n \times 2n}$ is a $4n \times 2n$ matrix of weights that depends on $l$ but not $t$.\footnote{Note: Sometimes these equations are written omitting the superscript $l$ and writing $\MB{h_t^{l-1}}$ as $x_t$, but for the purposes of deriving the back-propagation equations, we need to refer to the layer $l$ explicitly.}
-If $l=1$ then $\MB{h_t^{l-1}}$ is the input vector $x_t$.
-If $t=1$ then $\MB{h_{t-1}^l}$ and $\MB{c_{t-1}^l}$ are taken to be zero.
 
-An LSTM block at layer $l \in \{1, \dots L\}$ and time $t \in \{1, \dots T\}$ consists of:
-\begin{itemize}
-\item The hidden state $\hlt \in \mathbb{R}^n$
-\item The memory cell $\clt \in \mathbb{R}^n$
-\item The input gate $\ilt \in [0,1]^n$
-\item The forget gate $\flt \in [0,1]^n$
-\item The output gate $\olt \in [0,1]^n$
-\item The input modulation gate $\glt \in [0,1]^n$
-\end{itemize}
-We call $n$ the LSTM block size.
+%In similar spirit as \eq{e:rnn_simplified}, we can be GPU-efficient with
+%equations later, we can rewrite \eq{e:lstm_detailed} as:
+Following the same spirit as \eq{e:rnn_simplified}, we can be GPU-efficient with
+\eq{e:lstm_detailed} since the 8 different submatrices is grouped into a single big matrix,
+which we call $\lstm$. Let $\z{t}\!=\![\x{t}; \hid{t-1}]$, what we do is
+first multiply $\lstm \z{t}$ and then apply different non-linear functions to
+corresponding parts of the output. For the ease of deriving backpropagation
+equations later, we can rewrite \eq{e:lstm_detailed} as:
+\begin{align}
+\ut &= g(\lstm \z{t}) \\
+&= g(\xparam\x{t} + \hparam\hid{t-1})
+\label{e:lstm simplified}
+\end{align}
+Here, $g$ is a non-linear function applied element-wise and we define $g$ loosely in the sense that it uses $\tanh$ only for the vector part corresponding to $\hg$ and $\sigm$ for the rest.
 
-\paragraph{LSTM Backpropation}
-$\MB{\delta_{c^{(2)}}}$
 
-$\MB{\delta_{h^{(2)}}}$
+%\begin{align}
+%\label{e:lstm simplified}
+%\begin{pmatrix}
+%\ig \\
+%\fg \\
+%\og \\
+%\hg
+%\end{pmatrix}
+%&= 
+%\begin{pmatrix}
+%\sigm \paren{\iparam \z{t}} \\
+%\sigm \paren{\fparam \z{t}} \\
+%\sigm \paren{\oparam \z{t}} \\
+%\tanh \paren{\hparam \z{t}}
+%\end{pmatrix}
+%\end{align}
+%Note that $\hparam\!=\![\MB{W_{xh}} \MB{W_{hh}}]$ is the same as $\rnn$ in
+%\eq{e:rnn_simplified}; we define $\iparam, \fparam, \oparam$ similarly for the
+%input, forget, and output gates.
 
-$\MB{\delta_{c^{(1)}}}$
+\paragraph{LSTM Training}
+In the LSTM training pipeline, there are many components that are exactly the
+same or very similar to RNN training. We will now highlight some key
+differences. First of all, LSTM extends the recurrence function to have not just
+the hidden states but also the memory cells as both inputs and outputs. The
+definition is as below:
+\begin{align}
+\paren{\hid{t}, \mem{t}} &= f\paren{\x{t}, \hid{t-1}, \mem{t-1}}
+\label{e:abstract_lstm}
+\end{align}
+In our case, the abstract function $f$ is implemented by
+Eq.~\ref{e:lstm_detailed}-\ref{e:lstm_detailed_output}. Once $\hid{t}$ is
+computed, the prediction process is the same as that of RNNs which is given by
+Eq.~\ref{e:score}-\ref{e:softmax}. The training objective in \eq{e:objective}
+remains unchanged as well.
 
-$\MB{\delta_{h^{(1)}}}$
+\paragraph{LSTM Backpropagation}
+Since the prediction procedure is the same, LSTM backpropagation pipeline mimics
+that of RNNs up to \eq{e:grad_ht} and \eq{e:grad_Why}, which computes $d\hid{t}$
+and $d\W{hy}$ respectively.
 
-$\MB{\delta_{c}} \pluseq \MB{\delta_{h}}\MB{o_t}\tanh'(\MB{c_t}) $
+Given $d\hid{t}$, we now work backwark to derive other gradients. First,
+starting from \eq{e:lstm_detailed_output} and by applying
+\lemmaref{l:edot_der}, we have:
+\begin{align}                        
+d\og = \tanh(\mem{t}) \edot d\hid{t} \\
+d\mem{t} = \tanh'(\bm{\mem{t}}) \edot \bm{\og} \edot d\hid{t} 
+\end{align} 
 
-$\MB{\delta_{c}} = \MB{\delta_{c}} \circ \MB{f_t} $
+Before backpropagating \eq{e:lstm_cell}, once must {\it remember} to update $d\mem{t}$ with the gradient sent back from $\mem{t+1}$, which is accomplished by Lines~6 and 10 of Algorithm~\ref{a:lstm}. Given the updated $d\mem{t}$, we apply Corollary~\ref{c:edot_der} to derive: 
+\begin{align}                        
+d\fg = \mem{t-1} \edot d\mem{t} \\
+d\mem{t-1} = \fg \edot d\mem{t} \\
+d\ig = \hg \edot d\mem{t} \\
+d\hg = \ig \edot d\mem{t}
+\end{align} 
 
-$\MB{\delta_{h}} \pluseq \text{upper grad}$
+%For \eq{e:lstm simplified}, by applying \lemmaref{l:chain_rule} repeatedly for $\ig, \fg, \og, \hg$, we arrive at:
+%\begin{align}
+%\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}}
+%\\
+%\der{W} = \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}} 
+%\end{align}
 
+Let $d\ut = [d\ig; d\fg; d\og; d\hg]$ (vertical concatenation), we are now ready to backpropagate through \eq{e:lstm simplified}. In a similar manner as RNNs, Eq.~\ref{e:grad_xt}-\ref{e:grad_Whh}, we arrive at:
+\begin{align}
+% x_t
+d\x{t} &=  \tp{\xparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}\\
+% h_{t-1}
+d\hid{t-1} &=  \tp{\hparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}\\
+% T_x 
+d\xparam &=  \paren{g'(\lstm \z{t}) \edot d\ut} \cdot \tp{\x{t}} \\
+% T_h 
+d\hparam &=  \paren{g'(\lstm \z{t}) \edot d\ut} \cdot \tp{\hid{t-1}}
+\end{align}
+
+All of these gradients can now be put together in the below BPTT algorithm for LSTM:
+\begin{algorithm}
+\label{a:lstm}
+\For{$t=T \rightarrow 1$}
+{
+\tcp{Output backprop}
+% d_s
+$d\s{t} \leftarrow \bm{1}_{y_t} - \prob{t}$
+
+% W_hy
+$d\W{hy} \leftarrow d\W{hy} + d\s{t} \cdot \tp{\hid{t}}$
+
+% h_t
+$d\hid{t} \leftarrow d\hid{t} + \tp{\W{hy}} \cdot d\s{t}$
+
+\tcp{LSTM backprop}
+% og
+$d\og \leftarrow \tanh(\mem{t}) \edot d\hid{t}$
+
+% ct
+$d\mem{t} \leftarrow d\mem{t} + \tanh'(\bm{\mem{t}}) \edot \bm{\og} \edot d\hid{t}$ \tcp*{Already included $d\mem{t+1}$}
+
+% ft
+$d\fg \leftarrow \mem{t-1} \edot d\mem{t}$
+
+% it
+$d\ig \leftarrow \hg \edot d\mem{t}$
+
+% hhat_t
+$d\hg \leftarrow \ig \edot d\mem{t}$
+
+% reset, c{t-1}
+$d\mem{t} \leftarrow \fg \edot d\mem{t}$ \tcp*{Compute $d\mem{t-1}$}
+
+$d\ut = [d\ig; d\fg; d\og; d\hg]$
+
+% T_x 
+$d\xparam \leftarrow \paren{g'(\lstm \z{t}) \edot d\ut} \cdot \tp{\x{t}}$
+
+% T_h 
+$d\hparam \leftarrow  \paren{g'(\lstm \z{t}) \edot d\ut} \cdot \tp{\hid{t-1}}$
+
+\tcp{Input backprop}
+% x_t
+$d\x{t} \leftarrow  \tp{\xparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}$
+
+% h_{t-1}
+$d\hid{t-1} \leftarrow  \tp{\hparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}$
+}
+\caption{BPTT algorithm for LSTM}
+\end{algorithm}
 
 \section{Neural Machine Translation}
 \begin{figure}[tbh!]

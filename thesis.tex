@@ -94,7 +94,6 @@
 \newcommand{\y}[1]{\bm{y}_{#1}}
 \newcommand{\z}[1]{\bm{z}_{#1}}
 \newcommand{\s}[1]{\bm{s}_{#1}}
-\newcommand{\mem}[1]{\bm{c}_{#1}}
 \newcommand{\prob}[1]{\bm{p}_{#1}}
 \newcommand{\der}[1]{d\bm{#1}}
 \newcommand{\W}[1]{\bm{W}_{#1}}
@@ -103,6 +102,20 @@
 \newcommand{\yrange}[2]{y_{\overline{#1,#2}}}
 \newcommand{\ytop}[1]{y^{(#1)}}
 \newcommand{\thetav}{\bm{\theta}}
+
+\newcommand{\edot}{\circ}
+% lstm
+\newcommand{\mem}[1]{\bm{c}_{#1}}
+\newcommand{\ig}{\bm{i}_{t}}
+\newcommand{\fg}{\bm{f}_{t}}
+\newcommand{\og}{\bm{o}_{t}}
+\newcommand{\hg}{\MB{\hat{h}_t}}
+%\newcommand{\iparam}{\MB{T}_{\text{i}}} % input params 
+%\newcommand{\fparam}{\MB{T}_{\text{f}}} % forget params 
+%\newcommand{\oparam}{\MB{T}_{\text{o}}} % output params 
+\newcommand{\hparam}{\MB{T}_{\text{h}}} % hidden params 
+\newcommand{\xparam}{\MB{T}_{\text{x}}} % hidden params 
+\newcommand{\ut}{\bm{u}_t}
 
 % NMT
 \newcommand{\tgt}[1]{y_{#1}} % target word
@@ -204,9 +217,9 @@
 \label{c:misc}
 \begin{lemma}
 \label{l:diag_mul}
-Let $\bm{u}$, $\bm{v}$ be any vectors and $\odot$ be element-wise vector multiplication, we have:
+Let $\bm{u}$, $\bm{v}$ be any vectors and $\edot$ be element-wise vector multiplication, we have:
 \begin{align}
-\diag (\bm{u}) \cdot \bm{v} = \bm{u} \odot \bm{v}
+\diag (\bm{u}) \cdot \bm{v} = \bm{u} \edot \bm{v}
 \end{align}
 \end{lemma}
 
@@ -217,9 +230,9 @@ already knew how to compute its gradient $\der{v}$ with respect to a vector $\bm
 $\bm{v} = f(\bm{Wh})$, the gradients $\der{h}, \der{W}$ of the loss $l$ with respect to the vector
 $\bm{h}$ and the matrix $\bm{W}$ can be derived as follows:
 \begin{align}
-\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \odot \der{v}}
+\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}}
 \\
-\der{W} = \paren{f'(\bm{Wh}) \odot \der{v}} \cdot \tp{\bm{h}} 
+\der{W} = \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}} 
 \end{align}
 \end{lemma}
 
@@ -231,7 +244,7 @@ Let $\bm{z} = \bm{Wh}$, we have the following derivations: %applying chain rules
 &= \fracder{\bm{Wh}}{\bm{h}} \cdot \fracder{f(\bm{z})}{\bm{z}}
 \cdot \der{v} \\
 &=\tp{\bm{W}} \cdot \diag \paren{f'(\bm{z})} \cdot \der{v} \\
-&=\tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \odot \der{v}} &&
+&=\tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}} &&
 \text{[\lemmaref{l:diag_mul}]}
 \end{align*}
 
@@ -246,7 +259,7 @@ d\bm{w}_i &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
 &= \bm{h} \cdot f'(z_i) \cdot dv_i \\ 
 d\tp{\bm{w}_i} &= \paren{f'(z_i) \cdot dv_i} \cdot
 \tp{\bm{h}} && \text{[Tranposing]} \\
-\der{W} &= \paren{f'(\bm{Wh}) \odot \der{v}} \cdot \tp{\bm{h}}
+\der{W} &= \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}}
 && \text{[Concatenating row derivatives]}
 \end{align*}
 \end{proof}
@@ -261,6 +274,38 @@ i.e., $\bm{v} = \bm{Wh}$, we have:
 \der{W} = \der{v} \cdot \tp{\bm{h}} 
 \end{align}
 \end{corollary}
+
+\begin{lemma}
+\label{l:edot_der}
+Let $\bm{u}$, $\bm{v}, \bm{s}$ be any vectors such that  $\bm{s} = \bm{u} \edot
+f(\bm{v})$. Also, let $d\bm{u}$, $d\bm{v}, d\bm{s}$ be the gradients of a loss $l$ with
+respect to the corresponding vectors. We have:
+\begin{align}
+d\bm{u} = f(\bm{v}) \edot d\bm{s} \\
+d\bm{v} = f'(\bm{v}) \edot \bm{u} \edot d\bm{s} 
+%d\bm{u} = \diag \paren{f(\bm{v})} \cdot d\bm{s} \\
+%d\bm{v} = \diag \paren{f'(\bm{v}} \edot \bm{u}} \cdot d\bm{s} 
+\end{align}
+\end{lemma}
+
+%\begin{proof}
+%\begin{align}
+%d\bm{u} &= \parder{\diag \paren{f(\bm{v})} \cdot d\bm{s} \\
+%\end{align}
+%\end{proof}
+
+\begin{corollary}
+\label{c:edot_der}
+As a special case of \lemmaref{l:edot_der} when $f$ is an identity function,
+i.e.,  $\bm{s} = \bm{u} \edot \bm{v}$. We have:
+\begin{align}
+%d\bm{u} = \diag (\bm{v}) \cdot d\bm{s} \\
+%d\bm{v} = \diag (\bm{u}) \cdot d\bm{s} 
+d\bm{u} = \bm{v} \edot d\bm{s} \\
+d\bm{v} = \bm{u} \edot d\bm{s} 
+\end{align}
+\end{corollary}
+
 
 %\chapter{LSTM Backpropagation}
 %\input{2-backwardprop}
