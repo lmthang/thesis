@@ -40,6 +40,7 @@ Then, we delve into details of one particular type of RNNs, the Long Short-term 
 Given RNNs as a building block, we discuss NMT together with tips and tricks for better training and testing NMT.
 
 \section{Recurrent Neural Network}
+\label{sec:rnn}
 Recurrent Neural Network (RNNs) \cite{elman90} are models that help understand
 the temporal aspect as well as build up representations for sequential data
 using a dynamic memory structure. At the surface form, an RNN takes as input a sequence of vectors $\x{1},
@@ -123,6 +124,7 @@ focused angle, the language learning aspect. For more details on RNNs, we refer 
 \cite{sutskever12,mikolov12,karpathy15rnn}.
 
 \subsection{Recurrent Language Models}
+\label{subsec:rlm}
 To apply RNNs to sentences in languages, or generally sequences of discrete symbols, one can
 consider one-hot representations $\x{i} \inR{|V|}$, with $V$ being the
 vocabulary considered. However, for a large
@@ -492,7 +494,7 @@ first multiply $\lstm \z{t}$ and then apply different non-linear functions to
 corresponding parts of the output. For the ease of deriving backpropagation
 equations later, we can rewrite \eq{e:lstm_detailed} as:
 \begin{align}
-\ut &= g(\lstm \z{t}) \\
+\ut &= g(\lstm \z{t}) \label{e:lstm_notation} \\
 &= g(\xparam\x{t} + \hparam\hid{t-1})
 \label{e:lstm simplified}
 \end{align}
@@ -628,6 +630,39 @@ $d\hid{t-1} \leftarrow  \tp{\hparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}$
 \end{algorithm}
 
 \section{Neural Machine Translation}
+Having introduced recurrent language models, one can simply think of
+neural machine translation (NMT) as a recurrent language model that conditions
+on the source sentence. More formally, NMT aims to directly model the
+conditional probability $p(\tgt{}|\src{})$ of translating
+a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
+It accomplishes this goal through an {\it encoder-decoder} or {\it
+sequence-to-sequence} framework
+\cite{kal13,sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
+for each source sentence. Based on that source representation,
+the {\it decoder} generates a translation, one target word at a time, and hence,
+decomposes the log conditional probability as:
+\begin{equation}
+\log p(\tgt{}|\src{}) = \sum_{t=1}^m \nolimits \log
+p\paren{\tgt{t}|\tgt{<t},\MB{s}}
+\label{e:s2s}
+\end{equation}
+
+NMT models vary in terms of the exact architectures to use.
+A natural choice for sequential data is the recurrent
+neural network (RNN), used by most of the recent NMT work and for both the
+encoder and decoder.
+RNN models, however, differ in terms of: (a) {\it directionality} -- unidirectional
+or bidirectional; (b) {\it depth} -- single or deep multi-layer; and (c) {\it
+type} -- often either a vanilla, an LSTM 
+\cite{lstm97}, or a gated recurrent unit (GRU) \cite{cho14}.
+In general, for the encoder, almost any architecture can be used since we have
+fully observed the source sentence. 
+For example, \newcite{kal13} used a convolutional neural network for encoding the source.
+Choices on the decoder side are more limited since we need to be able
+to generate a translation. At the time of this thesis, the most popular choice is a
+unidirectional RNN, which simplifies the beam-search decoding algorithm by
+producing translations from left to right.
+
 \begin{figure}[tbh!]
 \centering
 \includegraphics[width=0.8\textwidth, clip=true, trim= 0 0 0
@@ -640,55 +675,68 @@ translating a source sentence \word{I am a student} into a target sentence
 \label{f:nmt_details}
 \end{figure}
 
+In this thesis, all our NMT models are deep multi-layer RNNs which are 
+unidirectional and have LSTM as the recurrent unit. We show an example of
+such model in Figure~\ref{f:nmt_details} though it should be easy to extend to
+other RNN architectures. In this example, we train our model to translate a source sentence
+\word{I am a student} into a target one \word{Je suis \'{e}tudiant}.
+At a high level, our NMT models consist of two recurrent language models as
+described in \secref{subsec:rlm}: the {\it encoder} RNN simply consumes the input
+source words without making any prediction; the {\it decoder}, on the other
+hand, processes
+the target sentence while predicting the next words. 
 
-Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
-a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
-It accomplishes such goal through the {\it encoder-decoder} framework \cite{sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
-for each source sentence. Based on that source representation,
-the {\it decoder} generates a translation, one target word at a time, and hence, decomposes the conditional probability as:
-\begin{equation}
-\log p(\tgt{}|\src{}) = \sum_{j=1}^m \nolimits \log
-p\paren{\tgt{j}|\tgt{<j},\src{},\MB{s}}
-\end{equation}
+In more detail, at the bottom layer, the encoder and decoder RNNs receive as
+{\it input} the following: first,
+the source sentence, then a boundary marker \word{\_} which indicates the
+transition from the encoding to the decoding mode, and the target sentence. 
+Given these discrete words, the model looks up the source and target
+embeddings to retrieve the corresponding word representations.
+For this {\it embedding layer} to work, a vocabulary is chosen for each language, and
+often the top $V$ frequent words are selected.
+%Thus, every word in the source or target vocabulary can be represented by a one-hot vector of length $V$.
+%The source input sentence and target input sentence, represented as a sequence
+%of one-hot vectors, are transformed into a sequence of word embeddings by the
+%\emph{embedding} weights. 
+These embedding weights, one set per language, are learned during training.
+While one can choose to initialize embedding weights with pretrained word
+representations, such as word2vec \cite{mikolov13nips} and Glove
+\cite{pennington2014}, we found, in this thesis, that these
+embeddings can be initialized randomly and learned from scratch given large training datasets.
 
-A natural choice to model such a decomposition in the decoder is to use a
-recurrent neural network (RNN) architecture, which most of the recent NMT work have in common. They,
-however, differ in terms of the RNN architectures used and how the encoder computes the source representation $\MB{s}$.
-%, e.g., vanilla RNN, long-short term memory (LSTM) \cite{lstm97} or gated recurrent units \cite{cho14}
+%, are different for the source words and the target words.
+%The word embeddings and all hidden layers are vectors of length $n$ (a chosen hyperparameter).
 
-Kalchbrenner and Blunsom \cite{kal13} used an RNN with the vanilla RNN unit for the decoder and a
-convolutional neural network for encoding the source. On
-the other hand, Sutskever et al. \cite{sutskever14} and Luong et al.
-\cite{luong15,luong15attn} built deep RNNs with the Long Short-Term Memory (LSTM) unit
-\cite{lstm97} for both the encoder and the decoder. Cho et al., \cite{cho14}, Bahdanau et al.,
-\cite{bog15}, and Jean et al. \cite{jean15,mono15} all adopted an
-LSTM-inspired hidden unit, the gated recurrent unit (GRU), and used bidirectional
-RNNs for the encoder.
-%\footnote{They all used a single RNN layer except for the latter two
-%works which utilized a bidirectional RNN for the encoder.}
+Once retrieved, the word embeddings are then fed as input into the main network, which consists
+of two multi-layer RNNs `stuck together' --- an encoder for the source
+language and a decoder for the target language. 
+The encoder RNN uses zero vectors as its starting states. The decoder, on the
+other hand, needs to have access to the source information, so one simple way to
+achieve that is to
+initialize it with the last hidden state of the encoder.\footnote{This is not the only way to initialize the decoder,
+e.g., \newcite{cho14} connect the last encoder state to every timesteps in the
+decoder.} In Figure~\ref{f:nmt_details}, we pass  
+the hidden state at the source word \word{student} to the decoder side.
+The \emph{feed-forward} (vertical) weights connect
+the hidden unit from the layer below to the upper one; whereas, the
+\emph{recurrent} (horizontal) weights transfer the history knowlege from the previous
+timestep to the next one.
+Often, we use different weights across the encoder and decoder as well as
+across different layers; in the current example, we have 4 different LSTM
+weight sets $\lstm$, detailed in \eq{e:lstm_notation}, over $\{\text{encoder,
+decoder}\} \times \{1^{\text{st}}, 2^{\text{nd}} \text{ layer}\}$.
+%The hidden state at the top layer of the decoder is fed through an
+%\textit{attention} layer, which guides the translation by `paying attention' to relevant parts of the source sentence; 
+%for more information see \cite{bahdanau2014neural} or Section 3 of \cite{luong2015effective}.
+Finally, for each target word, the hidden state at the top layer is transformed by the
+\emph{softmax} weights into a probability distribution over the target
+vocabulary of size $V$ according to \eq{e:score} and \eq{e:prob}. 
 
-In more details, considering the top recurrent layer in a deep RNN architecture, one can compute the probability of decoding each target word $y_j$ as:
-\begin{equation}
-p\left(\tgt{j}|\tgt{<j},\src{},\MB{s}\right) = \softmax\paren{\hd{j}}
-\end{equation}
-%with $g$ being the transformation function that outputs a vocabulary-sized
-%vector.\footnote{One can provide $g$ with other inputs such as the currently
-%predicted word $\tgt{j}$ as in \cite{bog15}.} 
-with $\hd{j}$ being the current target hidden state computed as:
-\begin{equation}
-\label{e:rnn}
-\hd{j} = f(\hd{j-1}, \tgt{j-1}, \MB{s})
-\end{equation}
-Here, $f$ derives the current state given the previous state
-$\hd{j-1}$, the
-current input (often the previous word $\tgt{t-1}$), and optionally, the source
-representation $\MB{s}$.
-$f$ can be a vanilla RNN unit, a GRU, or an LSTM. 
-The early NMT approach  \cite{kal13,sutskever14,cho14,luong15} uses the last source hidden state
-$\MB{s}=\hb{n}$ once to initialize the decoder hidden state and sets $\MB{s}=[\text{ }]$ in
-\eq{e:rnn}.
+\paragraph{Training}
+Training neural machine translation is almost similar to training recurrent
+language models that we have discussed in \secref{sec:rnn} except for the
+source-conditioning part.
 
-\subsection{Training}
 The training objective is formulated as follows:
 \begin{equation}
 J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
@@ -711,7 +759,7 @@ architecture proposed by \newcite{sutskever14} for
 translating a source sentence \word{I am a student} into a target sentence
 \word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
 } 
-\label{f:nmt_details}
+\label{f:nmt_test}
 \end{figure}
 
 
@@ -778,4 +826,77 @@ translating a source sentence \word{I am a student} into a target sentence
 %\al = Attend(\hd{t-1}, \MB{a}_{t-1}, \MB{\bar{h}}_{1 \ldots S})
 %\end{align}
 
+%The target word with the highest score is selected as the output translation.
+
+%\noindent {\bf Attention Mechanism} -- 
+%The early NMT approaches \cite{sutskever14,cho14}, which we have described above, use only the last encoder state
+% to initialize the decoder, i.e., setting the input representation $\MB{s}$ in
+% \eq{e:s2s} to $[\hb{n}]$. Recently, \newcite{bog15} propose an {\it attention
+% mechanism}, a form of random access memory for NMT to 
+%cope with long input sequences.
+%\newcite{luong15attn} further extend the attention mechanism to different
+%scoring functions, used to compare source and target
+%hidden states, as well as different
+%strategies to place the attention.
+%In all our models, we utilize the {\it global} attention mechanism and the {\it
+%bilinear form} for the attention scoring function similar to 
+%\cite{luong15attn}.
+%
+%\begin{figure}
+%\centering
+%%\psgrid
+%\rput(4.3,6.5){$\tgt{t}$}
+%\rput(1.4,5.6){$\mem{t}$}
+%\rput(0.8,3.1){$\hb{1}$}
+%\rput(2.9,3.1){$\hb{n}$}
+%\rput(4.9,3.1){$\hid{t}$}
+%\rput(4.9,6.0){$\hs$}
+%%\rput(4.0,3.8){$\hd{t-1}$}
+%\includegraphics[width=0.33\textwidth, clip=true, trim= 0 0 0 0]{img/attn.eps} % , angle=-90
+%\caption{{\bf Attention mechanism}.
+%} 
+%\label{f:attn}
+%\end{figure}
+%
+%Specifically, we set $\MB{s}$ in \eq{e:s2s} to
+%the set of source hidden states at the top layer, $[\hb{1}, \dots, \hb{n}]$. 
+%As illustrated in Figure~\ref{f:attn}, the attention mechanism consists of two stages: (a) {\it
+%context vector} -- the current hidden state $\hid{t}$ is compared with
+%individual source hidden states in $\MB{s}$ to learn an alignment vector, which
+%is then used to compute the context vector $\co$ as a weighted average of
+%$\MB{s}$; and (b) {\it
+%attentional hidden state} -- the context vector $\co$ is then used to derive a
+%new attentional hidden state:
+%\begin{equation}
+%\hs = \tanh(\W{}[\co; \hi])
+%\label{e:hs}
+%\end{equation} 
+%The attentional vector $\hs$ then replaces $\hid{t}$ in \eq{e:softmax} in
+%predicting the next word.
+
+%\newcite{kal13} used an RNN with the vanilla RNN unit for the decoder and a
+%convolutional neural network for encoding the source. On
+%the other hand, \newcite{sutskever14} and our work built deep RNNs with the LSTM unit
+%for both the encoder and the decoder. \newcite{cho14},  
+%\newcite{bog15}, inter alia, adopted an
+%LSTM-inspired hidden unit, the gated recurrent unit (GRU), and used bidirectional
+%RNNs for the encoder.
+
+%In more detail, considering the top recurrent layer in a deep RNN architecture, one can compute the probability of decoding each target word $y_j$ as:
+%\begin{equation}
+%p\left(\tgt{j}|\tgt{<j},\src{},\MB{s}\right) = \softmax\paren{\hid{j}}
+%\end{equation}
+%with $\hid{j}$ being the current target hidden state computed as:
+%\begin{equation}
+%\label{e:rnn}
+%\hid{j} = f(\hid{j-1}, \tgt{j-1}, \MB{s})
+%\end{equation}
+%Here, $f$ derives the current state given the previous state
+%$\hid{j-1}$, the
+%current input (often the previous word $\tgt{t-1}$), and optionally, the source
+%representation $\MB{s}$.
+%$f$ can be a vanilla RNN unit, a GRU, or an LSTM. 
+%The early NMT approach  \cite{kal13,sutskever14,cho14,luong15} uses the last source hidden state
+%$\MB{s}=\hb{n}$ once to initialize the decoder hidden state and sets $\MB{s}=[\text{ }]$ in
+%\eq{e:rnn}.
 

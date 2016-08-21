@@ -57,6 +57,7 @@
 \newcommand{\nlmtext}{neural probabilistic language models}
 \newcommand{\nlm}{NPLM}
 \newcommand{\nlms}{NPLMs}
+\newcommand{\secref}[1]{Section~(\ref{#1})}
 
 % math operators
 %\DeclareMathOperator*{\argmax}{\arg\,\max}
@@ -97,7 +98,6 @@
 \newcommand{\prob}[1]{\bm{p}_{#1}}
 \newcommand{\der}[1]{d\bm{#1}}
 \newcommand{\W}[1]{\bm{W}_{#1}}
-\newcommand{\hid}[1]{\bm{h}_{#1}}
 \newcommand{\inR}[1]{\in \mathbb{R}^{#1}}
 \newcommand{\yrange}[2]{y_{\overline{#1,#2}}}
 \newcommand{\ytop}[1]{y^{(#1)}}
@@ -121,14 +121,19 @@
 \newcommand{\tgt}[1]{y_{#1}} % target word
 \newcommand{\src}[1]{x_{#1}} % source word
 \newcommand{\al}{\MB{a}_{t}} % align
-\newcommand{\hi}{\MB{h}_{t}} % hidden top
-\newcommand{\his}{\MB{\bar{h}}_{s}} % hidden top source
-\newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
+\newcommand{\hid}[1]{\bm{h}_{#1}}
+%\newcommand{\his}{\MB{\bar{h}}_{s}} % hidden top source
+\newcommand{\hs}{\MB{\tilde{h}}_{t}} %h softmax
+%\newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
 \newcommand{\hb}[1]{\MB{\bar{h}}_{#1}} % hidden source
 %\newcommand{\rnn}{\MB{T}_{d \times 2d}} % RNN
 \newcommand{\rnn}{\MB{T}_{\text{rnn}}} % RNN
 % \newcommand{\lstm}{\MB{T}_{4d \times 2d}} % lstm 
 \newcommand{\lstm}{\MB{T}_{\text{lstm}}} % LSTM 
+
+% to remove:
+\newcommand{\hi}{\MB{h}_{t}} % hidden top
+\newcommand{\co}{\MB{c}_{t}} % context
 
 
 %% Abi
