@@ -95,7 +95,7 @@ the vectors $\prob{t}$ and $\s{t}$ that correspond to $y$.
 \label{e:softmax}
 \end{align}
 
-With the above formulae, we have completely defined the RNN weight set $\thetav$
+With the above formulas, we have completely defined the RNN weight set $\thetav$
 %=\!\{\W{xh}, \W{hh}, \W{hy}\}$, 
 which consists of {\it input} connections $\W{xh}$, {\it
 recurrent} connections $\W{hh}$, and {\it output}
@@ -218,7 +218,7 @@ respectively and define intermediate gradients $d\s{t}, d\hid{t}$ similarly.
 Starting with the loss $l_t$, we employ backpropagation through structures
 \cite{goller:ieeenn00} to derive each gradient one by one in the following
 order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
-\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. To simplify the math, we will utlize
+\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. To simplify the math, we will utilize
 several lemmas and corollaries provided in Appendix~\ref{c:misc}.
 
 First, from \eq{e:softmax}, we have:
@@ -241,10 +241,12 @@ The above gradients can be concisely written in vector form as:
 d\s{t} = \bm{1}_{y_t} - \prob{t}
 \end{align}
 
-Here, $\prob{t}$ is the probability distribution defined in \eq{e:prob} and has been calculated in the forward pass,
+Here, $\prob{t}$ is the probability distribution defined in \eq{e:prob} and has
+been calculated in the forward pass,
 so we simply reuse it. $\bm{1}_{y_t}$ is a one-hot vector with 1 at position
 $y_t$. 
-Applying Corollary~\ref{c:chain_rule}, noting that $\s{t} = \W{hy}\hid{t}$ in \eq{e:score}, we
+Applying Corollary~\ref{c:chain_rule}, noting that $\s{t} = \W{hy}\hid{t}$ in
+\eq{e:score}, we
 arrive at:
 \begin{align}
 % h_t
@@ -627,6 +629,7 @@ $d\x{t} \leftarrow  \tp{\xparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}$
 $d\hid{t-1} \leftarrow  \tp{\hparam} \cdot \paren{g'(\lstm \z{t}) \edot d\ut}$
 }
 \caption{BPTT algorithm for LSTM}
+\label{a:lstm_bptt}
 \end{algorithm}
 
 \section{Neural Machine Translation}
@@ -733,18 +736,90 @@ Finally, for each target word, the hidden state at the top layer is transformed 
 vocabulary of size $V$ according to \eq{e:score} and \eq{e:prob}. 
 
 \paragraph{Training}
-Training neural machine translation is almost similar to training recurrent
-language models that we have discussed in \secref{sec:rnn} except for the
-source-conditioning part.
-
-The training objective is formulated as follows:
+Training neural machine translation is similar to training a recurrent
+language model that we have discussed in \secref{sec:rnn} except that we need to
+handle the conditioning part on source sentences.
+The training objective for NMT is formulated as:
 \begin{equation}
 J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
 \label{e:j_t}
 \end{equation}
-with $\mathbb{D}$ being our parallel training corpus.
+Here, $\mathbb{D}$ refers to our parallel training corpus of source and target
+sentence pairs $(x, y)$. Given the aforementioned NMT architecture,
+computing the NMT loss for $(x, y)$ during the {\it forward} pass is
+almost the same as how we compute the regular RNN loss on just $y$.
+The only difference is that we have to first compute representations for the source
+sentence $x$ to initialize the decoder RNN instead of just starting
+from zero states. For the {\it backpropagation} phase, computing gradients for
+the decoder is the same as what we have described in
+Algorithm~\ref{a:lstm_bptt} for regular RNNs. The last hidden-state gradient
+from the decoder is
+passed back to the encoder. We then continue backpropating through the encoder
+in a similar fashion as that of the decoder but without any prediction losses.
+
+More concretely, we present in
+\algo{a:nmt_forward} details in the forward pass of an NMT model which uses
+a deep multi-layer LSTM architecture. Since the encoder and decoder share
+many operations in common, we combine both the source sentence $x$ with length
+$m_x$ and the target sentence $y$ with length $m_y$ together to form an input
+sequence $s$ as shown in Line 1, which also includes the end-of-sentence marker
+\word{\_}. We first start with the encoder parameters (Line~2-3) as well as zero
+states and memories (Line~4). The algorithm switches to the decoder mode at time
+$m_x + 1$ (Line~6). The encoder and decoder share the same LSTM codebase
+(Line~10-14). We first look up the corresponding embeddings for the input
+$s_t$; then build up hidden states and memories from the bottom layer to the top
+one (the $L^{\text{th}}$ layer). The hidden state computed at one layer is used
+as input to the upper one according to Line~13. \texttt{LSTM} in Line~12 refers
+to the entire formulation in
+Eq~(\ref{e:lstm_detailed}-\ref{e:lstm_detailed_output}), which one can easily
+replace with other hidden units such as RNN and GRU. Lastly, on the decoder
+side, the top hidden state is used to predict the next symbol $s_{t+1}$
+(Line~15-17).
+
+\begin{algorithm}
+$s \rightarrow [x, \text{\_}, y, \text{\_}]$ \tcp*{Length of $s$ is $m_x + 1 +
+m_y + 1$}
+$\W{e} \leftarrow \W{e}^{\text{encoder}}$ \tcp*{Encoder embeddings}
+$\lstm \leftarrow \lstm^{\text{encoder}}$ \tcp*{Encoder LSTMs} %multi-layer 
+$\hid{0}, \mem{0} \leftarrow \bm{0}, \bm{0}$ \tcp*{Starting states and memories}
+% Multi-layer 
+%\For{$l=1 \rightarrow L$}{
+%$\hid{0}^{(l)}, \mem{0}^{(l)} \leftarrow \bm{0}, \bm{0}$ \tcp*{Starting states and
+%memories}
+%}
+\For{$t=1 \rightarrow (m_x + 1 + m_y)$}
+{
+
+\tcp{Decoder transition}
+\If{$t == (m_x + 1)$}{
+    $\W{e} \leftarrow \W{e}^{\text{decoder}}$ \; % \tcp{Decoder embeddings}
+    $\lstm \leftarrow \lstm^{\text{decoder}}$ \; % \tcp{Decoder multi-layer LSTMs}
+}
+
+\tcp{Multi-layer LSTM}
+% x_t
+$\x{t} = \text{LookUp}(s_t, \W{e})$ \;
+\For{$l=1 \rightarrow L$} {
+    $\hid{t}^{(l)}, \mem{t}^{(l)}= \text{\texttt{LSTM}}\paren{\hid{t-1}^{(l)},
+    \mem{t-1}^{(l)}, \x{t}, \lstm^{(l)}}$ \tcp*{LSTM hidden unit}
+    $\x{t} = \hid{t}^{(l)}$ \;
+}
+
+\tcp{Target-side prediction}
+\If{$t \geq (m_x + 1)$}{
+    $\text{\texttt{Predict}}(s_{t+1}, \hid{t}^{(L)},\W{hy})$ \;
+}
+}
+
 
 mention bucketing and batching
+
+
+
+
+\caption{NMT training algorithm -- {\it forward} pass.}
+\label{a:nmt_forward}
+\end{algorithm}
 
 \subsection{Testing}
 
