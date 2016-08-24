@@ -817,30 +817,6 @@ $\hid{t}^{(0)} \leftarrow \text{\texttt{Emb\_LookUp}}(s_t, \W{e})$ \;
 \label{a:nmt_forward}
 \end{algorithm}
 
-
-%% BPTT
-Next, we describe details of the backpropagation step in \algo{a:nmt_backward}.
-A quick glance through the algorithm reveals many similarities compared to the
-forward pass algorithm except that we have reversed the procedue. First, we
-start with the decoder weights and initialize all gradients to zero (Line~1-2).
-At time $m_x$, we switch to the encoder mode while saving the currently
-accumulated LSTM and embedding gradients for the decoder (Line~5-7). 
-%Individual gradients are computed in Line~13-23. 
-Thanks to the backpropagation
-procedure presented earlier for LSTM, we can simplify the core NMT gradient
-computation (Line~9-19) by making the following two referents: (a)
-\texttt{Predict\_grad} (Line~2-4 of \algo{a:lstm_bptt}) which computes gradients for the target-side
-losses with respect to the hidden states at the top layer and the softmax
-weights $\W{hy}$; and (b) \texttt{LSTM\_grad} (Line~5-15 of
-\algo{a:lstm_bptt}) which computes gradients for inputs to LSTM and the LSTM
-weights per layer $\lstm^{(l)}$. It is important to note that in Lines 11 and 16 of
-\algo{a:nmt_backward}, we add the gradients (flowed vertically from either the
-loss or the upper LSTM layer) to the gradient of the below layer (which already
-contains the gradient backpropagated horizontally)
-instead of overriding it. Lastly, in Line 19, we perform
-sparse updates on the corresponding embedding matrix for participating words
-only.
-
 \begin{algorithm}
 % $s \leftarrow [x, \text{\_}, y, \text{\_}]$ \tcp*{Length of $s$ is $m_x + 1 + m_y + 1$}
 $\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{decoder}},
@@ -888,6 +864,29 @@ d\lstm^{(1..L)}$ \tcp*{Save encoder gradients}
 \label{a:nmt_backward}
 \end{algorithm}
 
+
+%% BPTT
+Next, we describe details of the backpropagation step in \algo{a:nmt_backward}.
+A quick glance through the algorithm reveals many similarities compared to the
+forward pass algorithm except that we have reversed the procedue. First, we
+start with the decoder weights and initialize all gradients to zero (Line~1-2).
+At time $m_x$, we switch to the encoder mode while saving the currently
+accumulated LSTM and embedding gradients for the decoder (Line~5-7). 
+%Individual gradients are computed in Line~13-23. 
+Thanks to the backpropagation
+procedure presented earlier for LSTM, we can simplify the core NMT gradient
+computation (Line~9-19) by making the following two referents: (a)
+\texttt{Predict\_grad} (Line~2-4 of \algo{a:lstm_bptt}) which computes gradients for the target-side
+losses with respect to the hidden states at the top layer and the softmax
+weights $\W{hy}$; and (b) \texttt{LSTM\_grad} (Line~5-15 of
+\algo{a:lstm_bptt}) which computes gradients for inputs to LSTM and the LSTM
+weights per layer $\lstm^{(l)}$. It is important to note that in Lines 11 and 16 of
+\algo{a:nmt_backward}, we add the gradients (flowed vertically from either the
+loss or the upper LSTM layer) to the gradient of the below layer (which already
+contains the gradient backpropagated horizontally)
+instead of overriding it. Lastly, in Line 19, we perform
+sparse updates on the corresponding embedding matrix for participating words
+only.
 % mention bucketing and batching
 
 \subsection{Testing}
@@ -895,6 +894,7 @@ Having trained an NMT model, we, of course, need to be able to use it to
 translate, or decode, unseen source sentences! This section explains a few different ways to 
 accomplish this goal and how to decode with an ensemble of models.
 
+%\paragraph{Greedy Decoder} 
 The simplest strategy to translate a source sentence is to perform {\it greedy
 decoding} which we illustrate in \figref{f:nmt_test}. The idea is simple: (a) we
 first encode the source sentence,
@@ -959,3 +959,31 @@ $y_1 \leftarrow \_$ \;
 \label{a:nmt_greedy}
 \end{algorithm}
 
+%\paragraph{Beam-search Decoder} 
+
+For NMT, it turns out that such a simple strategy of greedy decoding can produce
+very good translations \cite{sutskever14}. However, to achieve better result,
+a more popular strategy is to use {\it beam-search} decoding algorithm which has been the
+core of phrase-based statistical machine translation for years \cite{Koehn:2003:SMT}.
+However, unlike phrase-based SMT, NMT has a much simpler beam-search decoding algorithm
+since it generates translations word-by-word from left to right. One can modify
+the greedy decoding algorithm as follows to build a beam-search decoder: (a) at
+each timestep on the decoder side, we keep track of the top $B$ (the beam size) best
+translations together with their corresponding hidden states; (b) in Line 7 of
+\algo{a:nmt_greedy}, instead of applying argmax, we select the top $B$ most
+likely words; and (c) given $B$ previous best translation $\times B$ best words, we
+select a new set of $B$ best translations for the current timestep based on the
+combined scores (previous translation scores + current word translation scores).
+Extra care needs to be taken to make sure that in step (c) we select correct
+hidden states for the new set of $B$ best translations. \newcite{sutskever14}
+observed that for NMT, a minimal beam size of $2$ already provides a significant
+boost in translation quality. A beam of size $10$ is often used, which is
+significant smaller that what phrase-based SMT tends to use $> 1000$.
+
+Lastly, to achieve the very best result, one simple strategy which has been
+widely adopted for deep neural networks is to use an ensemble of models. For NMT
+decoding, using multiple models is pretty straightforward. The idea is that each
+model produces a distribution at each timestep in the decoder (Line~6 of
+\algo{a:nmt_greedy}). These different distributions are then averaged to produce
+a new ensemble distribution which we can be used for both greedy and beam-search
+decoders as if we decode from a single model.
