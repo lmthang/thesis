@@ -1,0 +1,75 @@
+
+Neural Machine
+Translation (NMT) is a novel approach to MT that has 
+achieved promising results \cite{kal13,sutskever14,cho14,bog15,jean15}. 
+An NMT system is a conceptually simple large neural network that 
+reads the entire source sentence and produces an output translation one word at a time.
+NMT systems are appealing because they use minimal domain knowledge which
+makes them well-suited to any problem that can be formulated as mapping an input sequence 
+to an output sequence \cite{sutskever14}.
+In addition, the natural ability of neural networks to generalize implies that 
+NMT systems will also generalize to novel word phrases and sentences that do not occur in the
+training set. 
+In addition, NMT systems potentially remove the need to store explicit phrase tables 
+and language models which are used in conventional systems. 
+Finally, the decoder of an NMT system is easy to implement, unlike the highly
+intricate decoders used by phrase-based systems \cite{Koehn:2003:SMT}.
+
+Despite these advantages, conventional NMT systems are incapable of translating rare 
+words because they have a fixed modest-sized vocabulary\footnote{ Due to the computationally intensive nature of the softmax, NMT systems often limit 
+their vocabularies to be the top 30K-80K most frequent words in each language. However, \newcite{jean15}
+has very recently proposed an efficient approximation to the softmax that allows
+for training NTMs with very large vocabularies. As discussed in Section~\ref{sec:nmt}, this technique is complementary to ours.}
+%, although decoding time grows linearly with the size of the
+%vocabulary. {\bf ILYA: their paper used a candidate list to speed up decoding.}}
+which forces them to use the \unksym{} symbol to 
+represent the large number of out-of-vocabulary (OOV) words, as illustrated in Figure~\ref{f:sent_pair}.
+Unsurprisingly, both \newcite{sutskever14} and \newcite{bog15} have
+observed that sentences with many rare words tend to be translated much more poorly than sentences
+containing mainly frequent words.
+%
+Standard phrase-based systems \cite{koehn2007moses,chiang07hiero,cer10phrasal,dyer10cdec}, 
+on the other hand, do not suffer from the rare word 
+problem to the same extent because they can support a much larger vocabulary, 
+and because their use of explicit alignments
+and phrase tables allows them to memorize the translations 
+of even extremely rare words. 
+
+Motivated by the strengths of standard phrase-based system, we
+propose and implement a novel approach to address the rare word problem of NMTs.
+Our approach annotates the training corpus with 
+explicit alignment information that enables the NMT system to emit, for each OOV word, a
+``pointer'' to its corresponding word in the source sentence. This
+information is later utilized in a post-processing step that translates
+the OOV words using a dictionary or with the identity translation, if no translation is found.
+
+Our experiments confirm that this approach is effective. On the English to French WMT'14
+translation task, this approach provides an improvement of
+up to \bestunkimp{} (if the vocabulary is relatively small) 
+BLEU points over an equivalent NMT system that does not use this technique.
+Moreover, our system is the first NMT that outperforms the winner of a WMT'14 task.
+
+\begin{figure*}[tbh!]
+\resizebox{10cm}{!}{
+\setlength{\unitlength}{1.1cm}
+\begin{picture}(10, 2.7) %(-3,-2)
+\put(0,2){{\it en}: The \unkword{ecotax} portico in \unkword{Pont-de-Buis} , \ldots [truncated] \ldots , was taken down on Thursday morning}
+\put(0,1){{\it fr}: \mbox{} Le \unkword{portique} \unkword{\'{e}cotaxe} de \unkword{Pont-de-Buis} , \ldots [truncated] \ldots , a \'{e}t\'{e} \unkword{d\'{e}mont\'{e}} jeudi matin}
+\put(0,0){{\it nn}: Le \unksym{} de \unksym{} \`{a} \unksym{} , \ldots [truncated] \ldots , a \'{e}t\'{e} pris le jeudi matin}
+\put(1.7,1.3){\line(2,1){1.2}} % portico
+\put(3.0,1.3){\line(-2,1){1.2}} % ecotax 
+\put(5.2,1.3){\line(-1,2){0.3}} % Pont-de-Buis
+\put(10.8,1.3){\line(-1,1){0.6}} % taken
+\put(10.8,1.3){\line(1,3){0.2}} % down
+\put(12,1.3){\line(3,2){0.9}} % Thursday
+\put(13,1.3){\line(2,1){1.2}} % morning
+\end{picture}
+}
+\caption[Example of the rare word problem]{{\bf Example of the rare word problem} -- An English source sentence ({\it en}), a human translation to French ({\it fr}), and a translation produced by one of our neural network systems ({\it nn}) before handling OOV words. We highlight \unkword{words} that are unknown to our model. 
+The token \unksym{} indicates an OOV word. 
+We also show a few important alignments between the pair of sentences. 
+}
+\label{f:sent_pair}
+\end{figure*}
+
+

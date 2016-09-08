@@ -148,27 +148,50 @@
 \newtheorem{claim}{Claim}
 \newtheorem{corollary}{Corollary}
 
-% lstm
-\newcommand{\ilt}{\MB{i^l_t}}
-\newcommand{\flt}{\MB{f^l_t}}
-\newcommand{\olt}{\MB{o^l_t}}
-\newcommand{\glt}{\MB{\hat{h}^l_t}}
-\newcommand{\hlt}{\MB{h^l_t}}
-\newcommand{\clt}{\MB{c^l_t}}
+%% lstm
+%\newcommand{\ilt}{\MB{i^l_t}}
+%\newcommand{\flt}{\MB{f^l_t}}
+%\newcommand{\olt}{\MB{o^l_t}}
+%\newcommand{\glt}{\MB{\hat{h}^l_t}}
+%\newcommand{\hlt}{\MB{h^l_t}}
+%\newcommand{\clt}{\MB{c^l_t}}
+%
+%\newcommand{\dilt}{\MB{\delta_i^l(t)}}
+%\newcommand{\dflt}{\MB{\delta_f^l(t)}}
+%\newcommand{\dolt}{\MB{\delta_o^l(t)}}
+%\newcommand{\dglt}{\MB{\delta_{\hat{h}}^l(t)}}
+%\newcommand{\dhlt}{\MB{\delta_h^l(t)}}
+%\newcommand{\dclt}{\MB{\delta_c^l(t)}}
+%
+%\newcommand{\zilt}{z_i^l(t)}
+%\newcommand{\zflt}{z_f^l(t)}
+%\newcommand{\zolt}{z_o^l(t)}
+%\newcommand{\zglt}{z_{\hat{h}}^l(t)}
+%\newcommand{\zhlt}{z_h^l(t)}
+%\newcommand{\zclt}{z_c^l(t)}
 
-\newcommand{\dilt}{\MB{\delta_i^l(t)}}
-\newcommand{\dflt}{\MB{\delta_f^l(t)}}
-\newcommand{\dolt}{\MB{\delta_o^l(t)}}
-\newcommand{\dglt}{\MB{\delta_{\hat{h}}^l(t)}}
-\newcommand{\dhlt}{\MB{\delta_h^l(t)}}
-\newcommand{\dclt}{\MB{\delta_c^l(t)}}
+%% Chapter 3
+\newcommand{\unkword}[1]{{\bf {\it {\underline{#1}}}}}
+\newcommand{\unksym}{{\it \texttt{\underline{unk}}}}
+\newcommand{\eossym}{$<$\texttt{eos}$>$}
+\newcommand{\unkcopy}[1]{{\bf {\it {\texttt{\underline{unk}$_{#1}$ }}}}}
+\newcommand{\unknull}{{\bf {\it {\texttt{\underline{unk}$_{\emptyset}$}}}}}
+\newcommand{\unktext}[1]{{\bf {\it \texttt{\underline{unk}}$_{#1}$}}}
+\newcommand{\pos}[1]{{\bf {\it {\texttt{p$_{#1}$}}}}}
+\newcommand{\posnull}{{\bf {\it {\texttt{p$_{\emptyset}$}}}}}
+\newcommand{\postext}[1]{{\bf {\it \texttt{p}$_{#1}$}}}
+\newcommand{\unkpos}[1]{{\bf {\it {\texttt{\underline{unkpos}$_{#1}$}}}}}
+\newcommand{\unkpostext}[1]{{\bf {\it \texttt{unkpos}$_{#1}$}}}
 
-\newcommand{\zilt}{z_i^l(t)}
-\newcommand{\zflt}{z_f^l(t)}
-\newcommand{\zolt}{z_o^l(t)}
-\newcommand{\zglt}{z_{\hat{h}}^l(t)}
-\newcommand{\zhlt}{z_h^l(t)}
-\newcommand{\zclt}{z_c^l(t)}
+% experiment results
+\newcommand{\bestbleu}{35.6}
+\newcommand{\bestbleuunk}{37.5} % after unk translation
+\newcommand{\bestbleuunkwmt}{36.6} % after unk translation
+\newcommand{\bestunkimp}{2.8} % best of (bleuunk - bleu)
+\newcommand{\unkimp}{1.9} % bestbleuunk - bestbleu
+\newcommand{\unkimpilya}{2.7} % compare with ilya best system 34.8
+\newcommand{\imprare}{4.8} % compare the last group of 500 sentences with the most rare words before and after unk translations (in Rarity Analysis)
+
 
 
 % -- Document --

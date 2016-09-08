@@ -1,0 +1,38 @@
+
+A neural machine translation system is any neural network that maps a source 
+sentence, $s_1,\ldots,s_n$,
+to a target sentence, $t_1,\ldots,t_m$, where all sentences are assumed to 
+terminate with a special
+``end-of-sentence'' token \eossym{}.  More concretely, an NMT system uses a neural 
+network to parameterize the conditional distributions
+\begin{equation}
+p(t_j|t_{<j},s_{\leq n})
+\end{equation}
+for $1\leq j \leq m$.  By doing so, it becomes possible to 
+compute and therefore maximize the log probability
+of the target sentence given the source sentence
+\begin{equation}
+\log p(t|s) = \sum_{j=1}^m  \log p\left(t_j|t_{<j},s_{\leq n}\right)
+\end{equation}
+There are many ways to parameterize these conditional distributions.
+For example, \newcite{kal13} used a combination of a
+convolutional neural network and a recurrent neural network, \newcite{sutskever14} used a deep Long Short-Term Memory
+(LSTM) model, \newcite{cho14} used an architecture similar to the LSTM, and
+\newcite{bog15} used a more elaborate neural network
+architecture that uses an attentional mechanism over the input sequence, 
+similar to \newcite{graves13c} and \newcite{graves14}.  
+
+In this work, we use the model of \newcite{sutskever14}, which 
+uses a deep LSTM to encode the input sequence and a separate deep LSTM 
+to output the translation. The encoder reads the 
+source sentence, one word at a time, and produces
+a large vector that represents the entire source sentence. 
+The decoder is initialized with this vector
+and generates a translation, one word at a time, 
+until it emits the end-of-sentence symbol \eossym{}.
+
+None the early work in neural machine translation systems has addressed the rare word problem,
+but the recent work of \newcite{jean15} has tackled it with 
+an efficient approximation to the softmax to accommodate for a very large vocabulary (500K words). However, even with a large vocabulary, the problem with rare words, e.g., names, numbers, etc., still persists, and \newcite{jean15} found that using techniques similar to ours are beneficial and complementary to their approach.
+%, and a combination
+%of both methods achieves even greater performance {\bf ILYA: they tried UNK replacement but session 3.3 in their paper never cites us (they mentioned us in Section 2.2), and yeah they obtained gains from doing so. When you said ``even greater performance'', it may sound like they even obtained better performance than us?}. 
