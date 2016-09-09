@@ -66,7 +66,10 @@ We compare our systems to others, including the current state-of-the-art MT syst
 recent end-to-end neural systems, as well as phrase-based baselines with neural components.
 
 The results shown in Table~\ref{t:results} demonstrate that our unknown word translation technique (in particular, the PosUnk model) significantly improves the translation quality for both the individual (non-ensemble) LSTM models and the ensemble models.\footnote{
-For the 40K-vocabulary ensemble, we combine 5 models with 4 layers and 3 models with 6 layers. For the 80K-vocabulary ensemble, we combine 3 models with 4 layers and 5 models with 6 layers. Two of the depth-6 models are regularized with dropout, similar to \newcite{zaremba15} with the dropout probability set to 0.2.} 
+For the 40K-vocabulary ensemble, we combine 5 models with 4 layers and 3 models
+with 6 layers. For the 80K-vocabulary ensemble, we combine 3 models with 4
+layers and 5 models with 6 layers. Two of the depth-6 models are regularized
+with dropout, similar to \newcite{zaremba14} with the dropout probability set to 0.2.} 
 For 40K-word vocabularies, the performance gains are in the range of 2.3-2.8 BLEU points. With larger vocabularies (80K), the performance gains are diminished, but our technique can still provide a nontrivial gains of 1.6-1.9 BLEU points. 
 
 \begin{table*}[tbh!]

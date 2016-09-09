@@ -84,7 +84,7 @@
 % transpose
 \newcommand{\tp}[1]{#1^\top}
 % round bracket
-%\newcommand{\open}[1]{\left(#1\right)}
+\newcommand{\open}[1]{\left(#1\right)}
 \newcommand{\paren}[1]{\left(#1\right)}
 % norm
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
@@ -125,16 +125,14 @@
 \newcommand{\src}[1]{x_{#1}} % source word
 \newcommand{\al}{\MB{a}_{t}} % align
 \newcommand{\hid}[1]{\bm{h}_{#1}}
-%\newcommand{\his}{\MB{\bar{h}}_{s}} % hidden top source
+\newcommand{\his}{\MB{\bar{h}}_{s}} % hidden top source
 \newcommand{\hs}{\MB{\tilde{h}}_{t}} %h softmax
-%\newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
+\newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
 \newcommand{\hb}[1]{\MB{\bar{h}}_{#1}} % hidden source
 %\newcommand{\rnn}{\MB{T}_{d \times 2d}} % RNN
 \newcommand{\rnn}{\MB{T}_{\text{rnn}}} % RNN
 % \newcommand{\lstm}{\MB{T}_{4d \times 2d}} % lstm 
 \newcommand{\lstm}{\MB{T}_{\text{lstm}}} % LSTM 
-
-% to remove:
 \newcommand{\hi}{\MB{h}_{t}} % hidden top
 \newcommand{\co}{\MB{c}_{t}} % context
 
@@ -147,28 +145,6 @@
 \newtheorem{definition}{Definition}
 \newtheorem{claim}{Claim}
 \newtheorem{corollary}{Corollary}
-
-%% lstm
-%\newcommand{\ilt}{\MB{i^l_t}}
-%\newcommand{\flt}{\MB{f^l_t}}
-%\newcommand{\olt}{\MB{o^l_t}}
-%\newcommand{\glt}{\MB{\hat{h}^l_t}}
-%\newcommand{\hlt}{\MB{h^l_t}}
-%\newcommand{\clt}{\MB{c^l_t}}
-%
-%\newcommand{\dilt}{\MB{\delta_i^l(t)}}
-%\newcommand{\dflt}{\MB{\delta_f^l(t)}}
-%\newcommand{\dolt}{\MB{\delta_o^l(t)}}
-%\newcommand{\dglt}{\MB{\delta_{\hat{h}}^l(t)}}
-%\newcommand{\dhlt}{\MB{\delta_h^l(t)}}
-%\newcommand{\dclt}{\MB{\delta_c^l(t)}}
-%
-%\newcommand{\zilt}{z_i^l(t)}
-%\newcommand{\zflt}{z_f^l(t)}
-%\newcommand{\zolt}{z_o^l(t)}
-%\newcommand{\zglt}{z_{\hat{h}}^l(t)}
-%\newcommand{\zhlt}{z_h^l(t)}
-%\newcommand{\zclt}{z_c^l(t)}
 
 %% Chapter 3
 \newcommand{\unkword}[1]{{\bf {\it {\underline{#1}}}}}
@@ -191,6 +167,40 @@
 \newcommand{\unkimp}{1.9} % bestbleuunk - bestbleu
 \newcommand{\unkimpilya}{2.7} % compare with ilya best system 34.8
 \newcommand{\imprare}{4.8} % compare the last group of 500 sentences with the most rare words before and after unk translations (in Rarity Analysis)
+
+%% Chapter 4
+\newcommand{\correct}[1]{\textit{\color{blue} #1}}
+\newcommand{\wrong}[1]{\textbf{\color{red} #1}}
+\newcommand{\pt}{p_{t}} % context
+\newcommand{\sotaold}{23.0} % WMT'14 English-German
+\newcommand{\sotanew}{25.9} % WMT'15 English-German
+\newcommand{\attngain}{5.0} % max improvement when using attention 
+\newcommand{\localm}{local-m} % max improvement when using attention 
+\newcommand{\localp}{local-p} % max improvement when using attention 
+\DeclareMathOperator{\alignf}{align}
+\DeclareMathOperator{\score}{score}
+
+%% Chapter 5
+\newcommand{\hide}[1]{}
+\newcommand{\source}[1]{\bi{#1}}
+\newcommand{\close}[1]{\underline{\color{brown} #1}}
+% char
+\newcommand{\Ww}{\MB{W}} % W_h 
+\newcommand{\Wc}{\MB{\breve{W}}} % W_c
+\newcommand{\hc}{\MB{\breve{h}}_{t}} %h softmax char
+
+\newcommand{\hybrid}{hybrid-NMT}
+\newcommand{\rare}{$<${\it rare}$>$}
+
+% best models
+\newcommand{\modelword}{{\it (d)}}
+\newcommand{\modelchar}{{\it (g)}}
+\newcommand{\modelsmall}{{\it (k)}}
+\newcommand{\model}{{\it (l)}}
+\newcommand{\ensbleu}{20.7}
+\newcommand{\gain}{2.1{-}11.4}
+\newcommand{\chr}{chrF$_3$}
+
 
 
 

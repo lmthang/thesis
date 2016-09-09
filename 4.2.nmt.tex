@@ -1,0 +1,41 @@
+A neural machine translation system is a neural network that directly models the conditional probability $p(\tgt{}|\src{})$ of translating
+a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.\footnote{All sentences are assumed to terminate with a special ``end-of-sentence'' token \eos{}.}
+A basic form of NMT consists of two components: (a) an {\it encoder} which computes a representation $\MB{s}$ for each source sentence  and (b) a {\it decoder} which generates one target word at a time and hence decomposes the conditional probability as:
+\begin{equation}
+\log p(\tgt{}|\src{}) = \sum_{j=1}^m \nolimits \log p\open{\tgt{j}|\tgt{<j},\MB{s}}
+\end{equation}
+
+A natural choice to model such a decomposition in the decoder is to use a recurrent neural network (RNN) architecture, which most of the recent NMT work such as \cite{kal13,sutskever14,cho14,bog15,luong15,jean15} have in common. They, however, differ in terms of which RNN architectures are used for the decoder and how the encoder computes the source sentence representation $\MB{s}$.
+
+\newcite{kal13} used an RNN with the standard hidden unit for the decoder and a
+convolutional neural network for encoding the source sentence representation. On
+the other hand, both \newcite{sutskever14} and \newcite{luong15} stacked
+multiple layers of an RNN with a Long Short-Term Memory (LSTM) hidden unit for
+both the encoder and the decoder. \newcite{cho14}, \newcite{bog15}, and
+\newcite{jean15} all adopted a different version of the RNN with an
+LSTM-inspired hidden unit, the gated recurrent unit (GRU), for both
+components.\footnote{They all used a single RNN layer except for the latter two
+works which utilized a bidirectional RNN for the encoder.}
+
+In more detail, one can parameterize the probability of decoding each word $y_j$ as:
+\begin{equation}
+p\left(\tgt{j}|\tgt{<j},\MB{s}\right) = \softmax\open{g\open{\h{j}}}
+\end{equation}
+with $g$ being the transformation function that outputs a vocabulary-sized
+vector.\footnote{One can provide $g$ with other inputs such as the currently
+predicted word $\tgt{j}$ as in \cite{bog15}.} Here, $\h{j}$ is the RNN hidden
+unit, abstractly computed as:
+\begin{equation}
+\h{j} = f(\h{j-1}, \MB{s}),
+\end{equation}
+where $f$ computes the current hidden state given the previous hidden state and
+can be either a vanilla RNN unit, a GRU, or an LSTM unit. In \cite{kal13,sutskever14,cho14,luong15}, the source representation $\MB{s}$ is only used once to initialize the decoder hidden state. On the other hand, in \cite{bog15,jean15} and this work, $\MB{s}$, in fact, implies a set of source hidden states which are consulted throughout the entire course of the translation process. Such an approach is referred to as an attention mechanism, which we will discuss next.
+
+In this work, following \cite{sutskever14,luong15}, we use the stacking LSTM architecture for our NMT systems, as illustrated in Figure~\ref{f:lstm}.
+%In addition, we added an extra {\it attention} layer between the top LSTM layer and the final softmax layer, as illustrated abstractly in Figure~\ref{f:attn}. 
+We use the LSTM unit defined in \cite{zaremba15}. Our training objective is formulated as follows:
+\begin{equation}
+J_t = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
+\label{e:j_t}
+\end{equation}
+with $\mathbb{D}$ being our parallel training corpus.

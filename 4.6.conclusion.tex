@@ -1,0 +1,21 @@
+In this paper, we propose two simple and effective attentional mechanisms for
+neural machine translation: the {\it global} approach which always looks at all
+source positions and the {\it local} one that only attends to a subset of source
+positions at a time. We test the effectiveness of our models in the WMT
+translation tasks between English and German in both directions. 
+Our local attention yields large gains of up to
+$\attngain{}$ BLEU over non-attentional models that already incorporate known
+techniques such as dropout. For the English to German translation direction, our
+ensemble model has established new state-of-the-art
+results for both WMT'14 and WMT'15.
+%, outperforming existing
+%best systems, backed by NMT models and $n$-gram LM rerankers, by more than 1.0 BLEU.
+
+We have compared various alignment functions and shed light on which functions
+are best for which attentional models.
+Our analysis shows that attention-based NMT models are superior to
+non-attentional ones in many cases, for example in translating names and
+handling long
+sentences.
+%We also evaluate %the alignment quality of our models 
+%using alignment error rates.

@@ -1,0 +1,184 @@
+We evaluate the effectiveness of our models on the WMT translation tasks between
+English and German in both directions. newstest2013 (3000 sentences) is used as
+a development set to select our hyperparameters. Translation performances are
+reported in case-sensitive BLEU \cite{Papineni02bleu} on newstest2014 (2737 sentences) and
+newstest2015 (2169 sentences). Following \cite{luong15}, we report
+translation quality using two types of BLEU: (a) {\it
+tokenized}\footnote{All texts are tokenized with \texttt{tokenizer.perl} and BLEU
+scores are computed with \texttt{multi-bleu.perl}.} BLEU to be comparable with
+existing NMT work and (b) {\it NIST}\footnote{With the \texttt{mteval-v13a}
+script as per WMT guideline.} BLEU to be comparable
+with WMT results.
+
+\begin{table*}[tbh!]
+\centering
+\resizebox{15cm}{!}{
+\begin{tabular}{l|r|c}
+\bf{System} & \bf{Ppl} & \bf{BLEU}\\
+  \hline
+Winning WMT'14 system -- {\it phrase-based + large LM} \cite{buck14} &  & 20.7\\
+  \hline
+\multicolumn{3}{l}{{\it Existing NMT systems}}\\
+  \hline
+RNNsearch \cite{jean15} &  & 16.5\\
+RNNsearch + unk replace \cite{jean15} &  & 19.0\\
+RNNsearch + unk replace + large vocab + {\it ensemble} 8 models \cite{jean15} &  & {\bf 21.6}\\
+  \hline
+\multicolumn{3}{l}{{\it Our NMT systems}}\\
+  \hline
+Base & 10.6 & 11.3\\
+Base + reverse & 9.9 & 12.6 ({\it +1.3})\\
+Base + reverse + dropout & 8.1 & 14.0 ({\it +1.4})\\
+  \hdashline
+Base + reverse + dropout + global attention ({\it location}) & 7.3 & 16.8 ({\it +2.8}) \\
+Base + reverse + dropout + global attention ({\it location}) + feed input & 6.4
+& 18.1 ({\it +1.3}) \\
+  \hdashline
+Base + reverse + dropout + local-p attention ({\it general}) + feed input
+& \multirow{ 2}{*}{5.9} & 19.0 ({\it +0.9}) \\
+Base + reverse + dropout + local-p attention ({\it general}) + feed input + unk replace
+&  & 20.9 ({\it +1.9}) \\
+  \hdashline
+{\it Ensemble} 8 models + unk replace &  & {\bf 23.0 ({\it +2.1})} \\
+\end{tabular}
+}
+\caption[WMT'14 English-German results]{{\bf WMT'14 English-German results} -- shown are
+the perplexities (ppl) and the {\it tokenized} BLEU scores of various systems on newstest2014. We highlight the {\bf
+best} system in bold and give {\it progressive} improvements in italic between
+consecutive systems. {\it local-p} referes to the local attention with 
+predictive alignments. We indicate for each attention model the
+alignment score function used in pararentheses. 
+}
+\label{t:ende}
+\end{table*}
+
+
+\subsection{Training Details}
+All our models are trained on the WMT'14 training data consisting of 4.5M
+sentences pairs (116M English words, 110M German words). Similar to \cite{jean15}, we limit our vocabularies to be the top 50K most frequent words for both languages. Words not in these shortlisted vocabularies are converted into a universal token \unk{}. 
+%To train the local attention model with unsupervised alignments, we use Berkeley aligner \cite{liang06alignment} to obtain the word alignments.\footnote{We remove sentence pairs in which at least one side has more than 100 words.}
+
+%Furthermore, given the alignment information obtained from attention-based NMT systems, both local and global, one can perform a post processing step to handle all the \unk{} tokens in the translations. Specifically, we first extract a word dictionary together with translation probabilities based on the alignment links.\footnote{We only keep aligned word pairs whose frequencies are not less than 10.} For each aligned target \unk{}, we will either use the word dictionary to translate (if there is a translation option) or perform identity translation. This technique has been shown to be very effective in \cite{luong15,jean15}, which we refer to as the {\it unk replacement} method. 
+
+When training our NMT systems, following \cite{bog15,jean15}, we filter out
+sentence pairs whose lengths exceed 50 words and shuffle mini-batches as we
+proceed. Our stacking LSTM models have 4 layers, each with 1000 cells, and
+1000-dimensional embeddings. We follow \cite{sutskever14,luong15} in training
+NMT with similar settings: (a) our parameters are uniformly initialized in
+$[-0.1, 0.1]$, (b) we train for 10 epochs using plain SGD, (c) a simple learning
+rate schedule is employed -- we start with a learning rate of 1; after 5 epochs,
+we begin to halve the learning rate every epoch, (d) our mini-batch size is 128,
+and (e) the normalized gradient is rescaled whenever its norm exceeds 5.
+Additionally, we also use dropout with probability $0.2$ for our LSTMs as suggested by
+\cite{zaremba14}. For dropout models, we train for 12 epochs and start halving
+the learning rate after 8 epochs. For local
+attention models, we empirically set the window size $D=10$.
+
+Our code is implemented in MATLAB. %\footnote{Publicly available at \url{http://annonymized}.} 
+When running on a single GPU device Tesla K40, we achieve a speed of 1K {\it
+target} words per second. It takes 7--10 days to completely train a model.
+
+\subsection{English-German Results}
+We compare our NMT systems in the English-German task with various other
+systems. These include the winning system in WMT'14
+\cite{buck14}, a phrase-based system whose language models were trained on a
+huge monolingual text, the Common Crawl corpus. For end-to-end NMT systems, to the best of our knowledge, \cite{jean15} is the only work experimenting with this language pair and currently the SOTA system.
+We only present results for some of our attention models and will later
+analyze the rest in Section~\ref{sec:analysis}. 
+
+As shown in Table~\ref{t:ende}, we achieve progressive improvements when
+(a) reversing the source sentence, +$1.3$ BLEU, as proposed in \cite{sutskever14}
+and (b) using dropout, +$1.4$ BLEU. On top of that, (c) the global
+attention approach gives a significant boost of +$2.8$ BLEU, making 
+ our model slightly better than the base attentional system of
+ \newcite{bog15} (row {\it RNNSearch}). When (d) using the {\it input-feeding}
+approach, we seize another notable gain of +$1.3$ BLEU and outperform their
+system. The local attention model with predictive alignments (row {\it \localp}) proves
+to be even better, giving us a further improvement of +$0.9$ BLEU on top of the
+global attention model. 
+It is interesting to observe the trend previously reported in
+\cite{luong15} that perplexity strongly correlates with translation quality.
+In total, we achieve a significant gain of
+\attngain{} BLEU points over the non-attentional baseline, which already includes
+known techniques such as source reversing and dropout.
+
+The unknown replacement technique proposed in \cite{luong15,jean15} yields another nice
+gain of +$1.9$ BLEU, demonstrating that our attentional models
+do learn useful alignments for unknown works. Finally, by ensembling 8 different
+models of various settings, e.g., using different attention approaches, with
+and without dropout etc., we were able to achieve a {\it new SOTA} result of
+$\sotaold{}$
+BLEU, outperforming the existing best system \cite{jean15} by +$1.4$ BLEU.
+
+\begin{table}[tbh!]
+\centering
+%\resizebox{8cm}{!}{
+\begin{tabular}{l|c}
+\bf{System} & \bf{BLEU}\\
+  \hline
+Top -- {\it NMT + 5-gram rerank} (Montreal) & 24.9 \\
+  \hline
+Our ensemble 8 models + unk replace & {\bf 25.9} \\
+\end{tabular}
+%}
+\caption[WMT'15 English-German results]{{\bf WMT'15 English-German results} -- {\it NIST} BLEU scores of the
+winning entry in WMT'15 and our best one on newstest2015.}
+\label{t:wmt15ende}
+\end{table}
+
+{\it Latest results in WMT'15} -- despite the fact that our models were trained
+on WMT'14 with slightly less data, we test them on newstest2015 to demonstrate
+that they can generalize well to different test sets. As shown in Table~\ref{t:wmt15ende}, our best
+system establishes a {\it new SOTA} performance of $\sotanew{}$ BLEU,
+outperforming the existing best system backed by NMT and a 5-gram LM reranker
+by +$1.0$
+BLEU.
+
+\subsection{German-English Results}
+We carry out a similar set of experiments for the WMT'15 translation task from German
+to English. 
+While our systems have not yet matched the performance of the 
+SOTA system, we nevertheless show the effectiveness of our
+approaches with large and progressive gains in terms of BLEU as illustrated in
+Table~\ref{t:deen}. 
+The {\it attentional} mechanism gives us +$2.2$ BLEU gain and on top of that, we
+obtain another boost of up to +$1.0$ BLEU from the {\it input-feeding} approach.
+Using a better alignment function, the content-based {\it dot} product one,
+together with {\it dropout} yields another gain of +$2.7$ BLEU. Lastly, when
+applying the unknown word replacement technique, we seize an additional +$2.1$
+BLEU, demonstrating the usefulness of attention in aligning rare words.
+%With more and better models trained, we hope to close the gap with the SOTA
+%system in the near future.
+\begin{table}
+\centering
+%\resizebox{8cm}{!}{
+\begin{tabular}{l|r|c}
+\bf{System} & \bf{Ppl.} & \bf{BLEU}\\
+  \hline
+\multicolumn{3}{l}{{\it WMT'15 systems}}\\
+  \hline
+SOTA -- {\it phrase-based} (Edinburgh) &  & {\bf 29.2}\\ %\cite{freitag14}
+NMT + 5-gram rerank (MILA) &  & 27.6\\ %\cite{freitag14}
+  \hline
+\multicolumn{3}{l}{{\it Our NMT systems}}\\
+  \hline
+Base (reverse) & 14.3 & 16.9\\
+  \hdashline
++ global ({\it location}) & 12.7 & 19.1 ({\it +2.2}) \\
++ global ({\it location}) + feed & 10.9 & 20.1 ({\it +1.0})\\
+  \hdashline
++ global ({\it dot}) + drop + feed & \multirow{ 2}{*}{9.7} & 22.8 ({\it +2.7})\\
++ global ({\it dot}) + drop + feed + unk &  & 24.9 ({\it +2.1})\\
+  %\hdashline
+%{\it Ensemble} 4 models + unk &  & {\bf xx} ({\it +1.2})\\
+\end{tabular}
+%}
+\caption[WMT'15 German-English results]{{\bf WMT'15 German-English results} -- 
+performances of various systems (similar to 
+Table~\ref{t:ende}). The {\it base} system already includes source reversing
+on which we add {\it global} attention, {\it drop}out, input {\it feed}ing, and
+{\it unk} replacement.}
+\label{t:deen}
+\end{table}
+
+
