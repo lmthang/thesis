@@ -8,38 +8,61 @@ if you stick a Babel fish in your ear, you can
 instantly understand anything in any form of language.}{{\it The Hitchhiker's
 Guide to the Galaxy}.
 Douglas Adams.}
-Human languages are diverse and rich in categories with about 6000 to 7000
-languages spoken worldwide.\footnote{\url{http://www.linguisticsociety.org/content/how-many-languages-are-there-world}}
+Human languages are diverse 
+%and rich in categories 
+with about 6000 to 7000
+languages spoken worldwide \cite{languages}. %\footnote{\url{http://www.linguisticsociety.org/content/how-many-languages-are-there-world}}
 As civilization advances, the need for seamless communication and understanding across
 languages becomes more and more crucial. Machine translation (MT), the
 task of teaching machines to learn to translate automatically across languages, as
 a result, is an important research area.
 MT has a long history \cite{hutchins07} from the original
-phiosophical ideas of universal languages in the seventeen century to the 
-first practical instances of MT in the twentieth century, e.g., one proposal by
-\newcite{weaver49}. Despite several excitement moments that led to hopes that MT
-will be solved ``very soon'', e.g., the 701 translator\footnote{\url{http://www-03.ibm.com/ibm/history/exhibits/701/701_translator.html}}
-developed by scientists at George Town and IBM in the 1950s or a simple
-vector-space transformation
-technique\footnote{\url{https://www.technologyreview.com/s/519581/how-google-converted-language-translation-into-a-problem-of-vector-space-mathematics/}} proposed by Google researchers at the beginning of the twenty-first
-century,
-MT remains to be an extremely challenging
-problem.\footnote{\url{http://www.huffingtonpost.com/nataly-kelly/why-machines-alone-cannot-translation_b_4570018.html}}
-To understand why MT is difficult, let us trace through one ``evolution''
-path of % development
-MT which crosses through techniques that are used extensively in
-commercial MT systems. 
+phiosophical ideas of universal languages in the $17^{\text{th}}$ century to %seventeen 
+%first practical instances of MT in the twentieth century, e.g., one proposal by \newcite{weaver49}. 
+\edit{
+those first practical suggestions in the 1950s, most notably an important
+proposal by \newcite{weaver49}. In that memorandum, Warren Weaver had touched on
+the idea of using computers to translate, specifically addressing the language
+ambiguity problem by combining his knowledge of statistics,
+cryptography, information theory, as well as logical and linguistic universals
+\cite{hutchins2000early}.
+%``renaissance'' of intensive MT research in the 1950s, starting with an
+%important proposal by \newcite{weaver49}. 
+Since then, MT has gone through many
+periods of great development but also encountered several stagnant phases as
+illustrated in \figref{f:mt_progress}.
+Despite several moments of excitement that led to hopes that MT
+will be solved ``very soon'' such as the 701 translator \cite{ibm701}
+developed by scientists at Georgetown and IBM in the 1950s and the popular Google Translate
+%or a simple vector-space transformation
+%technique \cite{vectorspace} proposed by Google researchers 
+at the beginning of the $21^{\text{st}}$ century \cite{brants07},
+MT remains an extremely challenging
+problem \cite{solvemt,winograd_mt16}.
+This motivates my thesis work in the area of machine translation, specifically
+aiming to advance neural machine translation, a technique that has eventually
+produced a significant leap in the translation quality as illustrated in
+\figref{f:mt_progress}.
+}
+%To understand why MT is difficult, let us trace through one ``evolution''
+%path of % development
+%MT which crosses through techniques that are used extensively in
+%commercial MT systems. 
 
-\section{Machine Translation Development}
-\begin{figure}
+\begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/mt.eps} % , angle=-90
-\caption[A general setup of machine translation]{{\bf Machine translation} (MT) -- a general setup of MT. Systems
-build translation models from parallel corpora to translate new unseen
-sentences, e.g., \word{She loves cute cats}.}
-\label{f:mt}
+\includegraphics[width=0.8\textwidth, clip=true, trim= 0 0 0
+80]{img/MT_progress} % , angle=-90
+\caption[Machine translation progress]{{\bf Machine translation progress} --
+from the 1950s, the starting of modern MT research, until the time of this
+thesis, 2016, in which neural MT becomes a dominant approach. Image courtesy of
+Christopher D. Manning.
+} 
+\label{f:mt_progress}
 \end{figure}
 
+
+\section{Machine Translation Background and Development}
 Modern
 statistical MT started out with a seminal work by IBM scientists
 \cite{Brown:1993:MSM}. The proposed technique requires minimal linguistic
@@ -58,6 +81,15 @@ more formally a {\it translation model}. Translated target words and phrases
 are then put together to form coherent and natural-sounding sentences by consulting a
 {\it language model} (LM) on which sequences of words, i.e., {\it \ngram{}s}, are
 likely to go with one another.
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/mt.eps} % , angle=-90
+\caption[A general setup of machine translation]{{\bf Machine translation} (MT) -- a general setup of MT. Systems
+build translation models from parallel corpora to translate new unseen
+sentences, e.g., \word{She loves cute cats}.}
+\label{f:mt}
+\end{figure}
+
 
 \begin{figure}[tbh!]
 \centering

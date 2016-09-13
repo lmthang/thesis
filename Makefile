@@ -1,7 +1,7 @@
 all: thesis.pdf
 
 clean:
-	rm -f *~ *.bak *.bbl *.aux *.log *.dvi *.pdf *.ps *.blg *.out
+	rm -f *~ *.bak *.bbl *.aux *.log *.dvi *.pdf *.ps *.blg *.out *.lof *.lot
 
 thesis.pdf: thesis.ps
 	ps2pdf thesis.ps thesis.pdf

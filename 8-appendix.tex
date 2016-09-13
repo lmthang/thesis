@@ -1,0 +1,98 @@
+\chapter{Miscellaneous}
+\label{c:misc}
+\begin{lemma}
+\label{l:diag_mul}
+Let $\bm{u}$, $\bm{v}$ be any vectors and $\edot$ be element-wise vector multiplication, we have:
+\begin{align}
+\diag (\bm{u}) \cdot \bm{v} = \bm{u} \edot \bm{v}
+\end{align}
+\end{lemma}
+
+\begin{lemma}
+\label{l:chain_rule}
+Let $l$ be a loss value that  in which we
+already knew how to compute its gradient $\der{v}$ with respect to a vector $\bm{v}$. Given that
+$\bm{v} = f(\bm{Wh})$, the gradients $\der{h}, \der{W}$ of the loss $l$ with respect to the vector
+$\bm{h}$ and the matrix $\bm{W}$ can be derived as follows:
+\begin{align}
+\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}}
+\\
+\der{W} = \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}} 
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Let $\bm{z} = \bm{Wh}$, we have the following derivations: %applying chain rules in vector calculus, 
+\begin{align*}
+\der{h} &= \fracder{\bm{z}}{\bm{h}} \cdot \fracder{\bm{v}}{\bm{z}}
+\cdot \der{v} && \text{[Vector calculus chain rules]}\\
+&= \fracder{\bm{Wh}}{\bm{h}} \cdot \fracder{f(\bm{z})}{\bm{z}}
+\cdot \der{v} \\
+&=\tp{\bm{W}} \cdot \diag \paren{f'(\bm{z})} \cdot \der{v} \\
+&=\tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}} &&
+\text{[\lemmaref{l:diag_mul}]}
+\end{align*}
+
+Let $\tp{\bm{w}_i}$ be the i$^{\text{th}}$ row vector of matrix $\bm{W}$ and
+$v_i, z_i$ be the i$^{\text{th}}$ elements of vectors $\bm{v}, \bm{z}$. Also
+denoting $\der{w}_i, dv_i$ to be the gradients of $l$ with respect to $\bm{w}_i,
+v_i$, we have:
+\begin{align*}
+d\bm{w}_i &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
+\cdot dv_i && \text{[Vector calculus chain rules]}\\
+&= \fracder{\tp{\bm{w}_i}\bm{h}}{\bm{w}_i} \cdot f'(z_i) \cdot dv_i \\
+&= \bm{h} \cdot f'(z_i) \cdot dv_i \\ 
+d\tp{\bm{w}_i} &= \paren{f'(z_i) \cdot dv_i} \cdot
+\tp{\bm{h}} && \text{[Tranposing]} \\
+\der{W} &= \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}}
+&& \text{[Concatenating row derivatives]}
+\end{align*}
+\end{proof}
+
+\begin{corollary}
+\label{c:chain_rule}
+As a special case of \lemmaref{l:chain_rule}, when $f$ is an identity function,
+i.e., $\bm{v} = \bm{Wh}$, we have:
+\begin{align}
+\der{h} = \tp{\bm{W}} \cdot \der{v}
+\\
+\der{W} = \der{v} \cdot \tp{\bm{h}} 
+\end{align}
+\end{corollary}
+
+\begin{lemma}
+\label{l:edot_der}
+Let $\bm{u}$, $\bm{v}, \bm{s}$ be any vectors such that  $\bm{s} = \bm{u} \edot
+f(\bm{v})$. Also, let $d\bm{u}$, $d\bm{v}, d\bm{s}$ be the gradients of a loss $l$ with
+respect to the corresponding vectors. We have:
+\begin{align}
+d\bm{u} = f(\bm{v}) \edot d\bm{s} \\
+d\bm{v} = f'(\bm{v}) \edot \bm{u} \edot d\bm{s} 
+%d\bm{u} = \diag \paren{f(\bm{v})} \cdot d\bm{s} \\
+%d\bm{v} = \diag \paren{f'(\bm{v}} \edot \bm{u}} \cdot d\bm{s} 
+\end{align}
+\end{lemma}
+
+%\begin{proof}
+%\begin{align}
+%d\bm{u} &= \parder{\diag \paren{f(\bm{v})} \cdot d\bm{s} \\
+%\end{align}
+%\end{proof}
+
+\begin{corollary}
+\label{c:edot_der}
+As a special case of \lemmaref{l:edot_der} when $f$ is an identity function,
+i.e.,  $\bm{s} = \bm{u} \edot \bm{v}$. We have:
+\begin{align}
+%d\bm{u} = \diag (\bm{v}) \cdot d\bm{s} \\
+%d\bm{v} = \diag (\bm{u}) \cdot d\bm{s} 
+d\bm{u} = \bm{v} \edot d\bm{s} \\
+d\bm{v} = \bm{u} \edot d\bm{s} 
+\end{align}
+\end{corollary}
+
+
+%\chapter{LSTM Backpropagation}
+%\input{2-backwardprop}
+
+
