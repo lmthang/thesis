@@ -6,28 +6,25 @@ thing in the universe. It feeds on brainwave energy  ...
 %the practical upshot of which is that 
 if you stick a Babel fish in your ear, you can
 instantly understand anything in any form of language.}{{\it The Hitchhiker's
-Guide to the Galaxy}.
-Douglas Adams.}
-Human languages are diverse 
-%and rich in categories 
+Guide to the Galaxy}. Douglas Adams.}
+Human languages are diverse %and rich in categories 
 with about 6000 to 7000
-languages spoken worldwide \cite{languages}. %\footnote{\url{http://www.linguisticsociety.org/content/how-many-languages-are-there-world}}
+languages spoken worldwide \cite{languages}.
 As civilization advances, the need for seamless communication and understanding across
 languages becomes more and more crucial. Machine translation (MT), the
 task of teaching machines to learn to translate automatically across languages, as
 a result, is an important research area.
 MT has a long history \cite{hutchins07} from the original
-phiosophical ideas of universal languages in the $17^{\text{th}}$ century to %seventeen 
+phiosophical ideas of universal languages in the $17^{\text{th}}$ century to
 %first practical instances of MT in the twentieth century, e.g., one proposal by \newcite{weaver49}. 
 \edit{
-those first practical suggestions in the 1950s, most notably an important
-proposal by \newcite{weaver49}. In that memorandum, Warren Weaver had touched on
+those first practical suggestions in the 1950s, most notably an influential %important
+proposal by \newcite{weaver49} which marked the beginnings of MT research in
+the United States. In that memorandum, Warren Weaver touched on
 the idea of using computers to translate, specifically addressing the language
 ambiguity problem by combining his knowledge of statistics,
 cryptography, information theory, as well as logical and linguistic universals
 \cite{hutchins2000early}.
-%``renaissance'' of intensive MT research in the 1950s, starting with an
-%important proposal by \newcite{weaver49}. 
 Since then, MT has gone through many
 periods of great development but also encountered several stagnant phases as
 illustrated in \figref{f:mt_progress}.
@@ -37,12 +34,15 @@ developed by scientists at Georgetown and IBM in the 1950s and the popular Googl
 %or a simple vector-space transformation
 %technique \cite{vectorspace} proposed by Google researchers 
 at the beginning of the $21^{\text{st}}$ century \cite{brants07},
-MT remains an extremely challenging
-problem \cite{solvemt,winograd_mt16}.
-This motivates my thesis work in the area of machine translation, specifically
-aiming to advance neural machine translation, a technique that has eventually
-produced a significant leap in the translation quality as illustrated in
-\figref{f:mt_progress}.
+MT remains an extremely challenging problem \cite{solvemt,winograd_mt16}.
+This motivates my work in the area of machine translation; specifically,
+in this thesis, the goal is to advance neural machine translation (NMT), a new
+promising approach for MT developed just recently, over the past two years. The results achieved in this
+thesis on NMT together with work from other researchers have eventually
+ produced a significant leap in the translation quality as illustrated in
+\figref{f:mt_progress}. Before delving into details of the thesis, we now walk
+the audience through the background and a bit of the development history of
+machine translation.
 }
 %To understand why MT is difficult, let us trace through one ``evolution''
 %path of % development
@@ -51,8 +51,7 @@ produced a significant leap in the translation quality as illustrated in
 
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.8\textwidth, clip=true, trim= 0 0 0
-80]{img/MT_progress} % , angle=-90
+\includegraphics[width=\textwidth, clip=true, trim= 0 0 20 80]{img/MT_progress}
 \caption[Machine translation progress]{{\bf Machine translation progress} --
 from the 1950s, the starting of modern MT research, until the time of this
 thesis, 2016, in which neural MT becomes a dominant approach. Image courtesy of
@@ -62,34 +61,146 @@ Christopher D. Manning.
 \end{figure}
 
 
-\section{Machine Translation Background and Development}
-Modern
-statistical MT started out with a seminal work by IBM scientists
-\cite{Brown:1993:MSM}. The proposed technique requires minimal linguistic
-content and only needs a {\it parallel corpus}, i.e., a set of pairs of sentences that are translations of one
-another, to train machine learning algorithms to tackle the translation problem.
-Such a language-independent setup is illustrated in Figure~\ref{f:mt} and remains
-to be the general approach for nowadays MT systems.
-For over twenty years since the IBM seminal paper, approaches in MT
-such as
-\cite{Koehn:2003:SMT,och03,Liang:2006:EDA,koehn2007moses,chiang07hiero,dyer10cdec,cer10phrasal},
-%inter alia, 
-are, by and large, similar according to the following two-stage
-process (see Figure~\ref{f:phrase_mt}). First, source sentences are broken into
-chunks which can be translated in isolation by looking up a ``dictionary'', or
-more formally a {\it translation model}. Translated target words and phrases
-are then put together to form coherent and natural-sounding sentences by consulting a
-{\it language model} (LM) on which sequences of words, i.e., {\it \ngram{}s}, are
-likely to go with one another.
+\section{Machine Translation}
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/mt.eps} % , angle=-90
-\caption[A general setup of machine translation]{{\bf Machine translation} (MT) -- a general setup of MT. Systems
-build translation models from parallel corpora to translate new unseen
+\includegraphics[width=\textwidth, clip=true, trim= 0 0 0 0]{img/mt.eps} % , angle=-90
+\caption[Corpus-based approaches to machine translation]{{\bf Corpus-based approaches to
+machine translation} -- a general setup in which MT systems
+are built from parallel corpora of sentence pairs having the same meaning. Once
+built, systems are used to translate new unseen
 sentences, e.g., \word{She loves cute cats}.}
 \label{f:mt}
 \end{figure}
 
+\edit{
+Despite much enthusiasm, the beginning period of MT research in the 1950-60s,
+was mostly about direct word-for-word replacement based on bilingual
+dictionaries.\footnote{There are also proposals for ``interlingual'' and
+``transfer'' approaches but these seemed to be too challenging to achieve, not
+to mention limitations in hardware at that time\cite{hutchins07}.} An MT winner quickly came
+right after the ALPAC report in 1966 pointing out that ``there is no immediate
+or predictable prospect of useful machine translation'', which hampered MT
+research for over a
+decade. Fast-forwarding through the resurgence in the 1980s beginning with
+Europe, Japan, and gradually the United States,
+}
+modern statistical MT started out with a seminal work by IBM scientists
+\cite{Brown:1993:MSM}. The proposed {\it corpus-based} approaches require
+minimal linguistic content and only need a {\it parallel} dataset of
+sentence pairs which are translations of one
+another, to train MT systems.
+Such a language-independent setup is illustrated in Figure~\ref{f:mt}. 
+\edit{
+In more
+detail, instead of hand building bilingual dictionaries which can be costly to
+obtain, Brown and colleagues proposed to learn these dictionaries, or {\it
+translation models}, probabilistically from parallel corpora. To accomplish
+this, they propose a series of 5 algorithms of increasing complexity, often
+referred as IBM Models 1-5, to learn {\it word alignment},
+a mapping between source and target words in a parallel corpus, as illustrated
+in \figref{f:wordalign}. The idea is
+simple: the more often two words, e.g., \word{loves} and \word{aime}, occur
+together in different sentence pairs, the more likely they are aligned to each
+other and have equivalent meanings.
+}
+
+\begin{figure}[tbh!]
+\centering
+\includegraphics[width=0.35\textwidth, clip=true, trim= 0 0 0
+0]{img/wordalign.eps}
+\caption[Word-based alignment]{{\bf Word-based alignment} -- example of
+an alignment between source and target words. In IBM
+alignment models, each target word is aligned to at most one source word.
+} 
+\label{f:wordalign}
+\end{figure}
+
+\edit{
+Once a translation model, i.e., a probabilistic bilingual dictionary, has been
+learned, IBM model 1, the simplest and the most na\"{i}ve one among the five proposed
+algorithms, translates a new source sentence as follows. First, it decides on
+how long the translation is as well as how source words will be mapped to target
+words as illustrated in Step 1 of \figref{f:wordmt_algo}. Then,
+in Step 2, it produces a translation by selecting for each target position a
+word that is the best translation for the aligned source word according to the
+bilingual dictionary. Subsequent IBM models build on top of one another and refine the
+translation story such as better modeling the reordering structure, i.e., how
+word positions differ between source and target languages. We refer the audience to
+the original IBM paper or Chapter 25 of \cite{Jurafsky:2009} for more details.
+}
+\begin{figure}[tbh!]
+\centering
+\includegraphics[width=0.8\textwidth, clip=true, trim= 0 0 0
+0]{img/wordmt_algo.eps} % , angle=-90
+\caption[A simple translation story]{{\bf A simple translation story} -- example of the generative story in
+IBM Model 1 to produce a target translation given a source sentence and a
+learned translation model.
+} 
+\label{f:wordmt_algo}
+\end{figure}
+
+\edit{
+There are, however, two important details that we left out in the above translation story,
+the {\it search} process and the {\it language modeling} component. In Step 1,
+one might wonder among the exponentially many choices, how do we know what the
+right translation length is and how source words should be mapped to target words? The
+search procedure informally helps us ``browse'' through a manageable set of
+candidates which are likely to include a good translation; whereas, the language
+model will help us select the best translation among these candidates. We will
+defer details of the search process to later since it is dependable on the
+exact translation model being used. Language modeling, on the other hand, is an
+important concept which has been studied earlier in speech recognition
+\cite{katz87}. In a nutshell, a language model (LM)
+learns from a corpus of monolingual text in the target language and collect
+statistics on which sequence of words are likely to go with one another. When
+applying to machine translation, an LM will assign high scores for coherent and
+natural-sounding translations and low scores for bad ones.
+For our example in the above figure, if the model happens to choose a wrong alignment, e.g.,
+\word{cute} goes to position 3 while \word{cats} goes to positions 4 and 5, an
+LM will alert us with a lower score given to that incorrect translation \word{Elle
+aime mignons les chats} compared to the translation \word{Elle aime les chats
+mignons} with a correct word ordering structure.\footnote{
+\edit{
+For completeness, translation and
+language models are integrated together in an MT system through the {\it
+Bayesian noisy channel} framework as follows:
+\begin{align}
+\label{e:noisy}
+\hat{t} &= \argmax_t P(t|s) \approx \argmax_t P(s|t) P(t)
+\end{align}
+Here, we have a source sentence $s$ in which we ask our {\it decoder}, an
+algorithm that implements the aforementioned search process, to find the best
+translation, the $\argmax$ part. $P(s|t)$ represents the {\it translation} model, the
+faithfulness of the translation in terms of meaning preservation between the source and the
+target sentences; whereas $P(t)$
+represents the {\it language} model, the fluency of the translated text.
+}
+}
+
+While the IBM work had a huge impact on the field of statistical MT, researchers
+quickly realized that word-based MT is insufficient as words
+require context to properly translate, e.g., \word{bank} has two totally different
+meanings when preceded by \word{financial} and \word{river}. As a result,
+{\it phrase-based models}, \cite{Marcu:2002,Zens2002,Koehn:2003:SMT}, inter alia, became the de facto
+standard in MT research and are still being the dominant approach in existing
+commercial systems such as Google Translate until now. Much credit went to Och's
+work on {\it alignment templates}, starting with his thesis in 1998 and later in
+\cite{och03,och04}. The idea of alignment templates is to enable phrase-based MT
+by first symmetrizing\footnote{\edit{Symmetrization is achieved by training IBM models
+in both directions, source to target and vice versa, then intersecting the
+alignments. There are subsequent techniques that jointly train alignments in
+both directions such as \cite{liang06alignment}.}} the alignment to obtain many-to-many correspondences
+between source and target words; in contrast, the original IBM models only produce
+one-to-many alignments. From the symmetrized alignment, several heuristics have
+been proposed to extract phrase pairs; the general idea is that phrase
+pairs need to be ``consistent'' with their alignments: each word in a phrase
+should not be aligned to a word outside of the other phrase. These pairs are stored
+in what called a {\it phrase table} together with various scores to evaluate
+phrase pairs in different aspects, e.g., how equivalent the meaning is, how good
+the alignment is, etc. \figref{f:phrase_mt} gives an example of how a
+phrase-based system translates.
+}
 
 \begin{figure}[tbh!]
 \centering
@@ -102,6 +213,44 @@ are translated.
 } 
 \label{f:phrase_mt}
 \end{figure}
+
+%% log-linear models %%
+\edit{
+State-of-the-art MT systems, in fact, contain more components than just the two
+basic translation and language models. There are many knowledge
+sources that can be useful to the translation task, e.g., language model,
+translation model, reversed translation model, reordering model, word penalty,
+phrase penalty, unknown-word penalty, etc. To incorporate all of
+these features, modern MT systems use a popular approach in natural language
+processing, called the {\it maximum-entropy} or
+{\it log-linear} models \cite{berger96,och02}, which has as its special case the
+Bayesian noisy channel model that we briefly mentioned through \eq{e:noisy}.
+Training log-linear MT models can be done using the standard {\it maximum
+likelihood estimation} approach. However, in practice, these models are learned
+by directly optimizing translation quality metrics such as BLEU
+\cite{Papineni02bleu} in a technique known as {\it minimum error rate training}
+or {\it MERT} \cite{och03mert}. Here, BLEU is an inexpensive automatic way of
+evaluating the translation quality; the idea is to count words and phrases that
+overlap between machine and human outputs.
+}
+
+
+%remains to be the general approach for nowadays MT systems.
+%For over twenty years since the IBM seminal paper, approaches in MT
+%such as
+%\cite{Koehn:2003:SMT,och03,Liang:2006:EDA,koehn2007moses,chiang07hiero,dyer10cdec,cer10phrasal},
+%%inter alia, 
+%are, by and large, similar according to the following two-stage
+%process (see Figure~\ref{f:phrase_mt}). First, source sentences are broken into
+%chunks which can be translated in isolation by looking up a ``dictionary'', or
+%more formally a {\it translation model}. Translated target words and phrases
+%are then put together to form coherent and natural-sounding sentences by consulting a
+%{\it language model} (LM) on which sequences of words, i.e., {\it \ngram{}s}, are
+%likely to go with one another.
+
+\section{Neural Machine Translation}
+%% interlingual idea, Vaquois diagram %%
+%% briefly mention syntax-based %%
 
 The aforementioned approach, while has been successfully deployed in many commercial systems,
 does not work very well and suffers from the following two major drawbacks.
