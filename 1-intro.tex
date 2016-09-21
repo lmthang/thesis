@@ -219,19 +219,39 @@ are translated.
 State-of-the-art MT systems, in fact, contain more components than just the two
 basic translation and language models. There are many knowledge
 sources that can be useful to the translation task, e.g., language model,
-translation model, reversed translation model, reordering model, word penalty,
-phrase penalty, unknown-word penalty, etc. To incorporate all of
-these features, modern MT systems use a popular approach in natural language
+translation model, reversed translation model, reordering
+model\footnote{\edit{Reordering models learn the patterns of how words move across source
+and target sentences and are trained based on the word alignment.}},
+length/unknown penalties\footnote{\edit{To produce translations of appropriate lengths
+and with a reasonable amount of unknown words, e.g., unseen names and numbers
+at test time.}}, etc. To incorporate all of
+these features, modern MT systems use a popular framework in natural language
 processing, called the {\it maximum-entropy} or
-{\it log-linear} models \cite{berger96,och02}, which has as its special case the
-Bayesian noisy channel model that we briefly mentioned through \eq{e:noisy}.
+{\it log-linear} model \cite{berger96,och02}, which has as its special case the
+Bayesian noisy channel model that we briefly mentioned in \eq{e:noisy}.
+
 Training log-linear MT models can be done using the standard {\it maximum
 likelihood estimation} approach. However, in practice, these models are learned
 by directly optimizing translation quality metrics such as BLEU
 \cite{Papineni02bleu} in a technique known as {\it minimum error rate training}
 or {\it MERT} \cite{och03mert}. Here, BLEU is an inexpensive automatic way of
 evaluating the translation quality; the idea is to count words and phrases that
-overlap between machine and human outputs.
+overlap between machine and human outputs. Despite many criticisms, BLEU is
+still the most widely used evaluation metric up until now thanks to its
+simplicity. 
+
+Lastly, there has also been effort in
+adding {\it syntax} to machine translation through tree-based models such as work by
+\newcite{wu97,yamada01,chiang05}, inter alia. As illustrated in
+\figref{f:mt_progress}, these approaches do provide gains
+for several language pairs, mostly those that are significant different in terms
+of sentence structures such as Chinese and English. However,
+the gains are often modest compared to the added complexity of tree-based models
+such as requirements to have good parsers and syntactic annotations.
+
+For more information on evaluation metrics, tree-based models, and other
+topics in statistical machine translation, we refer the audience to an 
+excellent book by \newcite{koehn10smt}.
 }
 
 
@@ -252,113 +272,191 @@ overlap between machine and human outputs.
 %% interlingual idea, Vaquois diagram %%
 %% briefly mention syntax-based %%
 
-The aforementioned approach, while has been successfully deployed in many commercial systems,
-does not work very well and suffers from the following two major drawbacks.
+%The aforementioned approach
+While statistical machine translation (SMT) has been successfully deployed in many
+commercial systems, it does not work very well and suffers from the following
+two major drawbacks.
 First, translation decisions are {\it locally determined} as we translate
-phrase-by-phrase and long-distance dependencies are often ignored. Second, it is
-slightly ``strange'' that language models (LMs), despite being a key component in the MT
-pipeline, utilize context information that is both short, consisting of only
-a handful of previous words, and target-only, never looking at the source
-words. These shortcomings in LMs gives rise to a new wave of {\it hybrid} systems which
-aim to empower phrase-based MT with neural network components, most notably
-\nlmtext{} (\nlms{}). 
+phrase-by-phrase and long-distance dependencies are often ignored. 
+\edit{
+More problematically, the entire MT pipeline is becoming increasingly {\it
+complex} as more and more features are added to the log-linear framework
+such as in recent MT systems \cite{galley08,chiang09,green13}. Many different
+components need to be tuned
+separately, e.g., translation models, language models, reordering models, etc.,
+which makes it difficult to combine them together and to innovate. As a result,
+the translation quality has saturated for SMT and big changes to the
+existing framework were in dire need.
 
-\nlms{} were first proposed by \newcite{Bengio2003}
-as a way to combat the ``curse'' of dimensionality suffered by traditional LMs.
-In traditional LMs, one has to explicitly store and handle 
-all possible \ngram{}s occurred in a training corpus, the number of which
-quickly becomes enormous. As a result, existing MT systems often limit
-themselves to use only short, e.g., $5$-gram, LMs \cite{kenlm}, which capture little context
-and cannot generalize well to unseen \ngram{}s. \nlms{} address these concerns by
-using distributed representations of words and not having to explicitly store
-all enumerations of words. As a result, many MT systems, \cite{schwenk07,vaswani13decode,luong15nlm}, inter
-alia, start adopting \nlms{} alongside with traditional LMs.
-To make \nlms{} even more powerful, recent work
-\cite{Schwenk12continuous,Son:2012:CST,Auli13,devlin14}
-propose to condition on source words beside the target context to lower
-uncertainty in predicting next words (see Figure~\ref{f:nnjm}).\footnote{In
-\cite{devlin14}, the authors have constructed a model that conditions on 3
-target words and 11 source words, effectively building a $15$-gram LM.}
+%Neural Machine Translation (NMT) is a new approach 
+%to translating text from one
+%language into another that captures long-range dependencies in sentences and
+%generalizes better to unseen texts. The core of NMT is a single deep neural
+%network with hundreds of millions of neurons that learn to directly map source
+%sentences to target ones \cite{kal13,sutskever14,cho14}.
+%NMT is appealing since it is conceptually
+%simple and can be trained
+%end-to-end. 
+%Second, it is
+%slightly unfortunate that language models (LMs), despite being a key component in the MT
+%pipeline, utilize context information that is both short, consisting of only
+%a handful of previous words, and target-only, never looking at the source
+%words. These shortcomings in LMs gives rise to a new wave of {\it hybrid} systems which
+%aim to empower phrase-based MT with neural network components, most notably
+%\nlmtext{} (\nlms{}). 
+
+Neural Machine Translation (NMT) is a new approach 
+that addresses the aforementioned problems. First, NMT is a {\it single big neural
+network} (with millions of artificial neurons) that is designed to model the
+entire MT process 
+% by learning to map source sentences to target ones 
+\cite{kal13,sutskever14,cho14}. NMT requires {\it minimal domain knowledge}, just a
+parallel corpus of source and target sentence pairs, similar to SMT, but with far
+less preprocessing steps before a translation model can be built.
+The most appealing feature of NMT is that it can be
+trained {\it end-to-end} directly from the learning objective; hence, eliminating the
+problem of having to learn multiple components in SMT systems. 
+
+Unlike those intricate decoders (the search procedure we mentioned earlier) in popular SMT packages
+\cite{koehn2007moses,chiang07hiero,dyer10cdec,cer10phrasal}, the translation
+story of NMT is conceptually simple.
+NMT translates as follows: an {\it encoder} reads through the given source
+sentence to build a ``thought''
+vector\footnote{This term was coined by Geoffrey Hinton in this article
+\url{https://www.theguardian.com/science/2015/may/21/google-a-step-closer-to-developing-machines-with-human-like-intelligence}.},
+a sequence of numbers that represents the sentence meaning; a {\it
+decoder}, then, processes the sentence vector to emit a translation, as
+illustrated in Figure~\ref{f:nmt}. 
+This is often referred to as the encoder-decoder
+architecture.\footnote{\edit{\newcite{allen87,chrisman91} wrote the very first papers
+on %\newcite{forcada97} 
+encoder-decoder models for translation!}} In this manner, NMT addresses the
+local translation problem in SMT; it does not do phrase-by-phrase translation.
+Instead, NMT gathers information from the entire source sentence before translating; as a result,
+it can capture {\it long-range dependencies} in languages, e.g., gender
+agreements; structural orderings of subject, verb, and object; etc.
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/nnjm.eps} % , angle=-90
-\caption[Source-conditioned \nlmtext{}]{{\bf Source-conditioned \nlmtext{}}
-(\nlms{}) -- example of a source-conditioned
-\nlm{} proposed by \newcite{devlin14}. To evaluate a how likely a next word
-\word{rive} is, the model not only relies on previous target words (context)
-\word{promenade le long de la} as in
-traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
-South Bank} to lower uncertainty in its prediction.
+\includegraphics[width=\textwidth, clip=true, trim= 0 0 0 0]{img/encdec}
+\caption[Encoder-decoder architecture]{{\bf Encoder-decoder architecture} --
+example of the general approach for NMT. An {\it encoder} converts a source sentence
+into a meaning vector which is passed through a {\it decoder} to produce a translation.
 } 
-\label{f:nnjm}
+\label{f:encdec}
 \end{figure}
 
-These hybrid MT systems with \nlm{} components, while having addressed shortcomings
-of traditional phrase-based MT,
-still translate locally and fail to capture long-range dependencies. For example, in Figure~\ref{f:nnjm}, the
-source-conditioned \nlm{} does not see the word \word{stroll}, or any other words
-outside of its fixed context windows, which can be useful in deciding that the
-next word should be \word{bank} as in \word{river bank} rather \word{financial
-bank}. More problematically, the entire MT pipeline is already complex with
-different components needed to be tuned separatedly, e.g., translation models,
-language models, reordering models, etc.; now, it becomes even worse as
-different neural components are incorporated. Neural Machine Translation to the
-rescue!
+%Such simplicity leads to several advantages. 
+%NMT requires minimal domain knowledge: it only assumes access to
+%sequences of source and target words as training data and learns to directly
+%map one into another. NMT beam-search decoders that
+%generate words from left to right can be easily implemented, unlike the highly
+%intricate decoders in standard MT \cite{Koehn:2003:SMT}. Lastly, the use of
+%recurrent neural networks (RNNs) allow NMT to generalize well to very long word
+%sequences while not having to 
+%explicitly store any gigantic
+%phrase tables or language models as in the case of standard MT.
 
+A realization of NMT is to use a powerful model for sequential data, namely recurrent
+neural network (RNN), for both the encoder and decoder \cite{sutskever14,cho14}.
+Interested readers can find details about RNNs in
+\secref{sec:rnn}; in a nutshell, RNNs allow us to build representations for
+variable-length input -- in our case, sentences -- using a dynamic memory
+structure. In \figref{f:nmt}, deep RNNs with two stacking layers are used to build
+a sequence-based NMT: an encoder first constructs a representation for a source
+sequence; a decoder, then, generates a target sequence,
+one symbol at a time until a special end-of-sequence symbol is produced.
 
-Neural Machine Translation (NMT) is a new approach to translating text from one
-language into another that captures long-range dependencies in sentences and
-generalizes better to unseen texts. The core of NMT is a single deep neural
-network with hundreds of millions of neurons that learn to directly map source
-sentences to target sentences \cite{kal13,sutskever14,cho14}. 
-%Despite being relatively new 
-%\cite{kal13,sutskever14,cho14}, NMT has already shown promising results,
-%achieving state-of-the-art performances for
-%several language pairs such as
-%English-French \cite{luong15}, English-German
-%\cite{jean15,luong15attn,sennrich16mono}, and
-%English-Czech \cite{jean15wmt,luong16}. 
-This is often referred as the sequence-to-sequence or encoder-decoder
-approach.\footnote{\newcite{forcada97} wrote the very first paper on sequence-to-sequence models for translation!}
-NMT is appealing since it is conceptually
-simple and can be trained
-end-to-end. NMT translates as follows: an {\it encoder} reads through the given source
-words one by one until the
-end, and then, a {\it decoder} starts emitting one target
-word at a time until a special end-of-sentence symbol is produced. We illustrate
-this process in Figure~\ref{f:nmt}. 
-% for the model described in \cite{sutskever14}.
+Sequence-based NMT has several advantages.
+First, NMT beam-search decoders that generate words from left to right can be
+easily implemented, unlike the highly complex beam-search decoders in SMT
+\cite{Koehn:2003:SMT}. More importantly, the use of
+RNNs allow NMT for {\it better generalization} to very long
+sequences while not having to  explicitly store any gigantic
+phrase tables or language models as in the case of SMT.
+As sequence-based NMT is currently the de facto approach, we will use NMT to
+generally refer to sequence-based NMT
+throughout this thesis unless otherwise stated.
 
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0
-0]{img/nmt_basic.eps} % , angle=-90
-\caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
-architecture proposed by \newcite{sutskever14} for
-translating a source sentence \word{I am a student} into a target sentence
-\word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
+\includegraphics[width=\textwidth, clip=true, trim= 0 0 0
+0]{img/nmt_intro} % , angle=-90
+\caption[Sequence Models for NMT]{{\bf Sequence Models for NMT} -- example of a
+deep recurrent architecture for translating a source sentence \word{She loves
+cute cats} into a target sentence \word{Elle aime les chats mignons}. On the
+decoder side, words generated from previous timesteps are used as inputs for the
+next ones. Here, \word{\texttt{\_}} marks the end of a sentence.
 } 
 \label{f:nmt}
 \end{figure}
 
-Such simplicity leads to several advantages. 
-NMT requires minimal domain knowledge: it only assumes access to
-sequences of source and target words as training data and learns to directly
-map one into another. NMT beam-search decoders that
-generate words from left to right can be easily implemented, unlike the highly
-intricate decoders in standard MT \cite{Koehn:2003:SMT}. Lastly, the use of
-recurrent neural networks (RNNs) allow NMT to generalize well to very long word
-sequences while not having to 
-explicitly store any gigantic
-phrase tables or language models as in the case of standard MT.
+
+%\begin{figure}[tbh!]
+%\centering
+%\includegraphics[width=\textwidth, clip=true, trim= 0 0 0
+%0]{img/nmt_basic} % , angle=-90
+%\caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
+%architecture proposed by \newcite{sutskever14} for
+%translating a source sentence \word{I am a student} into a target sentence
+%\word{Je suis \'{e}tudiant}. Here, \word{\texttt{\_}} marks the end of a sentence.
+%} 
+%\label{f:nmt}
+%\end{figure}
+
+}
+
+%\nlms{} were first proposed by \newcite{Bengio2003}
+%as a way to combat the ``curse'' of dimensionality suffered by traditional LMs.
+%In traditional LMs, one has to explicitly store and handle 
+%all possible \ngram{}s occurred in a training corpus, the number of which
+%quickly becomes enormous. As a result, existing MT systems often limit
+%themselves to use only short, e.g., $5$-gram, LMs \cite{kenlm}, which capture little context
+%and cannot generalize well to unseen \ngram{}s. \nlms{} address these concerns by
+%using distributed representations of words and not having to explicitly store
+%all enumerations of words. As a result, many MT systems, \cite{schwenk07,vaswani13decode,luong15nlm}, inter
+%alia, started adopting \nlms{} alongside with traditional LMs.
+%To make \nlms{} even more powerful, recent work
+%\cite{Schwenk12continuous,Son:2012:CST,Auli13,devlin14}
+%proposes to condition on source words as well as the target context to lower
+%uncertainty in predicting next words (see Figure~\ref{f:nnjm}).\footnote{In
+%\cite{devlin14}, the authors constructed a model that conditions on 3
+%target words and 11 source words, effectively building a $15$-gram LM.}
+%\begin{figure}[tbh!]
+%\centering
+%\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/nnjm.eps} % , angle=-90
+%\caption[Source-conditioned \nlmtext{}]{{\bf Source-conditioned \nlmtext{}}
+%(\nlms{}) -- example of a source-conditioned
+%\nlm{} proposed by \newcite{devlin14}. To evaluate how likely a next word
+%\word{rive} is, the model not only relies on previous target words (context)
+%\word{promenade le long de la} as in
+%traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
+%South Bank} to lower uncertainty in its prediction.
+%} 
+%\label{f:nnjm}
+%\end{figure}
+%
+%These hybrid MT systems with \nlm{} components, while having addressed shortcomings
+%of traditional phrase-based MT,
+%still translate locally and fail to capture long-range dependencies. For example, in Figure~\ref{f:nnjm}, the
+%source-conditioned \nlm{} does not see the word \word{stroll}, or any other words
+%outside of its fixed context windows, which can be useful in deciding that the
+%next word should be \word{bank} as in \word{river bank} rather \word{financial
+%bank}. 
+%
+%More problematically, the entire MT pipeline is already complex with
+%different components needing to be tuned separatedly, e.g., translation models,
+%language models, reordering models, etc.; now, it becomes even worse as
+%different neural components are incorporated. Neural Machine Translation to the
+%rescue!
+
 
 \section{Thesis Outline}
 Despite all the aforementioned advantages and potentials, the early NMT architecture
 \cite{sutskever14,cho14} still has many drawbacks. In this thesis, I will
 highlight three problems pertaining to the existing NMT model, namely the
-{\it vocabulary size}, the {\it sentence length}, and the {\it
-language complexity} issues. Each chapter is devoted to solving each of these
-problems in which I will describe how I have pushed the limits of NMT, making it
+{\it vocabulary coverage}, the {\it memory constraint}, and the {\it
+language complexity} issues. Each chapter is devoted to solving one of these
+problems. In each chapter, I will describe how I have pushed the limits of NMT, making it
 applicable to a wide variety of languages with state-of-the-art performance such as
 English-French \cite{luong15}, English-German \cite{luong15attn,luong15iwslt}, and
 English-Czech \cite{luong16}. Towards the {\it future} of
@@ -369,7 +467,7 @@ image caption generation, and auto-encoders or skip-thought vectors
 whether we can compress NMT for mobile devices \cite{see16}.
 In brief, this thesis is organized as follows. I start off by providing background knowledge on RNN and NMT
 in Chapter~\ref{c:background}. 
-The aforementioned three problems and approaches for NMT future are detailed in
+The aforementioned three problems and approaches to the future of NMT are detailed in
 Chapters~\ref{c:copy},~\ref{c:attention},~\ref{c:hybrid}, and~\ref{c:future}
 respectively, which we will go through one by one next.
 %My contributions are detailed in:
@@ -380,22 +478,25 @@ Chapter~\ref{c:conclude} wraps up and discusses remaining challenges in NMT rese
 
 \subsubsection*{Copy Mechanisms} 
 %\paragraph{Copy Mechanisms} 
-A significant weakness in conventional NMT 
+A significant weakness in the first NMT 
 systems is their inability to correctly translate very rare words:  
 end-to-end NMTs tend to have relatively small vocabularies with a single
 \unk{} symbol that represents every possible out-of-vocabulary (OOV) word. In
-Chapter~\ref{c:copy}, we propose simple and effective techniques to address this
+Chapter~\ref{c:copy}, I propose simple and effective techniques to address this
 {\it vocabulary size} problem through teaching NMT to ``copy'' words from source to
-target. Specifically, we train an NMT system on data that is augmented by the output of a word 
+target. Specifically, I train an NMT system on data that is augmented by the output of a word 
 alignment algorithm, allowing the NMT system to emit, for each OOV word
 in the target sentence, the position of its corresponding word in the source sentence.
 This information is later utilized in a
-post-processing step that translates every OOV word using a dictionary.  Our
+post-processing step that translates every OOV word using a dictionary. My 
 experiments on the WMT'14 English to French translation task show that this 
 method provides a substantial improvement of up to 2.8 BLEU points over an
 equivalent NMT system that does not use this technique. 
-With 37.5 BLEU points, our NMT system is the first to surpass 
-the best result achieved on a WMT'14 contest task.
+With 37.5 BLEU points, this NMT system is the first to surpass 
+the best result achieved on a WMT'14 contest task. 
+\edit{{\it This chapter is based
+on the following paper \cite{luong15} in which I, Ilya Sutskever, and Quoc Le
+share the first co-authorship.}}
 
 \subsubsection{Attention Mechanisms} 
 %\paragraph{Attention Mechanisms} 
@@ -408,15 +509,17 @@ there has been little work exploring useful architectures for attention-based
 NMT. Chapter~\ref{c:attention} examines two simple and effective classes of attentional
 mechanism: a {\it global} approach which always attends to all source words and
 a {\it local} one that only looks at a subset of source words at a time. 
-We demonstrate the effectiveness of both approaches on the WMT translation
+I demonstrate the effectiveness of both approaches on the WMT translation
 tasks between English and German in both directions. With local
-attention, we achieve a significant gain of 5.0 BLEU points over
+attention, I achieve a significant gain of 5.0 BLEU points over
 non-attentional systems that 
-already incorporate known techniques such as dropout. Our ensemble 
+already incorporate known techniques such as dropout. My ensemble 
 model using different attention architectures yields a new
 state-of-the-art result in the WMT'15 English to German
 translation task with 25.9 BLEU points, an improvement of 1.0 BLEU points over the existing
-best system backed by NMT and an $n$-gram reranker.
+best system backed by NMT and an $n$-gram reranker. 
+\edit{{\it This chapter is based
+on the following papers \cite{luong15attn,luong15iwslt}.}}
 
 \subsubsection{Hybrid Models} 
 %\paragraph{Hybrid Models} 
@@ -428,33 +531,46 @@ spellings.
 Chapter~\ref{c:hybrid} presents a novel word-character solution to that {\it
 language complexity} problem towards achieving
 open vocabulary NMT.
-We build hybrid systems that translate mostly at the {\it word}
-level and consult the {\it character} components for rare words. 
-Our character-level recurrent neural networks compute source
+I build hybrid systems that translate mostly at the {\it word}
+level and consult {\it character} components for rare words. 
+My character-level recurrent neural networks compute source
 word representations and recover unknown target words when needed.
 The twofold advantage of such a hybrid approach is that it is much faster and easier to
 train than character-based ones; at the same time, it never produces unknown words as in the case of word-based models. 
 On the WMT'15 English to Czech translation task, 
 this hybrid approach offers an addition boost of +$2.1{-}11.4$ BLEU points over models 
 that already handle unknown words. 
-Our best system achieves a new state-of-the-art result with
+My best system achieves a new state-of-the-art result with
 $20.7$ BLEU score.
-We demonstrate that our character models can successfully learn to not only generate well-formed words for Czech, a
+I demonstrate that my character models can successfully learn to not only generate well-formed words for Czech, a
 highly-inflected language with a very complex vocabulary, but also build correct
 representations for English source words.
+\edit{{\it This chapter is based on the following paper \cite{luong16}.}}
 
 \subsubsection{NMT Future} 
 %\paragraph{NMT Future} 
 Chapter~\ref{c:future} answers the two aforementioned questions
 for the future of NMT: whether we can utilize other tasks to improve
-translation and whether we can compress NMT models.
+translation and whether we can compress NMT models. 
+\edit{
+The former question is important because of the fact that the first NMT systems only
+utilize parallel corpora despite an abundant amount of available data from
+monolingual and multi-lingual corpora as well as data from related tasks. The
+latter question is motivated by the indispensable role of mobile devices in nowadays
+society\footnote{In 2014, the number of mobile devices is more than the number
+of people in the world according to
+\url{http://www.independent.co.uk/life-style/gadgets-and-tech/news/there-are-officially-more-mobile-devices-than-people-in-the-world-9780518.html}.}
+and the fact that state-of-the-art NMT models are beyond the storage capacity of
+existing mobile gadgets.
+}
+
 %, I answer two questions in Chapter~\ref{c:future}: (1) whether we can improve translation by jointly
 %learning from a wide variety of sequence-to-sequence tasks such as parsing,
 %image caption generation, and auto-encoders or skip-thought vectors; and (2)
 %whether we can compress NMT for mobile devices.
 
 For the first question, 
-we examine three multi-task learning (MTL) settings for sequence to sequence
+I examine three multi-task learning (MTL) settings for sequence to sequence
 models:
 (a) the {\it one-to-many} setting -- where the encoder is shared
 between several tasks such as machine translation and
@@ -463,24 +579,39 @@ decoder can be shared, as in the case of
 translation and image caption generation, and (c) the {\it
   many-to-many} setting -- where multiple encoders and decoders are
 shared, which is the case with unsupervised objectives
-and translation.  Our results show that training on a small amount of parsing and
+and translation.  My results show that training on a small amount of parsing and
 image caption data can improve the translation quality between English and
 German by up to $1.5$ BLEU
 points over strong single-task baselines on the WMT benchmarks. Rather
 surprisingly,
-we have established a new {\it
+I have established a new {\it
 state-of-the-art} result in constituent parsing with 93.0 F$_1$ by utilizing
-translation data. Lastly, we reveal interesting properties of the two unsupervised learning
-objectives, autoencoder and skip-thought, in the MTL context: autoencoder helps less in terms of
-perplexities but more on BLEU scores compared to skip-thought.
+translation data. Lastly, I reveal interesting properties of the two unsupervised learning
+objectives, autoencoder and skip-thought, in the MTL context: an autoencoder helps less in terms of
+perplexity but more on BLEU scores compared to skip-thought.
+\edit{{\it This section is based on the following paper \cite{luong16iclr}.}}
 
 %Neural Machine Translation (NMT), like many other deep learning domains, typically suffers from over-parameterization, resulting in large storage sizes.
-For the second question, we examine three simple magnitude-based pruning schemes to compress NMT models, namely {\it class-blind}, {\it class-uniform}, and {\it class-distribution}, which differ in terms of how pruning thresholds are computed for the different classes of weights in the NMT architecture.
-We demonstrate the efficacy of weight pruning as a compression technique for a state-of-the-art NMT system. 
-We show that an NMT model with over 200 million parameters can be pruned by 40\% with very little performance loss as measured on the WMT'14 English-German translation task. 
+For the second question, I examine three simple magnitude-based pruning schemes to compress NMT models, namely {\it class-blind}, {\it class-uniform}, and {\it class-distribution}, which differ in terms of how pruning thresholds are computed for the different classes of weights in the NMT architecture.
+I demonstrate the efficacy of weight pruning as a compression technique for a state-of-the-art NMT system. 
+I show that an NMT model with over 200 million parameters can be pruned by 40\% with very little performance loss as measured on the WMT'14 English-German translation task. 
 This sheds light on the distribution of redundancy in the NMT architecture.
-Our main result is that with {\it retraining}, we can recover and even surpass the original performance with an 80\%-pruned model. 
+My main result is that with {\it retraining}, I can recover and even surpass the original performance with an 80\%-pruned model. 
+\edit{{\it This section is based on the following paper \cite{see16} in which
+Abigail See and I share the first co-authoship.}}
 
+\edit{
+\subsubsection{Wrap-up} 
+In summary, this thesis has touched on a variety of aspects in which NMT can be
+significantly improved. My hope is to convince the audience 
+at the end of this thesis that NMT models have successfully taken over the role
+of SMT models and will continue to be the de factor standard for several years
+to come. Still, there are many challenging and rewarding problems to be explored
+which I will summarize in the conclusion chapter. {\it The material is based on an
+NMT tutorial given by me, Kyunghuyn Cho, and Christopher D. Manning at
+ACL'2016}.\footnote{The tutorial website is
+\url{https://sites.google.com/site/acl16nmt/}.}
+}
 
 %We start off by providing background knowledge on RNN and NMT
 %in Chapter~\ref{c:background}. The following chapters detail my contributions.
