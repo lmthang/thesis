@@ -1,10 +1,11 @@
 \epigraph{The Babel fish is small, yellow, leech-like, and probably the oddest
-thing in the universe. It feeds on brainwave energy  ...
+thing in the universe. 
+%It feeds on brainwave energy  ...
 %absorbing all unconscious
 %frequencies and then excreting telepathically a matrix formed from the conscious
 %frequencies and nerve signals picked up from the speech centres of the brain,
 %the practical upshot of which is that 
-if you stick a Babel fish in your ear, you can
+If you stick a Babel fish in your ear, you can
 instantly understand anything in any form of language.}{{\it The Hitchhiker's
 Guide to the Galaxy}. Douglas Adams.}
 Human languages are diverse %and rich in categories 
@@ -62,6 +63,7 @@ Christopher D. Manning.
 
 
 \section{Machine Translation}
+\label{sec:mt}
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth, clip=true, trim= 0 0 0 0]{img/mt.eps} % , angle=-90
@@ -384,7 +386,7 @@ throughout this thesis unless otherwise stated.
 \caption[Sequence Models for NMT]{{\bf Sequence Models for NMT} -- example of a
 deep recurrent architecture for translating a source sentence \word{She loves
 cute cats} into a target sentence \word{Elle aime les chats mignons}. On the
-decoder side, words generated from previous timesteps are used as inputs for the
+decoder side, {\it words} generated from previous timesteps are used as inputs for the
 next ones. Here, \word{\texttt{\_}} marks the end of a sentence.
 } 
 \label{f:nmt}
@@ -405,49 +407,6 @@ next ones. Here, \word{\texttt{\_}} marks the end of a sentence.
 
 }
 
-%\nlms{} were first proposed by \newcite{Bengio2003}
-%as a way to combat the ``curse'' of dimensionality suffered by traditional LMs.
-%In traditional LMs, one has to explicitly store and handle 
-%all possible \ngram{}s occurred in a training corpus, the number of which
-%quickly becomes enormous. As a result, existing MT systems often limit
-%themselves to use only short, e.g., $5$-gram, LMs \cite{kenlm}, which capture little context
-%and cannot generalize well to unseen \ngram{}s. \nlms{} address these concerns by
-%using distributed representations of words and not having to explicitly store
-%all enumerations of words. As a result, many MT systems, \cite{schwenk07,vaswani13decode,luong15nlm}, inter
-%alia, started adopting \nlms{} alongside with traditional LMs.
-%To make \nlms{} even more powerful, recent work
-%\cite{Schwenk12continuous,Son:2012:CST,Auli13,devlin14}
-%proposes to condition on source words as well as the target context to lower
-%uncertainty in predicting next words (see Figure~\ref{f:nnjm}).\footnote{In
-%\cite{devlin14}, the authors constructed a model that conditions on 3
-%target words and 11 source words, effectively building a $15$-gram LM.}
-%\begin{figure}[tbh!]
-%\centering
-%\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/nnjm.eps} % , angle=-90
-%\caption[Source-conditioned \nlmtext{}]{{\bf Source-conditioned \nlmtext{}}
-%(\nlms{}) -- example of a source-conditioned
-%\nlm{} proposed by \newcite{devlin14}. To evaluate how likely a next word
-%\word{rive} is, the model not only relies on previous target words (context)
-%\word{promenade le long de la} as in
-%traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
-%South Bank} to lower uncertainty in its prediction.
-%} 
-%\label{f:nnjm}
-%\end{figure}
-%
-%These hybrid MT systems with \nlm{} components, while having addressed shortcomings
-%of traditional phrase-based MT,
-%still translate locally and fail to capture long-range dependencies. For example, in Figure~\ref{f:nnjm}, the
-%source-conditioned \nlm{} does not see the word \word{stroll}, or any other words
-%outside of its fixed context windows, which can be useful in deciding that the
-%next word should be \word{bank} as in \word{river bank} rather \word{financial
-%bank}. 
-%
-%More problematically, the entire MT pipeline is already complex with
-%different components needing to be tuned separatedly, e.g., translation models,
-%language models, reordering models, etc.; now, it becomes even worse as
-%different neural components are incorporated. Neural Machine Translation to the
-%rescue!
 
 
 \section{Thesis Outline}
@@ -458,7 +417,8 @@ highlight three problems pertaining to the existing NMT model, namely the
 language complexity} issues. Each chapter is devoted to solving one of these
 problems. In each chapter, I will describe how I have pushed the limits of NMT, making it
 applicable to a wide variety of languages with state-of-the-art performance such as
-English-French \cite{luong15}, English-German \cite{luong15attn,luong15iwslt}, and
+English-French \cite{luong15}, English-German \cite{luong15attn,luong15iwslt},
+English-Vietnamese \cite{luong15iwslt}, and
 English-Czech \cite{luong16}. Towards the {\it future} of
 NMT, I answer two questions: (1) whether we can improve translation by jointly
 learning from a wide variety of sequence-to-sequence tasks such as parsing,
@@ -520,6 +480,8 @@ translation task with 25.9 BLEU points, an improvement of 1.0 BLEU points over t
 best system backed by NMT and an $n$-gram reranker. 
 \edit{{\it This chapter is based
 on the following papers \cite{luong15attn,luong15iwslt}.}}
+\error{Mention results from IWSLT, for TED talk English-German,
+English-Vietnamese}
 
 \subsubsection{Hybrid Models} 
 %\paragraph{Hybrid Models} 
@@ -598,7 +560,7 @@ I show that an NMT model with over 200 million parameters can be pruned by 40\% 
 This sheds light on the distribution of redundancy in the NMT architecture.
 My main result is that with {\it retraining}, I can recover and even surpass the original performance with an 80\%-pruned model. 
 \edit{{\it This section is based on the following paper \cite{see16} in which
-Abigail See and I share the first co-authoship.}}
+Abigail See and I share the first co-authorship.}}
 
 \edit{
 \subsubsection{Wrap-up} 
@@ -613,6 +575,12 @@ ACL'2016}.\footnote{The tutorial website is
 \url{https://sites.google.com/site/acl16nmt/}.}
 }
 
+\error{
+\subsubsection{Related publications}
+\cite{luong13}
+
+\cite{luong15nlm}
+}
 %We start off by providing background knowledge on RNN and NMT
 %in Chapter~\ref{c:background}. The following chapters detail my contributions.
 %Chapter~\ref{c:copy} discusses how the rare word

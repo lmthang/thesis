@@ -29,7 +29,7 @@
 
 %% Thang
 \usepackage{epigraph}
-\renewcommand{\epigraphsize}{\small}
+\renewcommand{\epigraphsize}{\normalsize} %\large} %\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
 \usepackage{pstricks} % for overlay latex on top of images
 
@@ -61,16 +61,17 @@
 \newcommand{\eq}[1]{Eq.~(\ref{#1})}
 \newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\figref}[1]{Figure~\ref{#1}}
-\newcommand{\nlmtext}{neural probabilistic language models}
-\newcommand{\nlm}{NPLM}
-\newcommand{\nlms}{NPLMs}
+\newcommand{\nlmtext}{neural language models} % probabilistic 
+\newcommand{\nlm}{NLM}
+\newcommand{\nlms}{NLMs}
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\algo}[1]{Algorithm~\ref{#1}}
 
 % math operators
 %\DeclareMathOperator*{\argmax}{\arg\,\max}
 %\DeclareMathOperator{\diag}{diag}
-\DeclareMathOperator{\e}{e}
+%\newcommand{\me}{\mathrm{e}}
+%\DeclareMathOperator{\e}{e}
 \DeclareMathOperator{\trace}{Tr}
 \DeclareMathOperator{\sigm}{sigm}
 \DeclareMathOperator{\sigmoid}{sigmoid}
@@ -239,23 +240,23 @@
 
 \chapter{Copy Mechanisms}
 \label{c:copy}
-\input{3-copy.tex}
+%\input{3-copy.tex}
 
 \chapter{Attention Mechanisms}
 \label{c:attention}
-\input{4-attention.tex}
+%\input{4-attention.tex}
 
 \chapter{Hybrid Models}
 \label{c:hybrid}
-\input{5-hybrid.tex}
+%\input{5-hybrid.tex}
 
 \chapter{NMT Future}
 \label{c:future}
-\input{6-future.tex}
+%\input{6-future.tex}
 
 \chapter{Conclusion}
 \label{c:conclude}
-\input{7-conclude.tex}
+%\input{7-conclude.tex}
 
 
 % -- Appendix --

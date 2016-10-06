@@ -1,27 +1,122 @@
-\epigraph{For neural machine translation, it all started from language
-modeling.}{Thang Luong.}
+\edit{
+\epigraph{Give me a place to stand and I will move the earth.}{Archimedes.}
+%\epigraph{For neural machine translation, it all started from language modeling.}{Thang Luong.}
 
-Language modeling plays an
-indispensable role in ensuring that machine translation systems produce fluent target
-sentences and has always been an active area of research.
-Despite much effort in improving traditional \ngram{} language models
-\cite{rosenfeld2000,srilm,teh2006,irstlm,kenlm,pauls2011,heafield13},
-traditional LMs inherently can only handle short
-contexts of a few words. Approaches to building \nlmtext{} (\nlms) using
-feed-forward networks such as those initiated by \newcite{Bengio2003} and
-enhanced by others \cite{Morin2005,Bengio08,MnihHinton2009,MnihTeh2012} have %,Mnih2007
-addressed that drawback to model longer contexts.
-% worked great compared to traditional \ngram{} language models. 
-Still, \nlms{} can only capture fixed-length contexts and is
-incapable of handling variable-length sequences, which is the case for sentences.
-Recurrent neural networks (RNNs) come in handy as a powerful and expressive
-architecture to handle sequential data and have successfully been applied to the
-language modeling task \cite{MikolovKBCK10,MikolovKBCK11,mikolovLM}.
-By viewing RNNs as generative models \cite{Sutskever11} that can produce texts 
-and by pushing another step towards conditioning RNNs on source sentences, recent works
-\cite{kal13,sutskever14,cho14} have started a new line of resesarch in machine translation, namely Neural
-Machine Translation (NMT). NMT is technically a source-conditioned \nlm{} that
-can be trained end-to-end.
+In this chapter, we provide background knowledge on three main topics, namely
+language model (LM), recurrent neural network (RNN), and neural machine
+translation (NMT).
+Language modeling is an important concept in natural language processing to
+allow one to do {\it word prediction}, i.e., guessing which word will come next
+given a preceding context. As we shall see later, there is an interesting fact
+that for neural machine
+translation, it all started from language modeling. Before we get into NMT, 
+we will go through the basics of recurrent neural network, the heart of
+sequence-based NMT, to
+explain how RNNs can naturally and effectively model {\it variable-length} inputs, or
+sentences in the context of the translation task. 
+We cover in depth one particular type of RNN, the {\it Long Short-term Memory}
+(LSTM), that makes training RNNs easier. Interested readers can find all the
+details of how to implement LSTM ``by hand'' with detailed formulas on gradient
+computation as compared to the automatic differentiation feature given by nowadays deep
+learning frameworks. The understanding of language modeling will allow us
+to extend RNNs into recurrent neural language models which enable {\it language
+generation}, a key step in NMT.
+Lastly, with RNN as a basic building block, we describe key elements of an NMT
+system as well as tips and tricks for better training and testing NMT.
+}
+
+\section{Language Model}
+\edit{
+As we have discussed in \secref{sec:mt}, language modeling plays an indispensable
+role in MT to ensure that systems produce fluent translations.
+% and has always been an active area of research.
+Specifically, the job of an LM is to specify a probability distribution over
+sequences of symbols (often, words) so that one can judge if a sequence of
+words is more likely or ``fluent'' than another. To accomplish that, an LM
+decomposes the probability of a word sequence $y = y_1, \ldots, y_m$ as:
+\begin{align}
+p(y) = \prod_{i=1}^m p(y_i | y_{<i}) %\yrange{1}{i-1})
+\end{align}
+In the above formula, each of the
+individual terms $p(y_i | y_{<i})$ is the conditional probability of the current
+word $y_i$ given previous words $y_{<i}$, also referred to as the {\it
+context} or the {\it history}. 
+To model these conditional probabilities, traditional \ngram{}
+ LMs have to resort to the %as well as feedforward-based neural
+Markovian assumption to consider only a fixed context window of $n\!-\!1$ words,
+effectively modeling $p(y_i | y_{i-n+1}, \ldots, y_{i-1})$. 
+In fact, \ngram{} LMs have to explicitly store and handle 
+all possible \ngram{}s occurred in a training corpus, the number of which
+quickly becomes enormous. As a result, 
+despite much research in this area 
+\cite{rosenfeld2000,srilm,teh2006,irstlm,kenlm}, inter alia, %,pauls2011,heafield13
+\ngram{} LMs can only handle short contexts of about 4 to 6 words,  
+%As a result, existing MT systems often limit
+%themselves to use only short, e.g., $5$-gram, LMs \cite{kenlm}, which capture little context
+and does not generalize well to unseen \ngram{}s. 
+
+Neural language models (NLMs), first proposed by \newcite{Bengio2003} and enhanced by
+others such as \newcite{Morin2005,MnihHinton2009,MnihTeh2012}, have addressed the
+aforementioned concerns using two ideas: 
+(a) {\it dense distributed representations} for words which encourage sharing
+of statistical weights between similar words; and (b) {\it feed-forward neural
+networks} to allow for better composition of unseen word sequences at test time
+without having to explicitly store all enumerations of \ngram{}s. 
+These features function as a way to combat the ``curse'' of dimensionality
+in language modeling. As a result, NLMs are compact and can extend to longer
+context.
+
+As a natural development, subsequent MT systems
+\cite{schwenk07,vaswani13decode,luong15nlm}, inter alia, started adopting NLMs
+alongside with traditional \ngram{} LMs and generally obtain sizable
+improvements in terms of translation quality.
+To make NLMs even more powerful, recent work
+\cite{Schwenk12continuous,Son:2012:CST,Auli13,devlin14}
+proposes to condition on source words as well as the target context to lower
+uncertainty in predicting next words (see Figure~\ref{f:nnjm}).\footnote{In
+\cite{devlin14}, the authors constructed a model that conditions on 3
+target words and 11 source words, effectively building a $15$-gram LM.}
+These hybrid MT systems with \nlm{} components, while better than statistical MT
+systems, still translate locally and fail to capture long-range dependencies.
+For example, in Figure~\ref{f:nnjm}, the
+source-conditioned \nlm{} does not see the word \word{stroll}, or any other words
+outside of its fixed context windows, which can be useful in deciding that the
+next word should be \word{bank} as in \word{river bank} rather \word{financial
+bank}. 
+\begin{figure}[tbh!]
+\centering
+\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/nnjm.eps} % , angle=-90
+\caption[Source-conditioned \nlmtext{}]{{\bf Source-conditioned \nlmtext{}}
+(\nlms{}) -- example of a source-conditioned
+\nlm{} proposed by \newcite{devlin14}. To evaluate how likely a next word
+\word{rive} is, the model not only relies on previous target words (context)
+\word{promenade le long de la} as in
+traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
+South Bank} to lower uncertainty in its prediction.
+\error{Plot a figure on NPLMs.}
+} 
+\label{f:nnjm}
+\end{figure}
+
+More problematically, the entire MT pipeline is already complex with
+different components needing to be tuned separately, e.g., translation models,
+language models, reordering models, etc.; now, it becomes even worse as
+different neural components are incorporated. This motivates neural machine
+translation to redesign the entire MT pipeline completely. Before we go into
+details of NMT, we will first learn about recurrent neural networks which is a
+building block for NMT and a key component that will
+help address the aforementioned problem of translating locally in statistical MT
+systems including hybrid models.
+}
+
+%Approaches to building \nlmtext{} (\nlms) using
+%feed-forward networks such as those initiated by \newcite{Bengio2003} and
+%enhanced by others \cite{Morin2005,Bengio08,MnihHinton2009,MnihTeh2012} have %,Mnih2007
+%addressed that drawback to model longer contexts.
+
+%% worked great compared to traditional \ngram{} language models. 
+%Still, \nlms{} can only capture fixed-length contexts and is
+%incapable of handling variable-length sequences, which is the case for sentences.
 
 %Early success of feed-forward \nlms{} has led to widespread adoption of \nlms{}
 %as an additional component in the machine translation pipeline
@@ -34,24 +129,23 @@ can be trained end-to-end.
 %improving MT has centered around enhancing language modeling -- more specifically, the need to capture long-range
 %dependencies better. We start out with efforts to scale up traditional \ngram{} language models 
 
-In this chapter, we provide background knowledge on two main topics, RNN and NMT.
-We first go through the basics of RNNs, explaining how they can be used to model sentences. 
-Then, we delve into details of one particular type of RNNs, the Long Short-term Memory, that makes training RNNs easier.
-Given RNNs as a building block, we discuss NMT together with tips and tricks for better training and testing NMT.
 
 \section{Recurrent Neural Network}
 \label{sec:rnn}
-Recurrent Neural Network (RNNs) \cite{elman90} are models that help understand
-the temporal aspect as well as build up representations for sequential data
-using a dynamic memory structure. At the surface form, an RNN takes as input a sequence of vectors $\x{1},
+\edit{
+%Recurrent Neural Network (RNNs) \cite{elman90} are models that help understand
+%the temporal aspect as well as build up representations for sequential data
+%using a dynamic memory structure. At the surface form
+Recurrent neural network (RNN) \cite{elman90} is a powerful and expressive
+architecture that can handle sequential data and has been successfully applied to 
+language modeling tasks \cite{MikolovKBCK10,MikolovKBCK11,mikolovLM}.
+}
+Formally, an RNN takes as input a sequence of vectors $\x{1},
 \x{2}, \ldots, \x{n}$ and processes them one by one. For each
 new input $\x{i}$, an RNN updates its memory to produce a hidden state
 $\hid{i}$ which one can think of as a representation for the partial sequence
 $\x{\overline{1,i}}$. %$\x{1},\ldots, \x{i}$. 
-The beauty of RNNs lies in the fact that it can
-capture the dynamics of an arbitrarily long sequence without having to increase its modeling
-capacity unlike the case of feedforward network which can only model
-relationship within a fixed-length sequence. The key secret sauce is in the
+The key secret sauce is in the
 recurrence formula of an RNN that defines how its hidden state is updated. At
 its simplest form, a ``vanilla'' RNN defines its recurrence function as:
 \begin{align}
@@ -70,11 +164,10 @@ an optional bias term in \eq{e:vanilla_rnn}.}
 
 At each timestep $t$, an RNN can (optionally) emit an output symbol
 $y_t$ which can either be discrete or real-valued. For the discrete scenario,
-which is often the case for languages, a probability distribution $\bm{p}$ over a 
-set of output classes $Y$ is derived as
-follows\footnote{For the real-valued case, we refer readers to mixture density
+which is often the case for linguistic applications, a probability distribution $\bm{p}$ over a 
+set of output classes $Y$ is derived as:\footnote{For the real-valued case, we refer readers to mixture density
 models \cite{bishop94} which have been applied to RNN training, e.g., for
-hand-writing synthesis \cite{graves13c}.}:
+hand-writing synthesis \cite{graves13c}.}
 \begin{align}
 \s{t} &= \W{hy}\hid{t} \label{e:score} \\
 \prob{t} &= \softmax(\s{t}) \label{e:prob}
@@ -91,7 +184,7 @@ element $y \in Y$ as below.
 For convenience, we overload our notations to use $\prob{t}(y)$ and $\s{t}(y)$ to refer to entries in
 the vectors $\prob{t}$ and $\s{t}$ that correspond to $y$.
 \begin{align}
-\prob{t}(y) = \frac{\e^{\s{t}(y)}}{\sum_{y' \in Y} \e^{\s{t}(y')}}
+\prob{t}(y) = \frac{e^{\s{t}(y)}}{\sum_{y' \in Y} e^{\s{t}(y')}}
 \label{e:softmax}
 \end{align}
 
@@ -101,8 +194,17 @@ which consists of {\it input} connections $\W{xh}$, {\it
 recurrent} connections $\W{hh}$, and {\it output}
 connections $\W{hy}$. These weights are shared across
 timesteps as illustrated in Figure~\ref{f:rnn} \error{Draw a picture on
-general RNNs}, which enables
-RNNs to handle arbitrarily long sequences.
+general RNNs}. %, which enables RNNs to handle arbitrarily long sequences.
+\edit{This is, in fact, the beauty of RNNs as they can
+capture the dynamics of arbitrarily long sequences without having to increase
+their modeling capacity. In contrast, feedforward networks can only model
+relationship over fixed-length segments. 
+
+Throughout this thesis, RNNs will be discussed from a language
+learning perspective. For more details on general RNNs, we refer readers to the
+following resources \cite{sutskever12,mikolov12,karpathy15rnn}.
+
+}
 
 \begin{figure}[tbh!]
 \centering
@@ -119,12 +221,18 @@ timesteps.
 \label{f:rnn}
 \end{figure}
 
-Next, we discuss the training and testing phases of RNNs from a slightly more
-focused angle, the language learning aspect. For more details on RNNs, we refer readers to the following resources
-\cite{sutskever12,mikolov12,karpathy15rnn}.
+%By viewing RNNs as generative models \cite{Sutskever11} that can produce texts 
+%and by pushing another step towards conditioning RNNs on source sentences, recent works
+%\cite{kal13,sutskever14,cho14} have started a new line of research in machine translation, namely Neural
+%Machine Translation (NMT). NMT is technically a source-conditioned \nlm{} that
+%can be trained end-to-end.
 
-\subsection{Recurrent Language Models}
-\label{subsec:rlm}
+%An RNN-based language model naturally lends itself to model the full
+%history as we shall see now.
+
+
+\paragraph{Recurrent Language Models}
+%\label{subsec:rlm}
 To apply RNNs to sentences in languages, or generally sequences of discrete symbols, one can
 consider one-hot representations $\x{i} \inR{|V|}$, with $V$ being the
 vocabulary considered. However, for a large
@@ -154,22 +262,6 @@ timesteps.
 \label{f:rlm}
 \end{figure}
 
-In language modeling (LM), the task is to specify a probability distribution over
-sequences of symbols (often, words) so that one can judge if a sequence of
-words is more likely or ``fluent'' than another. To accomplish that, an LM decomposes the
-probability of a word sequence $y = y_1, \ldots,
-y_m$ as:
-\begin{align}
-p(y) = \prod_{i=1}^m p(y_i | y_{<i}) %\yrange{1}{i-1})
-\end{align}
-In the above formula, each of the
-individual term $p(y_i | y_{<i})$ is the conditional probability of the current
-word $y_i$ given previous words $y_{<i}$, also referred as the {\it
-context} or the {\it history}. To model these conditional probabilities, traditional \ngram{}
-as well as feedforward-based neural language models have to resort to the
-Markovian assumption to model only a fixed window of context, i.e., $p(y_i |
-y_{i-n+1}, \ldots, y_{i-1})$. An RNN-based language model naturally lends itself to model the full
-history as we shall see now.
 
 An RNN-based language model (RNNLM) is a special case of RNNs in which: (a) the input and output
 are sequences of discrete words, (b) the output sequence ends %$y=\{y_1, \ldots, y_n$, \eos$\}$ 
