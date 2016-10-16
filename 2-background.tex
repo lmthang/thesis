@@ -93,20 +93,20 @@ bank}.
 \word{promenade le long de la} as in
 traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
 South Bank} to lower uncertainty in its prediction.
-\error{Plot a figure on NPLMs.}
+\error{Plot a figure on NPLMs?}
 } 
 \label{f:nnjm}
 \end{figure}
 
 More problematically, the entire MT pipeline is already complex with
-different components needing to be tuned separately, e.g., translation models,
-language models, reordering models, etc.; now, it becomes even worse as
-different neural components are incorporated. This motivates neural machine
-translation to redesign the entire MT pipeline completely. Before we go into
-details of NMT, we will first learn about recurrent neural networks which is a
-building block for NMT and a key component that will
-help address the aforementioned problem of translating locally in statistical MT
-systems including hybrid models.
+different components needing to be tuned separately such as translation models,
+language models, and reordering models. Now, it becomes even worse as
+different neural components are incorporated in to the translation framework.
+This inspires the birth of neural machine
+translation with a goal of redesigning the entire MT pipeline completely. To start, we will
+first learn about recurrent neural network, a
+building block for NMT as well as a key component to address the local
+translation problem in statistical MT systems.
 }
 
 %Approaches to building \nlmtext{} (\nlms) using
@@ -193,33 +193,41 @@ With the above formulas, we have completely defined the RNN weight set $\thetav$
 which consists of {\it input} connections $\W{xh}$, {\it
 recurrent} connections $\W{hh}$, and {\it output}
 connections $\W{hy}$. These weights are shared across
-timesteps as illustrated in Figure~\ref{f:rnn} \error{Draw a picture on
-general RNNs}. %, which enables RNNs to handle arbitrarily long sequences.
+timesteps as illustrated in Figure~\ref{f:rnn}. %, which enables RNNs to handle arbitrarily long sequences.
 \edit{This is, in fact, the beauty of RNNs as they can
 capture the dynamics of arbitrarily long sequences without having to increase
 their modeling capacity. In contrast, feedforward networks can only model
 relationship over fixed-length segments. 
 
+\begin{figure}[tbh!]
+\centering
+%\psgrid
+\rput(8.2,3.5){{\color{lightred} $\W{hy}$}}
+\rput(7.7,2.5){{\color{lightblue} $\W{hh}$}}
+\rput(8.2,0.9){{\color{lightgreen} $\W{xh}$}}
+\rput(8.9,0.3){{\color{lightgreen} $\x{n}$}}
+\rput(6.9,0.3){{\color{lightgreen} $\ldots$}}
+\rput(5.1,0.3){{\color{lightgreen} $\x{2}$}}
+\rput(3.3,0.3){{\color{lightgreen} $\x{1}$}}
+\rput(8.9,4.2){{\color{lightred} $\y{n}$}}
+\rput(6.9,4.2){{\color{lightred} $\ldots$}}
+\rput(5.1,4.2){{\color{lightred} $\y{2}$}}
+\rput(3.3,4.2){{\color{lightred} $\y{1}$}}
+\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
+\caption[Recurrent neural networks]{{\bf Recurrent neural networks} -- example of a recurrent
+neural network that processes a input sequence $\x{1}, \x{2}, \ldots, \x{n}$ to
+build up hidden representations as each input is consumed and produces an output
+sequence $\y{1}, \y{2}, \ldots, \y{n}$. The input $\MB{W_{xh}}$, recurrent
+$\MB{W_{hh}}$, and output $\MB{W_{hy}}$  weights are shared across timesteps.
+} 
+\label{f:rnn}
+\end{figure}
+}
 Throughout this thesis, RNNs will be discussed from a language
 learning perspective. For more details on general RNNs, we refer readers to the
 following resources \cite{sutskever12,mikolov12,karpathy15rnn}.
 
-}
 
-\begin{figure}[tbh!]
-\centering
-%\psgrid
-\rput(7.1,2.6){{\color{lightblue} $\MB{W_{hh}}$}}
-\rput(8.6,1.0){{\color{lightgreen} $\MB{W_{xh}}$}}
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
-\caption[Recurrent neural networks]{{\bf Recurrent neural networks} -- example of a recurrent
-neural network that processes a sequence of input words \word{I am a student} to
-build up hidden representations as input symbols are consumed. The recurrent
-$\MB{W_{hh}}$ and feed-forward $\MB{W_{xh}}$ weights are shared across
-timesteps.
-} 
-\label{f:rnn}
-\end{figure}
 
 %By viewing RNNs as generative models \cite{Sutskever11} that can produce texts 
 %and by pushing another step towards conditioning RNNs on source sentences, recent works
@@ -233,49 +241,56 @@ timesteps.
 
 \paragraph{Recurrent Language Models}
 %\label{subsec:rlm}
-To apply RNNs to sentences in languages, or generally sequences of discrete symbols, one can
-consider one-hot representations $\x{i} \inR{|V|}$, with $V$ being the
-vocabulary considered. However, for a large
-vocabulary $V$, such a representation choice is problematic as it results in
-a large weight matrix $\W{xh}$ and there is no notion of similarity between
-words. In practice, low-dimensional dense representations for words, or {\it
-word embeddings}, are often used to address these problems. Specifically, an
-embedding matrix
-$\W{e} \inR{d_e \times |V|}$ is looked up for each word $x_i$ to retrieve a
-representation $\x{i} \inR{d_e}$. As a result, a simple RNN applied to language
-modeling will generally have $\theta = \{\W{xh}, \W{hh}, \W{hy}, \W{e}\}$ as its
-weights as illustrated in Figure~\ref{f:rlm} \error{Draw an RNN with
-embedding}.
+\edit{
+As a special case of RNN, recurrent language model assumes that the input and output
+sequences consist of discrete symbols, often words in a language.
+Additionally, the input sequence is prepended with a special starting symbol
+\sos{}, e.g., $x=\{$ \sos, ``I'', ``am'', ``a'', ``student''$\}$.
+Since the goal of a language model is to predict the next word, the output
+sequence is a shift-by-1 version of the input and ends
+with a special symbol \eos{} that marks the boundary, e.g., $y=\{$ ``I'', ``am'', ``a'',
+``student'', \eos$\}$. As we illustrate in \figref{f:rlm}, the word emitted at
+one timestep is used as an input to the next timestep.
+}
 
 \begin{figure}[tbh!]
 \centering
 %\psgrid
-\rput(7.1,2.6){{\color{lightblue} $\MB{W_{hh}}$}}
-\rput(8.6,1.0){{\color{lightgreen} $\MB{W_{xh}}$}}
-\includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/rnn.eps} % , angle=-90
+\rput(9,4.6){{\color{lightred} $\W{hy}$}}
+\rput(8.7,3.9){{\color{lightblue} $\W{hh}$}}
+\rput(9,2.5){{\color{lightgreen} $\W{xh}$}}
+\rput(1.4,1.3){{\color{lightpurple} $\W{e}$}}
+\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/rnnlm.eps} % , angle=-90
 \caption[Recurrent language models]{{\bf Recurrent language models} -- example of a recurrent
-neural network that processes a sequence of input words \word{I am a student} to
-build up hidden representations as input symbols are consumed. The recurrent
-$\MB{W_{hh}}$ and feed-forward $\MB{W_{xh}}$ weights are shared across
-timesteps.
+language model that processes a sentence \word{I am a student} and predicts next
+words as it goes. \edit{Beside the shared recurrent $\W{hh}$ and feed-forward $\W{xh}$
+weights, there is an additional shared embedding weight matrix $\W{e}$ that needs to be
+learned as well.}
 } 
 \label{f:rlm}
 \end{figure}
 
+To apply RNNs to sentences in languages, or generally sequences of discrete symbols, one can
+consider one-hot representations for words, i.e., $\x{i} \inR{|V|}$, with $V$ being the
+vocabulary considered. However, for a large
+vocabulary $V$, such a representation choice is problematic as it results in
+a large weight matrix $\W{xh}$ and there is no notion of similarity between
+words. In practice, low-dimensional dense representations for words, or {\it
+embeddings}, are often used to address these problems. Specifically, an
+embedding matrix
+$\W{e} \inR{d_e \times |V|}$ is looked up for each word $x_i$ to retrieve a
+representation $\x{i} \inR{d_e}$. As a result, a vanilla recurrent language model
+will generally have $\theta = \{\W{xh}, \W{hh}, \W{hy}, \W{e}\}$ as its
+weights. % as illustrated in Figure~\ref{f:rlm}. 
+% \error{Mention that we want to learn the embedding matrix}.
 
-An RNN-based language model (RNNLM) is a special case of RNNs in which: (a) the input and output
-are sequences of discrete words, (b) the output sequence ends %$y=\{y_1, \ldots, y_n$, \eos$\}$ 
-with a special symbol \eos{} that marks the boundary, e.g., $y=\{$ ``I'', ``am'', ``a'',
-``student'', \eos$\}$, and (c) the input sequence is a
-shift-by-1 version of the output sequence with \sos{} as a starting symbol,
-e.g., $x=\{$ \sos, ``I'', ``am'', ``a'',
-``student''$\}$. We illustrate this in \figref{f:rlm}.
 
 %i.e., $x=\{$
 %\sos{}, $y_1, \dots, y_n\}$. In our example, $x=\{$ \sos, ``I'', ``am'', ``a'',
 %``student''$\}$, whereas $y=\{$ ``I'', ``am'', ``a'',
 %``student'', \eos$\}$
-\paragraph{Training}
+
+\subsection{Training \& Backpropagation}
 Given a training dataset of $N$ discrete output sequences $\ytop{1}, \ldots,
 \ytop{N}$ with lengths $m_1, \ldots, m_N$ accordingly. The learning objective is
 to minimize the negative log-likelihood, or the {\it cross-entropy} loss, of these training examples:
@@ -300,37 +315,46 @@ a learning rate is given below:
 \begin{align}
 \thetav \longleftarrow \thetav - \eta \grad{J(\thetav)} %\fracder{J(\thetav)}{\thetav}
 \end{align}
+\edit{Here, $\grad{J(\thetav)}$ is the gradient of the loss that we are
+minimizing with respect to the model weights. Intuitively, what the formula does is to update the weights along the
+opposite direction of the gradient to minimize the loss objective. The learning
+rate $\eta$, sometimes referred as a {\it step size}, is a hyperparameter which
+controls how much we update the weights along the optimization direction.}
 
-\paragraph{Single-timestep Backpropagation} To compute the gradients for the loss $J(\thetav)$,
+\paragraph{Single-Time Backpropagation} To compute the gradients for the loss $J(\thetav)$,
 we first need to be able to derive the gradients of the per-timestep loss $l_t
-=\log \prob{t}(y_t)$ with respect to both the RNN weights
-$\{\W{xh}, \W{hh}, \W{hy}\}$ and the inputs $\{\x{t}, \hid{t-1}\}$. We denote
+=-\log \prob{t}(y_t)$ with respect to both the RNN weights
+$\{\W{xh}, \W{hh}, \W{hy}\}$ and the inputs $\{\x{t}, \hid{t-1}\}$. It is worth
+noting that
+$\x{t}$ is a column vector in the embedding matrix $\W{e}$. We denote
 these gradients as $\{d\W{xh}, d\W{hh}, d\W{hy}, d\x{t}, d\hid{t-1}\}$
-respectively and define intermediate gradients $d\s{t}, d\hid{t}$ similarly. 
+respectively and define intermediate gradients $d\s{t}, d\hid{t}$ similarly
+with $\s{t}$ and $\hid{t}$ being used in \eq{e:score} and \eq{e:prob}. 
 Starting with the loss $l_t$, we employ backpropagation through structures
 \cite{goller:ieeenn00} to derive each gradient one by one in the following
 order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
 \{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. To simplify the math, we will utilize
 several lemmas and corollaries provided in Appendix~\ref{c:misc}.
 
-First, from \eq{e:softmax}, we have:
+First, from \eq{e:softmax}, with $\prob{t}(y) = \dfrac{e^{\s{t}(y)}}{\sum_{y' \in Y}
+e^{\s{t}(y')}}$, we have:
+% $l_t = -\log \prob{t}(y_t) = \log \sum_{y'} e^{\s{t}(y')} - \s{t}(y_t)$. As a result:
 \begin{align}
-d\s{t} = \fracder{\l_t}{\s{t}} = \parfrac{\s{t}} \paren{\s{t}(y_t) - \log \sum_{y'}
-e^{\s{t}(y')}}
+d\s{t} = \fracder{\l_t}{\s{t}} = \parfrac{\s{t}} \paren{\log \sum_{y'} e^{\s{t}(y')} - \s{t}(y_t)}
 \end{align}
 
 Computing per-coordinate gradient $\s{t}(y)$ gives:
 \begin{align}
- \parfrac{\s{t}(y)} \paren{\s{t}(y_t) - \log \sum_{y'} e^{\s{t}(y')}} =
+ \parfrac{\s{t}(y)} \paren{\log \sum_{y'} e^{\s{t}(y')} - \s{t}(y_t)} =
   \begin{cases}
-   1 - \prob{t}(y_t) & y = y_t \\
-   -\prob{t}(y) & y \neq y_t
+   \prob{t}(y_t) - 1 & y = y_t \\
+   \prob{t}(y) & y \neq y_t
   \end{cases}
 \end{align}
 
 The above gradients can be concisely written in vector form as:
 \begin{align}
-d\s{t} = \bm{1}_{y_t} - \prob{t}
+d\s{t} = \prob{t} - \bm{1}_{y_t}
 \end{align}
 
 Here, $\prob{t}$ is the probability distribution defined in \eq{e:prob} and has
@@ -436,7 +460,8 @@ $d\hid{t-1} \leftarrow \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \edot d\hid{
 \caption{BPTT algorithm for ``vanilla'' RNNs}
 \end{algorithm}
 
-\subsection{Better Training RNNs}
+%\subsection{Better Training RNNs}
+\subsection{Long Short-Term Memory} %Advanced RNN \& 
 Even though computing RNN gradients is straightforward once 
 the BPTT algorithm has been plotted out, training is inherently difficult due to the nonlinear
 iterative nature of RNNs. Among all reasons, 
@@ -454,7 +479,7 @@ refer readers to more rigorous and in-depth analyses in \cite{Bengio-trnn94,lstm
 The main cause of these two problems all lies in Line 8 of the BPTT
 algorithm which can be rewritten as
 $d\hid{t-1} = \tp{\W{hh}} \cdot \diag\paren{\sigma'(\rnn \z{t})} \cdot
-d\hid{t}$ (see \lemmaref{l:diag_mul}). We can try to understand the behavior of RNNs over time by assuming
+d\hid{t}$ (see \remarkref{r:diag_mul}). We can try to understand the behavior of RNNs over time by assuming
 for a moment that there is no contribution from intermediate losses, i.e., Line 4
 is ``ignored''. Given such an assumption, a signal backpropagated from the current hidden state over K
 steps will become 
@@ -464,11 +489,11 @@ d\hid{t}$. Assuming that the non-linear function $\sigma$ is bounded, e.g.,
 $\sigm$ and $\tanh$, and behaves ``nicely'', what we need to deal with now is
 the multiplication of the recurrent matrix over time.
 This leads to the fact that the behavior of RNNs is often governed by the characteristics of the recurrent matrix
-$\W{hh}$ and most analyses examine in terms of the largest eigen value of
-$\W{hh}$ as well as the norms of these signals. Roughly speaking, if the largest eigen value
+$\W{hh}$ and most analyses examine it in terms of the largest eigenvalue of
+$\W{hh}$ as well as the norms of these signals. Roughly speaking, if the largest eigenvalue
 is large enough, exploding gradients will be likely to happen. On the contrary,
-if the largest eigen value is below a certain threshold, vanishing gradients
-will occur as clearly explained by \newcite{pascanu13}.
+if the largest eigenvalue is below a certain threshold, vanishing gradients
+will occur, as clearly explained by \newcite{pascanu13}.
 
 \paragraph{Gradient Clipping} In practice, it is generally easy to cope with the exploding gradient problem by
 applying different forms of gradient clipping. The first approach was proposed by
@@ -480,7 +505,7 @@ clipping as suggested by \newcite{pascanu13}. The idea is simple: given a final
 gradient vector $\bm{g}$ computed per mini-batch, if its norm
 $||\bm{g}||$ is greater than a threshold
 $\tau$, then we will use the following scaled gradient $\frac{\tau}{||\bm{g}||} \bm{g}$
-instead. The latter approach has been widely used in many systems nowadays and
+instead. The latter approach is widely used in many systems nowadays and
 can also be used in conjunction with the former. We take the combined approach
 in our implementations described later in this thesis. 
 
@@ -492,7 +517,8 @@ architectures \cite{el96}, leaky integrators \cite{Jaeger2007}, second-order
 methods \cite{MartensS11}, and
 regularization \cite{pascanu13}, to name a few; also, see \cite{bengio13} for a
 comparison of some of these techniques. Among all, Long Short-term
-Memory (LSTM), invented by \newcite{lstm97}, appears to be one of the most
+Memory (LSTM), invented by \newcite{lstm97} \edit{and later refined by
+\newcite{Gers00}}, appears to be one of the most
 widely adopted solutions to the vanishing gradient problem.
 Graves and colleagues deserve credit for popularizing LSTM through a series of
 work \cite{graves05,graves09,graves13c}. 
@@ -504,7 +530,7 @@ input} gates), and extract information ({\it output} gates) at each timestep.
 There are many implementation instances of LSTM, differing in terms of
 whether and which biases are used, how gates are built, etc; however, it turns
 out that these different choices do not matter much for most cases
-\cite{jozefowicz15,greff15}. As such, in this section and through out this
+\cite{jozefowicz15,greff15}. As such, in this section and throughout this
 thesis, we will stick to the formulation described in \cite{zaremba14}.
 
 Instead of jumping directly into the detailed formulation, let us provide intuitions
@@ -524,7 +550,7 @@ paths, there is exactly one path that goes through all the memory units
 $\mem{i}$ ($i=\overline{1,T}$) and is
 guaranteed to not vanish since $d\mem{t} = d\mem{t-1}$ along that path. 
 
-Such architecture, however, does not account for the fact that certain inputs,
+Such an architecture, however, does not account for the fact that certain inputs,
 e.g., function words or punctuations,
 are, sometimes, not relevant to the task at hand and should be downweighted.
 Occasionally, we might also want
@@ -544,11 +570,12 @@ information retrieval.
 %before extracting information for $\hid{t}$ using the output gate $\og$,
 %we introduce some non-linearity through $\sigma$ to better retrieve information
 %from the memory or the cell $\mem{t}$. 
-As an evidence, \newcite{greff15} have
-shown that such a output nonlinearity is critical to the performance of an LSTM. Moving on, to ensure that the
+As evidence, \newcite{greff15} have
+shown that such an output nonlinearity is critical to the performance of an LSTM. Moving on, to ensure that the
 gates are adaptive, we build them from the information given by the current
 input $\x{t}$ and the previous hidden state $\hid{t-1}$. We also want the gates to be in $[0, 1]$,
-so $\sigm$ will be used. All
+so $\sigm$ will be used \edit{(here $\sigm$ refers to the {\it sigmoid} function
+defined as $f(x) = \dfrac{1}{1 + e^{-x}})$}. All
 of these desiderata lead to the below LSTM formulation described in
 \cite{zaremba14} in which $\sigma$ is chosen to be $\tanh$:
 \begin{align}
@@ -582,8 +609,8 @@ of these desiderata lead to the below LSTM formulation described in
 %In similar spirit as \eq{e:rnn_simplified}, we can be GPU-efficient with
 %equations later, we can rewrite \eq{e:lstm_detailed} as:
 Following the same spirit as \eq{e:rnn_simplified}, we can be GPU-efficient with
-\eq{e:lstm_detailed} since the 8 different submatrices is grouped into a single big matrix,
-which we call $\lstm$. Let $\z{t}\!=\![\x{t}; \hid{t-1}]$, what we do is
+\eq{e:lstm_detailed} since the 8 different submatrices are grouped into a single big matrix,
+which we call $\lstm$. Let $\z{t}\!=\![\x{t}; \hid{t-1}]$. What we do is
 first multiply $\lstm \z{t}$ and then apply different non-linear functions to
 corresponding parts of the output. For the ease of deriving backpropagation
 equations later, we can rewrite \eq{e:lstm_detailed} as:
@@ -636,15 +663,18 @@ Since the prediction procedure is the same, LSTM backpropagation pipeline mimics
 that of RNNs up to \eq{e:grad_ht} and \eq{e:grad_Why}, which computes $d\hid{t}$
 and $d\W{hy}$ respectively.
 
-Given $d\hid{t}$, we now work backwark to derive other gradients. First,
+Given $d\hid{t}$, we now work backward to derive other gradients. First,
 starting from \eq{e:lstm_detailed_output} and by applying
-\lemmaref{l:edot_der}, we have:
+\remarkref{r:edot_der}, we have:
 \begin{align}                        
 d\og = \tanh(\mem{t}) \edot d\hid{t} \\
 d\mem{t} = \tanh'(\bm{\mem{t}}) \edot \bm{\og} \edot d\hid{t} 
 \end{align} 
 
-Before backpropagating \eq{e:lstm_cell}, once must {\it remember} to update $d\mem{t}$ with the gradient sent back from $\mem{t+1}$, which is accomplished by Lines~6 and 10 of Algorithm~\ref{a:lstm}. Given the updated $d\mem{t}$, we apply Corollary~\ref{c:edot_der} to derive: 
+Before backpropagating \eq{e:lstm_cell}, once must {\it remember} to update
+$d\mem{t}$ with the gradient sent back from $\mem{t+1}$, which is accomplished
+by Lines~6 and 10 of Algorithm~\ref{a:lstm}. Given the updated $d\mem{t}$, we
+apply \remarkref{r:edot_der2} to derive: 
 \begin{align}                        
 d\fg = \mem{t-1} \edot d\mem{t} \\
 d\mem{t-1} = \fg \edot d\mem{t} \\
@@ -827,7 +857,7 @@ Finally, for each target word, the hidden state at the top layer is transformed 
 \emph{softmax} weights into a probability distribution over the target
 vocabulary of size $V$ according to \eq{e:score} and \eq{e:prob}. 
 
-\paragraph{Training}
+\subsection{Training}
 Training neural machine translation is similar to training a recurrent
 language model that we have discussed in \secref{sec:rnn} except that we need to
 handle the conditioning part on source sentences.

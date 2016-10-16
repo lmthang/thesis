@@ -49,17 +49,18 @@
 \usepackage{hyperref}
 \usepackage[hyphenbreaks]{breakurl}
 
+\definecolor{lightred}{HTML}{BB4C4C}
 \definecolor{lightgreen}{HTML}{44B178}
 \definecolor{lightblue}{HTML}{3B8CDA}
+\definecolor{lightpurple}{HTML}{C183E8}
 \newcommand{\error}[1]{{\color{red} #1}}
 \newcommand{\ngram}{$n$-gram}
 \newcommand{\word}[1]{``#1''}
 \newcommand{\bfit}[1]{\textbf{\textit{#1}}}
 \newcommand{\unk}{$<$\texttt{unk}$>$}
-\newcommand{\sos}{$<$\texttt{sos}$>$}
-\newcommand{\eos}{$<$\texttt{eos}$>$}
+\newcommand{\sos}{$<$\texttt{s}$>$}
+\newcommand{\eos}{$<$\texttt{/s}$>$}
 \newcommand{\eq}[1]{Eq.~(\ref{#1})}
-\newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\figref}[1]{Figure~\ref{#1}}
 \newcommand{\nlmtext}{neural language models} % probabilistic 
 \newcommand{\nlm}{NLM}
@@ -148,10 +149,13 @@
 \usepackage{amsthm} %for the proof environment
 %theorem environments
 \newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
 \newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
 \newtheorem{claim}{Claim}
 \newtheorem{corollary}{Corollary}
+\newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
+\newcommand{\remarkref}[1]{Remark~\ref{#1}}
 
 %% Chapter 3
 \newcommand{\unkword}[1]{{\bf {\it {\underline{#1}}}}}
@@ -240,23 +244,23 @@
 
 \chapter{Copy Mechanisms}
 \label{c:copy}
-%\input{3-copy.tex}
+\input{3-copy.tex}
 
 \chapter{Attention Mechanisms}
 \label{c:attention}
-%\input{4-attention.tex}
+\input{4-attention.tex}
 
 \chapter{Hybrid Models}
 \label{c:hybrid}
-%\input{5-hybrid.tex}
+\input{5-hybrid.tex}
 
 \chapter{NMT Future}
 \label{c:future}
-%\input{6-future.tex}
+\input{6-future.tex}
 
 \chapter{Conclusion}
 \label{c:conclude}
-%\input{7-conclude.tex}
+\input{7-conclude.tex}
 
 
 % -- Appendix --
