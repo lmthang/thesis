@@ -20,6 +20,9 @@
 \usepackage{tikz-dependency,pifont}
 % (print algorithms)
 \usepackage[ruled,lined,linesnumbered]{algorithm2e}
+\makeatletter 
+\g@addto@macro{\@algocf@init}{\SetKwInOut{Parameter}{Parameters}} 
+\makeatother
 % (custom)
 \input std-macros.tex
 \input macros.tex	
@@ -145,17 +148,16 @@
 \newcommand{\co}{\MB{c}_{t}} % context
 
 
-%% Abi
+%% theorem environments
 \usepackage{amsthm} %for the proof environment
-%theorem environments
-\newtheorem{theorem}{Theorem}
-\newtheorem{remark}{Remark}
-\newtheorem{lemma}{Lemma}
-\newtheorem{definition}{Definition}
-\newtheorem{claim}{Claim}
-\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{{\it Remark}}
+\newtheorem{lemma}{{\it Lemma}}
+\newtheorem{corollary}{{\it Corollary}}
 \newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\remarkref}[1]{Remark~\ref{#1}}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{definition}{Definition}
+%\newtheorem{claim}{Claim}
 
 %% Chapter 3
 \newcommand{\unkword}[1]{{\bf {\it {\underline{#1}}}}}
@@ -212,6 +214,14 @@
 \newcommand{\gain}{2.1{-}11.4}
 \newcommand{\chr}{chrF$_3$}
 
+% chapter 6.1 multi-task
+\newcommand{\ssl}{\emph{seq2seq}} % sequence to sequence learning
+\newcommand{\mtssl}{\emph{MT-seq2seq}} % sequence to sequence learning
+\newcommand{\mtl}{\texttt{MTL}} % sequence to sequence learning
+\newcommand{\otm}{one-to-many}
+\newcommand{\mto}{many-to-one}
+\newcommand{\mtm}{many-to-many}
+
 
 
 
@@ -264,8 +274,8 @@
 
 
 % -- Appendix --
-\appendix
-\input{8-appendix.tex}
+%\appendix
+%\input{8-appendix.tex}
 
 %\onlinesignature
 

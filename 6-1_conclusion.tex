@@ -1,0 +1,21 @@
+
+In this paper, we showed that multi-task learning (MTL) can improve the
+performance of the attention-free sequence to sequence model of
+\citep{sutskever14}.  We found it surprising that training on syntactic
+parsing and image caption data improved our translation performance, given
+that these 
+datasets are orders of magnitude smaller than typical translation
+datasets. 
+Furthermore, we have established a new {\it state-of-the-art} result in
+constituent parsing with an ensemble of multi-task models.
+We also show that the two unsupervised
+learning objectives, autoencoder and skip-thought, behave differently in the MTL context
+involving translation. We hope that these interesting
+findings will motivate future work in utilizing unsupervised data for sequence
+to sequence learning.
+A criticism of our work is that our sequence to sequence models do not employ
+the attention mechanism \citep{bog15}.  We leave the exploration
+of MTL with attention for future work.
+
+
+

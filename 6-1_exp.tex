@@ -1,0 +1,558 @@
+We evaluate the multi-task learning setup on a wide variety of
+sequence-to-sequence tasks: constituency parsing, image caption
+generation, machine translation, and a number of unsupervised learning as
+summarized in Table~\ref{t:tasks}.
+
+\subsection{Data}
+\label{subsec:data}
+Our experiments are centered around the {\it translation} task, where we aim to determine 
+whether other tasks can improve translation and vice versa. We use the WMT'15 data
+\citep{bojar15} for the English$\leftrightarrows$German
+translation problem. Following 
+\citet{luong15attn}, we use the 50K most frequent words for each
+language from the training corpus.\footnote{The corpus has already been tokenized using the default
+tokenizer from Moses.  Words not in these vocabularies are represented by the token
+\texttt{<unk>}.} These vocabularies are then shared with other tasks, except for
+parsing in which the target ``language'' has a vocabulary of 104 tags. 
+We use newstest2013 (3000 sentences) as a validation set to select our
+hyperparameters, e.g., mixing coefficients. For testing, to be comparable with existing results in
+\citep{luong15attn}, we use the filtered
+newstest2014 (2737
+sentences)\footnote{\url{http://statmt.org/wmt14/test-filtered.tgz}} for the
+English$\rightarrow$German translation task and newstest2015 (2169
+sentences)\footnote{\url{http://statmt.org/wmt15/test.tgz}}
+for the German$\rightarrow$English task.
+See the summary in Table~\ref{t:tasks}.
+
+For the {\it unsupervised} tasks, we use the English and German monolingual corpora
+from WMT'15.\footnote{The training sizes reported for
+the unsupervised tasks are
+only 10\% of
+the original WMT'15 monolingual corpora which we randomly sample from. Such reduced sizes are
+for faster training time and already about three times larger than that of the parallel
+data. We consider using all the monolingual data in future work.} Since in
+our experiments, unsupervised tasks are always coupled with translation tasks,
+we use the same validation and test sets as the accompanied translation tasks.
+
+For {\it constituency parsing}, we experiment with two types of corpora:
+\begin{enumerate}
+\item a small corpus -- the widely used
+Penn Tree Bank (PTB) dataset \citep{Marcus:1993:BLA} and,
+\item a large corpus -- the high-confidence (HC) parse trees 
+provided by \citet{vinyals15grammar}.
+\end{enumerate}
+The two parsing tasks, however, are evaluated on the same validation (section
+22) and test (section 23)
+sets from the PTB data. Note also that the parse trees have been linearized
+following \citet{vinyals15grammar}. 
+Lastly, for {\it image caption generation}, we use a dataset of image and caption pairs provided by
+\citet{vinyals15caption}.
+
+
+% together with various training details.
+%\citep{vinyals15caption}\citep{luong15attn}\citep{dai15,kiros15skip}
+\subsection{Training Details}
+
+In all experiments, following \citet{sutskever14} and \citet{luong15}, we train deep LSTM
+models as follows: (a) we use 4 LSTM layers each of which has
+1000-dimensional cells and embeddings,\footnote{For image caption generation, we use 1024
+dimensions, which is also the size of the image embeddings.} (b) parameters are
+uniformly initialized in [-0.06, 0.06], (c) we use a mini-batch size of 128, (d)
+dropout is applied with probability of 0.2 over vertical connections
+\citep{pham2014dropout}, (e) we use SGD with a fixed
+learning rate of 0.7, (f) input sequences are reversed, and lastly, (g) we use a simple finetuning schedule -- after $x$
+epochs, we halve the learning rate every $y$ epochs. The values $x$ and $y$
+are referred as {\it finetune start} and {\it finetune cycle} in
+Table~\ref{t:tasks} together with the number of training epochs per task.
+
+As described in Section~\ref{sec:multi}, for each multi-task
+experiment, we need to choose one task to be the {\it reference
+task} (which corresponds to $\alpha_1 = 1$). The choice of the
+reference task helps specify the number of training epochs and the
+finetune start/cycle values which we also when training that reference
+task alone for fair comparison. To make sure our findings are
+reliable, we run each experimental configuration twice and
+report the average performance in the format {\it mean (stddev)}.
+
+\begin{table}%[tbh!]
+\centering
+\resizebox{14cm}{!}{
+\begin{tabular}{l|c|c|c|c|c|c|c|c}
+\multirow{ 2}{*}{\bf{Task}} & {\bf Train} & {\bf Valid} &{\bf Test} &
+\multicolumn{2}{c|}{{\bf Vocab Size}} & {\bf Train} &
+\multicolumn{2}{c}{{\bf Finetune}}\\
+  \cline{5-6} \cline{8-9}
+  & {\bf Size}& {\bf Size}& {\bf Size} & Source & Target & {\bf Epoch} & Start & Cycle \\
+  \hline
+English$\rightarrow$German Translation & 4.5M & 3000 & 3003 & 50K & 50K & 12 & 8 & 1 \\
+  \hline
+German$\rightarrow$English Translation & 4.5M & 3000 & 2169 & 50K & 50K & 12 & 8 & 1 \\
+  \hline
+English unsupervised & 12.1M & \multicolumn{2}{c|}{\multirow{2}{*}{Details in
+text}} & 50K & 50K & 6 & 4 & 0.5 \\
+  \cline{1-2} \cline{5-9}
+German unsupervised & 13.8M & \multicolumn{2}{c|}{} & 50K & 50K & 6 & 4 & 0.5 \\
+  \hline
+Penn Tree Bank Parsing & 40K & 1700 & 2416 & 50K & 104 & 40 & 20 & 4 \\
+  \hline
+High-Confidence Corpus Parsing & 11.0M & 1700 & 2416 & 50K & 104 & 6 & 4 & 0.5 \\
+  \hline
+Image Captioning & 596K & 4115 & -  & - & 50K & 10 & 5 & 1 \\ 
+\end{tabular}
+}
+\caption{{\bf Data \& Training Details} -- Information about the different
+datasets used in this work. For each task, we display the following
+statistics: (a) the number of training examples, (b) the sizes of the
+vocabulary, (c) the number of training epochs, and (d) details on when
+and how frequent we halve the learning rates ({\it finetuning}).}
+\label{t:tasks} 
+\end{table}
+
+\subsection{Results}
+We explore several multi-task learning scenarios by combining a {\it
+large} task (machine translation) with: (a) a {\it small} task -- Penn
+Tree Bank (PTB) parsing, (b) a {\it medium-sized} task -- image
+caption generation, (c) another {\it large} task -- parsing on the
+high-confidence (HC) corpus, and (d) lastly, {\it unsupervised tasks},
+such as autoencoders and skip-thought vectors. In terms of evaluation metrics,
+we report both validation and test perplexities for all tasks. Additionally, we
+also compute test BLEU scores \citep{Papineni02bleu} for the translation task.
+
+\subsubsection{Large Tasks with Small Tasks} % -- {\it translation \& parsing}}
+\label{subsubsec:big_small}
+
+In this setting, we want to understand if a small task such as {\it
+PTB parsing} can help improve the performance of a large task such as
+translation.  Since the parsing task maps from a sequence of English
+words to a sequence of parsing tags \citep{vinyals15grammar}, only the
+encoder can be shared with an English$\rightarrow$German translation
+task.  As a result, this is a {\it one-to-many}
+MTL scenario ($\S$\ref{subsec:otm}).
+
+To our surprise, the results in Table~\ref{t:big_small} suggest that
+by adding a very small number of parsing mini-batches (with mixing ratio $0.01$,
+i.e., one parsing mini-batch per 100 translation mini-batches), we can improve
+the translation quality substantially. More concretely,
+our best multi-task model yields a gain of +$1.5$ BLEU points over the
+single-task baseline. It is worth pointing out that as shown in
+Table~\ref{t:big_small}, our single-task baseline is very strong, even better
+than the equivalent non-attention model reported in \citep{luong15attn}. Larger
+mixing coefficients, however, overfit the small
+PTB corpus; hence, achieve smaller gains in translation quality. 
+
+For parsing, as \citet{vinyals15grammar} have shown that attention is crucial to
+achieve good parsing performance when training on the small PTB corpus,
+we do not set a high bar for our attention-free systems in this setup (better
+performances are reported in Section~\ref{subsub:ll}). Nevertheless, the parsing
+results in Table~\ref{t:big_small} indicate that MTL is
+also beneficial for parsing, yielding an improvement of up to +$8.9$ F$_1$ points
+over the baseline.\footnote{While perplexities correlate well with BLEU scores as shown
+in \citep{luong15}, we observe empirically in Section~\ref{subsub:ll} that parsing perplexities are only
+reliable if it is less than $1.3$. Hence, we omit parsing perplexities in
+Table~\ref{t:big_small} for
+clarity. The parsing test perplexities (averaged over two
+runs) for the last four rows in Table~\ref{t:big_small} are 1.95, 3.05, 2.14, and 1.66. Valid perplexities
+are similar.} 
+It would be interesting to study how MTL can be
+useful with the presence of the {\it attention} mechanism, which we
+leave for future work.
+
+
+\begin{table}[tbh!]
+\centering
+%\resizebox{14cm}{!}{
+\begin{tabular}{l|c|c|c|c}
+\multirow{ 2}{*}{\bf{Task}} & \multicolumn{3}{c|}{{\bf Translation}} &
+\multicolumn{1}{c}{{\bf
+Parsing}}\\
+  \cline{2-5}
+  & Valid ppl & Test ppl & Test BLEU & Test F$_1$ \\
+  \hline
+\citep{luong15attn} & - & 8.1 & 14.0 & -  \\
+  \hline
+\multicolumn{5}{c}{{\it Our single-task systems}} \\
+  \hline
+Translation & 8.8 (0.3) & 8.3 (0.2) & 14.3 (0.3) & -\\
+  \hline
+PTB Parsing & - & - & - & 43.3 (1.7) \\
+  \hline
+\multicolumn{5}{c}{{\it Our multi-task systems}} \\
+  \hline
+{\it Translation} + PTB Parsing (1x) &  8.5 (0.0) & 8.2 (0.0) & 14.7 (0.1) & 54.5 (0.4) \\
+  \hline
+{\it Translation} + PTB Parsing (0.1x) &  8.3 (0.1) & 7.9 (0.0) & 15.1 (0.0) &
+{\bf 55.2 (0.0)}\\
+  \hline
+{\it Translation} + PTB Parsing (0.01x) &  {\bf 8.2} (0.2) & {\bf 7.7} (0.2) & {\bf
+15.8} (0.4) & 39.8 (2.7) \\
+\end{tabular}
+%}
+\caption{{\bf English$\rightarrow$German WMT'14 translation \& Penn Tree Bank parsing results} --
+shown are perplexities (ppl), BLEU scores, and parsing F$_1$ for various systems. For muli-task
+models, {\it reference} tasks are in
+italic with the mixing ratio in parentheses. Our results are averaged over two
+runs
+in the format {\it mean (stddev)}. Best results are
+highlighted in boldface.}
+\label{t:big_small}
+\end{table}
+
+\subsubsection{Large Tasks With Medium Tasks} % -- {\it translation \& captioning}}
+We investigate whether the same pattern carries over to a medium task
+such as {\it image caption generation}. Since the image caption
+generation task maps images to a sequence of
+English words \citep{vinyals15caption,xu15}, only the decoder can be
+shared with a German$\rightarrow$English translation task. Hence, this
+setting falls under the {\it many-to-one} MTL setting ($\S$\ref{subsec:mto}).
+
+The results in Table~\ref{t:big_medium} show the same trend we observed
+before, that is, by training on another task for a very small
+fraction of time, the model improves its performance on its main task.
+Specifically, with 5 parameter updates for image caption generation per 100
+updates for translation (so the mixing ratio of $0.05$), we obtain a 
+gain of +$0.7$ BLEU scores over a strong single-task baseline. Our baseline is
+almost a BLEU point better than the equivalent non-attention model reported in
+\cite{luong15attn}.
+%When the {\it reference} task is image caption generation, MTL is still
+%useful.\footnote{See
+%Section~\ref{subsec:learning} on the use of reference tasks for fair
+%comparison.} For every captioning parameter update, if the model also performs
+%MTL with 2 translation minibatches (a mixing ratio of $2$), a gain of +$3.3$ points in
+%terms of image caption generation perplexity can be achieved.
+
+\begin{table}[tbh!]
+\centering
+%\resizebox{14cm}{!}{
+\begin{tabular}{l|c|c|c|c}
+\multirow{ 2}{*}{\bf{Task}} & \multicolumn{3}{c|}{{\bf Translation}} &
+\multicolumn{1}{c}{{\bf
+Captioning}}\\
+  \cline{2-5}
+  & Valid ppl & Test ppl & Test BLEU & Valid ppl \\ % & Test ppl \\
+  \hline
+\citep{luong15attn} & - & 14.3 & 16.9 & - \\ %& - \\
+  \hline
+\multicolumn{5}{c}{{\it Our single-task systems}} \\
+  \hline
+Translation & 11.0 (0.0) & 12.5 (0.2) & 17.8 (0.1) & - \\ %& - \\
+  \hline
+Captioning & - & - & - & 30.8 (1.3) \\ % & \\
+%Captioning (2 layer) & - & 29.4 (0.3) \\
+%Captioning (1 layer) & - & 28.4 (0.1) \\
+  \hline
+\multicolumn{5}{c}{{\it Our multi-task systems}} \\
+  \hline
+{\it Translation} + Captioning (1x) & 11.9 & 14.0 & 16.7 & 43.3 \\ % & 43.0 \\
+{\it Translation} + Captioning (0.1x) &  10.5 (0.4) & 12.1 (0.4) & 18.0 (0.6) &
+{\bf 28.4} (0.3) \\ %& {\bf 27.9} (0.2) \\
+{\it Translation} + Captioning (0.05x) &  {\bf 10.3} (0.1) &  {\bf 11.8} (0.0) &
+{\bf 18.5} (0.0) & 30.1 (0.3) \\ % & 29.8 (0.5)\\
+{\it Translation} + Captioning (0.01x) &  10.6 (0.0) & 12.3 (0.1)& 18.1 (0.4) & 35.2 (1.4)
+\\ % &  34.1 (1.4) \\
+%  \hline
+%{\it Captioning} + Translation (1x) & 25.6 & & & 30.2 & \\
+%{\it Captioning} + Translation (2x) & 16.5 (1.2) & & & {\bf 27.5} (0.1) & \\
+%{\it Captioning} + Translation (5x) & 12.0 (0.0) & & & 27.9 (0.0) & \\
+\end{tabular}
+%}
+\caption{{\bf German$\rightarrow$English WMT'15 translation \& captioning results} -- shown are
+perplexities (ppl) and BLEU scores 
+for various tasks with similar format as
+in Table~\ref{t:big_small}. {\it Reference} tasks are in italic with mixing
+ratios in parentheses. The average results of 2 runs are in {\it
+mean (stddev)} format.} %; others are for 1 run only.} 
+%Note that the captioning tasks are trained and tested
+%using the same English vocabulary as the translation tasks with 50K words.}
+\label{t:big_medium}
+\end{table}
+
+
+\subsubsection{Large Tasks with Large Tasks}
+\label{subsub:ll}
+Our first set of experiments is almost the same as the one-to-many setting in
+Section~\ref{subsubsec:big_small} which combines {\it translation}, as the reference
+task, with parsing. The only difference is in terms of parsing data. Instead of using the
+small Penn Tree Bank corpus, we consider a large parsing resource, the
+high-confidence (HC) corpus, which is provided by \citet{vinyals15grammar}.
+As highlighted in Table~\ref{t:big_big_translation}, the
+trend is consistent; MTL helps boost translation quality by up
+to +$0.9$ BLEU points. 
+%For this case, it is expected that we do not
+%get better parsing results since the multi-task model has seen very
+%little parsing data compared to the single-task model.
+
+\begin{table}[tbh!]
+\centering
+%\resizebox{14cm}{!}{
+\begin{tabular}{l|c|c|c}
+\multirow{ 2}{*}{\bf{Task}} & \multicolumn{3}{c}{{\bf Translation}}\\
+  \cline{2-4}
+  & Valid ppl & Test ppl & Test BLEU\\
+  \hline
+\citep{luong15attn} & - & 8.1 & 14.0 \\
+  \hline
+\multicolumn{4}{c}{{\it Our systems}} \\
+  \hline
+Translation & 8.8 (0.3) & 8.3 (0.2) & 14.3 (0.3)\\
+  \hline
+{\it Translation} + HC Parsing (1x) &  8.5 (0.0) & 8.1 (0.1) & 15.0 (0.6) \\
+{\it Translation} + HC Parsing (0.1x) &  {\bf 8.2} (0.3) & {\bf 7.7} (0.2) &
+{\bf 15.2} (0.6)\\
+{\it Translation} + HC Parsing (0.05x) &  8.4 (0.0) & 8.0 (0.1) & 14.8 (0.2) \\
+\end{tabular}
+%}
+\caption{{\bf English$\rightarrow$German WMT'14 translation} -- shown are
+perplexities (ppl) and BLEU scores of various translation models. Our
+multi-task systems combine translation and parsing on the
+high-confidence corpus together. Mixing
+ratios are in parentheses and the average results over 2 runs are in {\it
+mean (stddev)} format. Best results are bolded.}
+\label{t:big_big_translation}
+\end{table}
+
+The second set of experiments shifts the attention to {\it parsing} by having it as the reference task. 
+We show in Table~\ref{t:big_big_parsing} results that combine parsing with
+either (a) the English autoencoder task or (b) the English$\rightarrow$German
+translation task. Our models are compared against the best attention-based systems in
+\citep{vinyals15grammar}, including the state-of-the-art result of 92.8 F$_1$.
+
+\begin{table}[tbh!]
+\centering
+%\resizebox{14cm}{!}{
+\begin{tabular}{l|c|c}
+\multirow{ 2}{*}{\bf{Task}}& \multicolumn{2}{c}{{\bf
+Parsing}}\\
+  \cline{2-3}
+  & Valid ppl & Test F$_1$\\
+  \hline
+  \hline
+LSTM+A \citep{vinyals15grammar} &  - & 92.5 \\
+LSTM+A+E \citep{vinyals15grammar} & - & {\bf 92.8} \\
+  \hline
+\multicolumn{3}{c}{{\it Our systems}} \\
+  \hline
+HC Parsing & 1.12/1.12 & 92.2 (0.1) \\
+  \hline
+{\it HC Parsing} + Autoencoder (1x) & 1.12/1.12 & 92.1 (0.1) \\
+{\it HC Parsing} + Autoencoder (0.1x) & 1.12/1.12 & 92.1 (0.1) \\
+{\it HC Parsing} + Autoencoder (0.01x) & 1.12/1.13 & 92.0 (0.1) \\
+  \hline
+{\it HC Parsing} + Translation (1x) & 1.12/1.13 & 91.5 (0.2) \\
+{\it HC Parsing} + Translation (0.1x) & 1.13/1.13 & 92.0 (0.2) \\
+{\it HC Parsing} + Translation (0.05x) & {\bf 1.11/1.12} & {\bf 92.4 (0.1)} \\
+{\it HC Parsing} + Translation (0.01x) & 1.12/1.12 & 92.2 (0.0) \\
+  \hline
+Ensemble of 6 multi-task systems & - & {\bf 93.0} \\
+\end{tabular}
+%}
+\caption{{\bf Large-Corpus parsing results} -- shown are
+perplexities (ppl) and F$_1$ scores 
+for various parsing models. Mixing ratios are in parentheses and the average
+results over 2 runs are in {\it mean (stddev)} format. We show the individual perplexities for all runs
+due to small differences among them. For \citet{vinyals15grammar}'s parsing results, LSTM+A
+represents a single LSTM with attention, whereas LSTM+A+E indicates an ensemble
+of 5 systems. Important results are bolded.}
+\label{t:big_big_parsing}
+\end{table}
+
+
+Before discussing the multi-task results, we note a few interesting
+observations. First, very small parsing perplexities, close to 1.1, can be achieved with large
+training data.\footnote{Training solely on the small Penn Tree Bank
+corpus can only reduce the perplexity to at most $1.6$, as evidenced by poor
+parsing results in Table~\ref{t:big_small}. At the same time, these parsing
+perplexities are much smaller than
+what can be achieved by a translation task. This is because parsing only has
+$104$ tags in the target vocabulary compared to
+$50$K words in the translation case. Note that $1.0$ is the theoretical
+lower bound.}  
+Second, our baseline system can obtain a very competitive F$_1$ score of
+92.2, rivaling \citet{vinyals15grammar}'s systems. This is rather surprising
+since our models do not use any attention mechanism. A closer look into these
+models reveal that there seems to be an architectural difference:
+\citet{vinyals15grammar} use 3-layer LSTM with 256 cells and
+512-dimensional embeddings; whereas our models use 4-layer LSTM with 1000 cells and
+1000-dimensional embeddings. This further supports findings in \citep{rafal16} that
+larger networks matter for sequence models.
+
+For the multi-task results, while autoencoder does not seem to help parsing,
+translation does. At the mixing ratio of 0.05, we obtain a non-negligible boost of 0.2 F$_1$ 
+over the baseline and with 92.4 F$_1$, our multi-task system is on par with the best single system reported in
+\citep{vinyals15grammar}. Furthermore, by ensembling 6 different multi-task
+models (trained with the translation task at mixing ratios of
+0.1, 0.05, and 0.01), we are able to establish a new {\it state-of-the-art} result in
+English constituent parsing with {\bf 93.0} F$_1$ score.
+
+%\begin{table}[tbh!]
+%\centering
+%\resizebox{14cm}{!}{
+%\begin{tabular}{l|c|c|c|c|c|c}
+%\multirow{ 2}{*}{\bf{Task}} & \multicolumn{3}{c|}{{\bf Translation}} &
+%\multicolumn{3}{c}{{\bf
+%Parsing}}\\
+%  \cline{2-7}
+%  & Valid ppl & Test ppl & Test BLEU & Valid ppl & Test ppl & Test F$_1$\\
+%  \hline
+%\citep{luong15attn} & - & 8.1 & 14.0 & - & - & - \\
+%  \hline
+%LSTM+A \citep{vinyals15grammar} & - & - & - & - & - & 92.5 \\
+%LSTM+A+E \citep{vinyals15grammar} & - & - & - & - & - & {\bf 92.8} \\
+%  \hline
+%\multicolumn{6}{c}{{\it Our single-task systems}} \\
+%  \hline
+%Translation & 8.8 (0.3) & 8.3 (0.2) & 14.3 (0.3) & - & - & - \\
+%  \hline
+%HC Parsing & - & - & - & 1.12/1.12& 1.12/1.12 & 92.2 (0.1) \\
+%  \hline
+%\multicolumn{6}{c}{{\it Our multi-task systems}} \\
+%  \hline
+%{\it Translation} + HC Parsing (1x) &  8.5 (0.0) & 8.1 (0.1) & 15.0 (0.6) &
+%1.13/1.13 & 1.12/1.12 & - \\
+%{\it Translation} + HC Parsing (0.1x) &  {\bf 8.2} (0.3) & {\bf 7.7} (0.2) &
+%{\bf 15.2} (0.6) &  1.18/1.19 & 1.17/1.18 & -  \\
+%{\it Translation} + HC Parsing (0.05x) &  8.4 (0.0) & 8.0 (0.1) &
+%14.8 (0.2) &  1.24/1.24 & 1.22/1.23 & - \\
+%  \hline
+%{\it HC Parsing} + Translation (1x) & 8.4 (0.0) & 8.0 (0.1) & - & 1.12/1.13 &
+%1.12/1.12 & 91.5 (0.2) \\
+%{\it HC Parsing} + Translation (0.1x) & 21.2 (0.5) & 22.6 (0.6) & - & 1.13/1.13 & 1.12/1.12 & 92.0 (0.2) \\
+%{\it HC Parsing} + Translation (0.05x) & 31.4 (0.4) & 34.1 (0.5) & - & {\bf
+%1.11/1.12} & {\bf 1.11/1.12} & {\bf 92.4 (0.1)} \\
+%\end{tabular}
+%}
+%\caption{{\bf English$\rightarrow$German WMT'14 translation \& Large-Corpus parsing results} -- shown are
+%perplexities (ppl) and BLEU scores 
+%for various tasks with similar format as
+%in Table~\ref{t:big_small}. {\it Reference} tasks are in italic with mixing
+%ratios in parentheses. The average results of 2 runs are in {\it
+%mean (stddev)}. For parsing, we show the individual perplexities for all runs
+%due to small differences. For \citet{vinyals15grammar}'s parsing results, LSTM+A
+%represents a single LSTM with attention, whereas LSTM+A+E indicates an ensemble
+%of 5 systems.}
+%\label{t:big_big}
+%\end{table}
+
+\subsubsection{Multi-tasks and Unsupervised Learning}
+Our main focus in this section is to determine whether unsupervised
+learning can help improve translation. Specifically, we follow the {\it
+many-to-many} approach described in Section~\ref{subsec:mtm} to couple
+the German$\rightarrow$English translation task with two unsupervised learning
+tasks on monolingual corpora, one per language.
+The results in Tables~\ref{t:unsupervised_de_en} show a similar trend as before,
+a small amount of other tasks, in this case the {\it autoencoder} objective with
+mixing coefficient 0.05, improves the translation quality by +$0.5$ BLEU
+scores. However, as we train more on the 
+autoencoder task, i.e. with larger mixing ratios, the translation performance gets worse. 
+
+\begin{table}[tbh!]
+\centering
+\resizebox{14cm}{!}{
+\begin{tabular}{l|c|c|c|c|c}
+\multirow{ 2}{*}{\bf{Task}} & \multicolumn{3}{c|}{{\bf Translation}} &
+\multicolumn{1}{c|}{{\bf
+German}}& \multicolumn{1}{c}{{\bf English}}\\
+  \cline{2-6}
+  & Valid ppl & Test ppl & Test BLEU & Test ppl & Test ppl \\
+  \hline
+\citep{luong15attn} & - & 14.3 & 16.9 & - & -  \\
+  \hline
+\multicolumn{6}{c}{{\it Our single-task systems}} \\
+  \hline
+Translation & 11.0 (0.0) & 12.5 (0.2) & 17.8 (0.1) & - & - \\
+  \hline
+\multicolumn{6}{c}{{\it Our multi-task systems with Autoencoders}}\\
+  \hline
+{\it Translation} + autoencoders (1.0x) &  12.3 &  13.9 & 16.0 & {\bf 1.01} & 2.10 \\ % 1.04 & 2.75 \\
+{\it Translation} + autoencoders (0.1x) & 11.4 & 12.7 & 17.7 & 1.13 & {\bf 1.44} \\ % 1.19 & 1.75 \\
+{\it Translation} + autoencoders (0.05x) & {\bf 10.9} (0.1) & {\bf 12.0} (0.0) &
+{\bf 18.3} (0.4) & 1.40 (0.01) & 2.38 (0.39) \\
+%{\it Translation} + autoencoders (2.0x) &  10.1 &  {\bf 1.05} & {\bf 1.04} \\
+  \hline
+\multicolumn{6}{c}{{\it Our multi-task systems with Skip-thought Vectors}}\\
+  \hline
+{\it Translation} + skip-thought (1x) & {\bf 10.4} (0.1) & {\bf 10.8} (0.1) & 17.3
+(0.2) & {\bf 36.9} (0.1) & {\bf 31.5} (0.4) \\ %39.0 (0.2) & 38.1 (0.1) \\
+{\it Translation} + skip-thought (0.1x) &  10.7 (0.0) & 11.4 (0.2) & 17.8 (0.4)
+& 52.8 (0.3) & 53.7 (0.4) \\ %  51.0 (0.2) & 64.2 (0.4)\\
+{\it Translation} + skip-thought (0.01x) &  11.0 (0.1) & 12.2 (0.0) & {\bf
+17.8} (0.3)
+& 76.3 (0.8) & 142.4 (2.7) \\ % 69.5 (0.4) & 165.3 (3.6)\\
+\end{tabular}
+}
+\caption{{\bf German$\rightarrow$English WMT'15 translation \& unsupervised learning results} -- shown are perplexities
+for translation and unsupervised learning tasks. We experiment with both {\it
+autoencoders} and {\it skip-thought vectors} for the unsupervised objectives. Numbers in {\it
+mean (stddev)} format are the average results of 2 runs; others are for 1 run
+only.}
+%shown are perplexities
+%for translation and unsupervised learning tasks. We follow the same format as in
+%Table~\ref{t:unsupervised_en_de}.}
+\label{t:unsupervised_de_en}
+\end{table}
+
+{\it Skip-thought} objectives, on the other hand, behave differently. If we
+merely look at the perplexity metric, the results are very encouraging: with
+more skip-thought data, we perform better consistently across both the
+translation and the unsupervised tasks. However, when computing the BLEU scores,
+the translation quality degrades as we increase the mixing coefficients. We anticipate that
+this is due to the fact that the skip-thought objective changes the nature of
+the translation task when using one half of a sentence to predict the other
+half. It is not a problem for the autoencoder objectives, however, since one can
+think of autoencoding a sentence as translating into the same language.
+
+We believe these findings pose interesting challenges in the quest towards  better
+unsupervised objectives, which should satisfy the following criteria: (a)
+a desirable objective should be compatible with the supervised task in focus, e.g.,
+autoencoders can be viewed as a special case of translation,
+and (b) with more unsupervised data, both intrinsic and extrinsic metrics
+should be improved; skip-thought objectives satisfy this criterion in terms of
+the intrinsic metric but not the extrinsic one.
+
+%results with {\it
+%skip-thought} objectives which improve translation performance between
+%English and German in both directions. In addition, we observe
+%that better translation perplexities are achieved as we increase
+%the portions of unsupervised parameter updates from 
+%$0.01$ to $1$. These results show that the skip-thought objective
+%is better than the autoencoder as an unsupervised objective for language tasks.
+
+%As a side note, we observe that the source-to-source unsupervised tasks
+%($3^{\text{rd}}$ column) seem to benefit this MTL setting more than the
+%target-to-target unsupervised tasks ($4^{\text{th}}$ column). This might be
+%explained by the asymmetric structure in the sequence to sequence learning framework
+%\citep{sutskever14} that no prediction is made on the source side {\bf [To thang: I don't understand
+%this last point]}.
+
+%\begin{table}[tbh!]
+%\centering
+%%\resizebox{8cm}{!}{
+%\begin{tabular}{l|c|c|c}
+%\multirow{ 2}{*}{\bf{Task}} & \multicolumn{3}{c}{{\bf Perplexity}}\\
+%  \cline{2-4}
+%  & Translation & English & German \\
+%  \hline
+%Translation& 8.8 (0.3) & - & -\\
+%  \hline
+%\multicolumn{4}{c}{{\it Autoencoders}}\\
+%  \hline
+%{\it Translation} + autoencoders (0.1x) & 9.0 &  1.37 & 3.85 \\
+%{\it Translation} + autoencoders (1.0x) &  10.0 &  1.09 & 2.78 \\
+%%{\it Translation} + autoencoders (2.0x) &  10.1 &  1.05 & 1.04 \\
+%  \hline
+%{\it Translation} + skip-thought (0.01x) & 8.6 (0.4)  & 64.1 (1.7) & 150.9
+%(1.3) \\
+%{\it Translation} + skip-thought (0.1x) &  8.8 (0.3) &  46.5 (0.5) & 72.7
+%(9.1)\\
+%{\it Translation} + skip-thought (1x) & {\bf 8.4} (0.2)  & 35.0 (0.6) &
+%43.1 (1.5)\\
+%\end{tabular}
+%%}
+%\caption{{\bf English$\rightarrow$German translation \& unsupervised learning results} -- shown are perplexities
+%for translation and unsupervised learning tasks. We experiment with both {\it
+%autoencoders} and {\it skip-thought vectors} for the unsupervised objectives. Numbers in {\it
+%mean (stddev)} format are the average results of 2 runs; others are for 1 run
+%only.}
+%\label{t:unsupervised_en_de}
+%\end{table}
+
+

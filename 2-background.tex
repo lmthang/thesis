@@ -290,6 +290,7 @@ weights. % as illustrated in Figure~\ref{f:rlm}.
 %``student''$\}$, whereas $y=\{$ ``I'', ``am'', ``a'',
 %``student'', \eos$\}$
 
+
 \subsection{Training \& Backpropagation}
 Given a training dataset of $N$ discrete output sequences $\ytop{1}, \ldots,
 \ytop{N}$ with lengths $m_1, \ldots, m_N$ accordingly. The learning objective is
@@ -321,6 +322,107 @@ opposite direction of the gradient to minimize the loss objective. The learning
 rate $\eta$, sometimes referred as a {\it step size}, is a hyperparameter which
 controls how much we update the weights along the optimization direction.}
 
+\paragraph{Mathematical Helpers}
+%\label{ss:misc}
+\edit{To simplify the maths for our backpropagation derivations in the next
+section, we present here a few simple remarks and lemmas on vector calculus and gradient
+computation.}
+
+\begin{remark}
+\label{r:diag_mul}
+Let $\bm{u}$, $\bm{v}$ be any vectors and $\edot$ be element-wise vector multiplication, we have:
+\begin{align}
+\diag (\bm{u}) \cdot \bm{v} = \bm{u} \edot \bm{v}
+\end{align}
+\edit{Here $\diag (\bm{u})$ refers to a diagonal matrix with its diagonal
+elements being $\bm{u}$.}
+\end{remark}
+
+\begin{lemma}
+\label{l:chain_rule}
+Let $l$ be a loss value for which we
+already know how to compute its gradient $\der{v}$ with respect to a vector $\bm{v}$. Given that
+$\bm{v} = f(\bm{Wh})$, the gradients $\der{h}, \der{W}$ of the loss $l$ with respect to the vector
+$\bm{h}$ and the matrix $\bm{W}$ can be derived as follows:
+\begin{align}
+\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}}
+\\
+\der{W} = \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}} 
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Let $\bm{z} = \bm{Wh}$, we have the following derivations: %applying chain rules in vector calculus, 
+\begin{align*}
+\der{h} &= \fracder{\bm{z}}{\bm{h}} \cdot \fracder{\bm{v}}{\bm{z}}
+\cdot \der{v} && \text{[Vector calculus chain rules]}\\
+&= \fracder{\bm{Wh}}{\bm{h}} \cdot \fracder{f(\bm{z})}{\bm{z}}
+\cdot \der{v} \\
+&=\tp{\bm{W}} \cdot \diag \paren{f'(\bm{z})} \cdot \der{v} \\
+&=\tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}} &&
+\text{[\remarkref{r:diag_mul}]}
+\end{align*}
+
+Let $\tp{\bm{w}_i}$ be the $i^{\text{th}}$ row vector of matrix $\bm{W}$ and
+$v_i, z_i$ be the $i^{\text{th}}$ elements of vectors $\bm{v}, \bm{z}$. Also
+denoting $\der{w}_i, dv_i$ to be the gradients of $l$ with respect to $\bm{w}_i,
+v_i$, we have:
+\begin{align*}
+d\bm{w}_i &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
+\cdot dv_i && \text{[Vector calculus chain rules]}\\
+&= \fracder{\tp{\bm{w}_i}\bm{h}}{\bm{w}_i} \cdot f'(z_i) \cdot dv_i \\
+&= \bm{h} \cdot f'(z_i) \cdot dv_i \\ 
+d\tp{\bm{w}_i} &= \paren{f'(z_i) \cdot dv_i} \cdot
+\tp{\bm{h}} && \text{[Tranposing]} \\
+\der{W} &= \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}}
+&& \text{[Concatenating row derivatives]}
+\end{align*}
+\end{proof}
+
+\begin{corollary}
+\label{c:chain_rule}
+As a special case of \lemmaref{l:chain_rule}, when $f$ is an identity function,
+i.e., $\bm{v} = \bm{Wh}$, we have:
+\begin{align}
+\der{h} = \tp{\bm{W}} \cdot \der{v}
+\\
+\der{W} = \der{v} \cdot \tp{\bm{h}} 
+\end{align}
+\end{corollary}
+
+\begin{remark}
+\label{r:edot_der}
+Let $\bm{u}$, $\bm{v}, \bm{s}$ be any vectors such that  $\bm{s} = \bm{u} \edot
+f(\bm{v})$. Also, let $d\bm{u}$, $d\bm{v}, d\bm{s}$ be the gradients of a loss $l$ with
+respect to the corresponding vectors. We have:
+\begin{align}
+d\bm{u} = f(\bm{v}) \edot d\bm{s} \\
+d\bm{v} = f'(\bm{v}) \edot \bm{u} \edot d\bm{s} 
+%d\bm{u} = \diag \paren{f(\bm{v})} \cdot d\bm{s} \\
+%d\bm{v} = \diag \paren{f'(\bm{v}} \edot \bm{u}} \cdot d\bm{s} 
+\end{align}
+\end{remark}
+
+%\begin{proof}
+%\begin{align}
+%d\bm{u} &= \parder{\diag \paren{f(\bm{v})} \cdot d\bm{s} \\
+%\end{align}
+%\end{proof}
+
+\begin{remark}
+\label{r:edot_der2}
+As a special case of \remarkref{r:edot_der} when $f$ is an identity function,
+i.e.,  $\bm{s} = \bm{u} \edot \bm{v}$. We have:
+\begin{align}
+%d\bm{u} = \diag (\bm{v}) \cdot d\bm{s} \\
+%d\bm{v} = \diag (\bm{u}) \cdot d\bm{s} 
+d\bm{u} = \bm{v} \edot d\bm{s} \\
+d\bm{v} = \bm{u} \edot d\bm{s} 
+\end{align}
+\end{remark}
+
+
+
 \paragraph{Single-Time Backpropagation} To compute the gradients for the loss $J(\thetav)$,
 we first need to be able to derive the gradients of the per-timestep loss $l_t
 =-\log \prob{t}(y_t)$ with respect to both the RNN weights
@@ -333,8 +435,9 @@ with $\s{t}$ and $\hid{t}$ being used in \eq{e:score} and \eq{e:prob}.
 Starting with the loss $l_t$, we employ backpropagation through structures
 \cite{goller:ieeenn00} to derive each gradient one by one in the following
 order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
-\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. To simplify the math, we will utilize
-several lemmas and corollaries provided in Appendix~\ref{c:misc}.
+\{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. 
+%To simplify the math, we will utilize
+%several lemmas and corollaries provided in \secref{ss:misc}.
 
 First, from \eq{e:softmax}, with $\prob{t}(y) = \dfrac{e^{\s{t}(y)}}{\sum_{y' \in Y}
 e^{\s{t}(y')}}$, we have:
@@ -760,8 +863,7 @@ neural machine translation (NMT) as a recurrent language model that conditions
 on the source sentence. More formally, NMT aims to directly model the
 conditional probability $p(\tgt{}|\src{})$ of translating
 a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
-It accomplishes this goal through an {\it encoder-decoder} or {\it
-sequence-to-sequence} framework
+It accomplishes this goal through an {\it encoder-decoder} framework
 \cite{kal13,sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
 for each source sentence. Based on that source representation,
 the {\it decoder} generates a translation, one target word at a time, and hence,
@@ -776,9 +878,9 @@ NMT models vary in terms of the exact architectures to use.
 A natural choice for sequential data is the recurrent
 neural network (RNN), used by most of the recent NMT work and for both the
 encoder and decoder.
-RNN models, however, differ in terms of: (a) {\it directionality} -- unidirectional
+The used RNN models, however, differ in terms of: (a) {\it directionality} -- unidirectional
 or bidirectional; (b) {\it depth} -- single or deep multi-layer; and (c) {\it
-type} -- often either a vanilla, an LSTM 
+type} -- often either a vanilla RNN, an LSTM 
 \cite{lstm97}, or a gated recurrent unit (GRU) \cite{cho14}.
 In general, for the encoder, almost any architecture can be used since we have
 fully observed the source sentence. 
@@ -790,7 +892,7 @@ producing translations from left to right.
 
 \begin{figure}[tbh!]
 \centering
-\includegraphics[width=0.8\textwidth, clip=true, trim= 0 0 0
+\includegraphics[width=1\textwidth, clip=true, trim= 0 0 0
 0]{img/nmt_very_details.eps} % , angle=-90
 \caption[Neural machine translation]{{\bf Neural machine translation} -- example of a deep recurrent
 architecture proposed by \newcite{sutskever14} for
@@ -801,12 +903,13 @@ translating a source sentence \word{I am a student} into a target sentence
 \end{figure}
 
 In this thesis, all our NMT models are deep multi-layer RNNs which are 
-unidirectional and have LSTM as the recurrent unit. We show an example of
-such model in Figure~\ref{f:nmt_details} though it should be easy to extend to
-other RNN architectures. In this example, we train our model to translate a source sentence
+unidirectional and have an LSTM as the recurrent unit. We show an example of
+such model in Figure~\ref{f:nmt_details}.
+%though it should be easy to extend to other RNN architectures. 
+In this example, we train our model to translate a source sentence
 \word{I am a student} into a target one \word{Je suis \'{e}tudiant}.
-At a high level, our NMT models consist of two recurrent language models as
-described in \secref{subsec:rlm}: the {\it encoder} RNN simply consumes the input
+At a high level, our NMT models consist of two recurrent neural networks as
+described in \secref{sec:rnn}: the {\it encoder} RNN simply consumes the input
 source words without making any prediction; the {\it decoder}, on the other
 hand, processes
 the target sentence while predicting the next words. 
@@ -834,13 +937,16 @@ embeddings can be initialized randomly and learned from scratch given large trai
 
 Once retrieved, the word embeddings are then fed as input into the main network, which consists
 of two multi-layer RNNs `stuck together' --- an encoder for the source
-language and a decoder for the target language. 
+language and a decoder for the target language. \edit{These two RNNs, in
+principle, can share the same weights; however, in practice, we found that
+having two different RNN parameters works better and less overfits to large
+training datasets.}
 The encoder RNN uses zero vectors as its starting states. The decoder, on the
 other hand, needs to have access to the source information, so one simple way to
 achieve that is to
 initialize it with the last hidden state of the encoder.\footnote{This is not the only way to initialize the decoder,
-e.g., \newcite{cho14} connect the last encoder state to every timesteps in the
-decoder.} In Figure~\ref{f:nmt_details}, we pass  
+e.g., \newcite{cho14} connect the last encoder state to every timestep in the
+decoder as an extra input.} In Figure~\ref{f:nmt_details}, we pass  
 the hidden state at the source word \word{student} to the decoder side.
 The \emph{feed-forward} (vertical) weights connect
 the hidden unit from the layer below to the upper one; whereas, the
@@ -858,9 +964,9 @@ Finally, for each target word, the hidden state at the top layer is transformed 
 vocabulary of size $V$ according to \eq{e:score} and \eq{e:prob}. 
 
 \subsection{Training}
-Training neural machine translation is similar to training a recurrent
+Training a neural machine translation system is similar to training a recurrent
 language model that we have discussed in \secref{sec:rnn} except that we need to
-handle the conditioning part on source sentences.
+handle the conditioning on source sentences.
 The training objective for NMT is formulated as:
 \begin{equation}
 J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
@@ -876,18 +982,17 @@ from zero states. For the {\it backpropagation} phase, computing gradients for
 the decoder is the same as what we have described in
 Algorithm~\ref{a:lstm_bptt} for regular RNNs. The last hidden-state gradient
 from the decoder is
-passed back to the encoder. We then continue backpropating through the encoder
+passed back to the encoder. We then continue backpropagating through the encoder
 in a similar fashion as that of the decoder but without any prediction losses.
 
 More concretely, we present in
-\algo{a:nmt_forward} details in the forward pass of an NMT model which uses
+\algo{a:nmt_forward} details of the forward pass of an NMT model which uses
 a deep multi-layer LSTM architecture. Since the encoder and decoder share
-many operations in common, we combine both the source sentence $x$ (length
-$m_x$) and the target sentence $y$ (length $m_y$) together to form an input
-sequence $s$ as shown in Line 1, which also includes the end-of-sentence marker
-\word{\_}. We first start with the encoder weights and initial states
-set to zero (Line~2-3). The algorithm switches to the decoder mode at time
-$m_x + 1$ (Line~5). The same LSTM codebase (Line~8-11) is used for both the
+many operations in common, we combine the source sentence $x$ (length
+$m_x$), the target sentence $y$ (length $m_y$), and the end-of-sentence markers
+\word{\_} together to form an input sequence $s$ as shown in Line 1. We first start with the encoder weights and initial states
+set to zero (lines~2-3). The algorithm switches to the decoder mode at time
+$m_x + 1$ (line~5). The same LSTM codebase (lines~8-11) is used for both the
 encoder and decoder in which embeddings are first looked up for the input
 $s_t$; after that, hidden states as well as LSTM cell memories are built from the
 bottom layer to the top one (the $L^{\text{th}}$ layer). 
@@ -898,10 +1003,15 @@ to the entire formulation in
 Eq~\ref{e:lstm_detailed}-\ref{e:lstm_detailed_output}, which one can easily
 replace with other hidden units such as RNN and GRU. Lastly, on the decoder
 side, the top hidden state is used to predict the next symbol $s_{t+1}$
-(Line~13); then, a loss value $l_t$ and a probability distribution
+(line~13); then, a loss value $l_t$ and a probability distribution
 $\prob{t}$ computed according to Eq~\ref{e:score}-\ref{e:prob} are returned.
 
 \begin{algorithm}
+\KwIn{source sentence $x$ of length $m_x$, target sentence $y$ of length $m_y$.}
+\Parameter{encoder $\W{e}^{\text{encoder}}$, $\lstm^{\text{encoder}}$; 
+decoder $\W{e}^{\text{decoder}}$, $\lstm^{\text{decoder}}$.}
+\KwOut{loss $\MB{l}$ and other intermediate variables for backpropagation.} 
+
 $s \leftarrow [x, \text{\_}, y, \text{\_}]$ \tcp*{Length of $s$ is $m_x + 1 +
 m_y + 1$}
 $\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{encoder}},
@@ -940,18 +1050,15 @@ $\hid{t}^{(0)} \leftarrow \text{\texttt{Emb\_LookUp}}(s_t, \W{e})$ \;
 \end{algorithm}
 
 \begin{algorithm}
-% $s \leftarrow [x, \text{\_}, y, \text{\_}]$ \tcp*{Length of $s$ is $m_x + 1 + m_y + 1$}
-$\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{decoder}},
-\lstm^{\text{decoder}}$ \tcp*{Decoder weights}
-$d\hid{}^{(1..L)}, d\mem{}^{(1..L)}, d\lstm^{(1..L)}, d\W{e}, d\W{hy}
-\leftarrow \bm{0}$ \tcp*{Zero init} %\; %\leftarrow \bm{0}^{(1..L)}, \bm{0}^{(1..L)}, \bm{0}, \bm{0}$ \tcp*{Starting gradients} % for memories} % m_x + 1 + m_y
+%$\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{decoder}}, \lstm^{\text{decoder}}$ \tcp*{Decoder weights}
+$d\hid{m_x + 1 + m_y}^{(1..L)}, d\mem{m_x + 1 + m_y}^{(1..L)} \leftarrow \bm{0}$ \tcp*{Cell and state gradients}
+$d\lstm^{(1..L)}, d\W{e}, d\W{hy} \leftarrow \bm{0}$ \tcp*{Model weight gradients}
 
 \For{$t=(m_x + 1 + m_y) \rightarrow 1$} {
 
 \tcp{Encoder transition}
 \If{$t == m_x$}{
-  $\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{encoder}},
-  \lstm^{\text{encoder}}$ \; %\tcp*{Encoder weights}
+  %$\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{encoder}}, \lstm^{\text{encoder}}$ \tcp*{Encoder weights}
   $d\W{e}^{\text{decoder}}, d\lstm^{\text{decoder}} \leftarrow d\W{e},
   d\lstm^{(1..L)}$ \tcp*{Save decoder gradients}
   $d\lstm^{(1..L)}, d\W{e} \leftarrow \bm{0}$ \; %\tcp*{Zero init} %\;
@@ -960,23 +1067,24 @@ $d\hid{}^{(1..L)}, d\mem{}^{(1..L)}, d\lstm^{(1..L)}, d\W{e}, d\W{hy}
 \tcp{Target-side prediction}
 \If{$t \geq (m_x + 1)$}{
   $d\hid{}, d\W{} \leftarrow
-  \text{\texttt{Predict\_grad}}(s_{t+1}, \prob{t}, \hid{t}^{(L)},\W{hy})$\;
+  \text{\texttt{Predict\_grad}}(s_{t+1}, \prob{t}, \hid{t}^{(L)})$\; %,\W{hy})$\;
   % \texttt{Accumulate}$(d\W{hy})$;
-  $d\hid{}^{(L)} \leftarrow d\hid{}^{(L)} + d\hid{}$\;
+  $d\hid{t}^{(L)} \leftarrow d\hid{t}^{(L)} + d\hid{}$ \tcp*{\edit{Vertical  gradients}} %\;
   $d\W{hy} \leftarrow d\W{hy} + d\W{}$\;
 }
 
 \tcp{Multi-layer LSTM}
 \For{$l=L \rightarrow 1$} {
   %\tcp{The first two returning gradients are for the previous timestep}
-  $d\hid{}^{(l)}, d\mem{}^{(l)}, d\x{}, d\bm{T} \leftarrow 
-  \text{\texttt{LSTM\_grad}}\paren{d\hid{}^{(l)}, d\mem{}^{(l)}, \hid{t-1}^{(l)},
-  \mem{t-1}^{(l)}, \hid{t}^{(l-1)}, \lstm^{(l)}}$ \;
+  \tcp{\edit{Recurrent  gradients}}
+  $d\hid{t-1}^{(l)}, d\mem{t-1}^{(l)}, d\x{}, d\bm{T} \leftarrow 
+  \text{\texttt{LSTM\_grad}}\paren{d\hid{t}^{(l)}, d\mem{t}^{(l)}, \hid{t-1}^{(l)},
+  \mem{t-1}^{(l)}, \hid{t}^{(l-1)}}$ \;  %, \lstm^{(l)}
   % \texttt{Accumulate}$(d\lstm^{(l)})$;
-  $d\hid{}^{(l-1)} \leftarrow d\hid{}^{(l-1)} + d\x{}$\;
+  $d\hid{t}^{(l-1)} \leftarrow d\hid{t}^{(l-1)} + d\x{}$\tcp*{\edit{Vertical  gradients}}
   $d\lstm^{(l)} \leftarrow d\lstm^{(l)} + d\bm{T}$\;
 }
-$d\W{e} \leftarrow \text{\texttt{Emb\_grad\_update}}(s_t, d\hid{}^{(0)}, d\W{e})$ \;
+$d\W{e} \leftarrow \text{\texttt{Emb\_grad\_update}}(s_t, d\hid{t}^{(0)}, d\W{e})$ \;
 
 }
 $d\W{e}^{\text{encoder}}, d\lstm^{\text{encoder}} \leftarrow d\W{e},
@@ -990,25 +1098,29 @@ d\lstm^{(1..L)}$ \tcp*{Save encoder gradients}
 %% BPTT
 Next, we describe details of the backpropagation step in \algo{a:nmt_backward}.
 A quick glance through the algorithm reveals many similarities compared to the
-forward pass algorithm except that we have reversed the procedue. First, we
-start with the decoder weights and initialize all gradients to zero (Line~1-2).
-At time $m_x$, we switch to the encoder mode while saving the currently
-accumulated LSTM and embedding gradients for the decoder (Line~5-7). 
+forward pass algorithm except that we have reversed the procedue. 
+First, we initialize gradients of the recurrent layers at the final time step (line 1)
+as well the model weights on the decoder size (line 2) to zero.
+At time $m_x$, we switch to the encoder mode by saving the currently
+accumulated LSTM and embedding gradients for the decoder (line 5) and 
+starting to accumulate gradients for the encoder weights (line 6). 
 %Individual gradients are computed in Line~13-23. 
 Thanks to the backpropagation
 procedure presented earlier for LSTM, we can simplify the core NMT gradient
-computation (Line~9-19) by making the following two referents: (a)
-\texttt{Predict\_grad} (Line~2-4 of \algo{a:lstm_bptt}) which computes gradients for the target-side
+computation (lines~8-18) by making the following two referents: (a)
+\texttt{Predict\_grad} (lines~2-4 of \algo{a:lstm_bptt}) which computes gradients for the target-side
 losses with respect to the hidden states at the top layer and the softmax
-weights $\W{hy}$; and (b) \texttt{LSTM\_grad} (Line~5-15 of
+weights $\W{hy}$; and (b) \texttt{LSTM\_grad} (lines~5-15 of
 \algo{a:lstm_bptt}) which computes gradients for inputs to LSTM and the LSTM
-weights per layer $\lstm^{(l)}$. It is important to note that in Lines 11 and 16 of
-\algo{a:nmt_backward}, we add the gradients (flowed vertically from either the
+weights per layer $\lstm^{(l)}$. It is important to note that in Lines 10 and 15 of
+\algo{a:nmt_backward}, we add the gradients (flowing vertically from either the
 loss or the upper LSTM layer) to the gradient of the below layer (which already
 contains the gradient backpropagated horizontally)
-instead of overriding it. Lastly, in Line 19, we perform
+instead of overriding it. In Line 18, we perform
 sparse updates on the corresponding embedding matrix for participating words
-only.
+only. Lastly, implementation wise, one can save memory by using a single copy of
+$d\hid{}^{(1..L)}$ and $d\mem{}^{(1..L)}$ for all time steps and overwriting the values
+whenever we transition from timesteps $t$ to $t-1$ (line 14).
 % mention bucketing and batching
 
 \subsection{Testing}
@@ -1036,7 +1148,7 @@ hand, uses words predicted by the model.
 \centering
 \includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0
 0]{img/nmt_test.eps} % , angle=-90
-\caption[Neural machine translation]{{\bf Greedy Decoding}
+\caption[Greedy Decoding]{{\bf Greedy Decoding}
 -- example of how a trained NMT model produces a translation for a
 source sentence \word{I am a student} using greedy search.
 } 
@@ -1050,12 +1162,12 @@ pass in \algo{a:nmt_forward}. First, we run through the encoder in Line 1 to obt
 representation $\hid{0}, \mem{0}$ for the source sentence $x$ (length $m_x$). We
 then use the end-of-sentence marker \word{\_} as an input to start the decoding
 process and restrict the final translation to have a maximum length of
-$\alpha*m_x$.\footnote{We often set $\alpha$ to $1.5$} At each timestep on the
-decoder side, we call \texttt{MultiLayerLSTM}, which refers to Line~8-11 in
+$\alpha*m_x$.\footnote{We often set $\alpha$ to $1.5$. } At each timestep on the
+decoder side, we call \texttt{MultiLayerLSTM}, which refers to Lines~8-11 in
 \algo{a:nmt_forward}, to build up representations over $L$ stacking LSTM layers. The hidden
 state at the top layer is used to compute the predictive distribution $\prob{t}$
 from which we make a greedy choice to produce the index of the translation word
-at that timestep (Line~7). The process ends when we have produced the marker
+at that timestep (line~7). The process ends when we have produced the marker
 \word{\_} as a translation word or when the translation length exceeds the
 length threshold.
 
@@ -1084,11 +1196,16 @@ $y_1 \leftarrow \_$ \;
 %\paragraph{Beam-search Decoder} 
 
 For NMT, it turns out that such a simple strategy of greedy decoding can produce
-very good translations \cite{sutskever14}. However, to achieve better result,
-a more popular strategy is to use {\it beam-search} decoding algorithm which has been the
+very good translations \cite{sutskever14}. However, to achieve a better result,
+a more popular strategy is to use a {\it beam-search} decoding algorithm which has been the
 core of phrase-based statistical machine translation for years \cite{Koehn:2003:SMT}.
-However, unlike phrase-based SMT, NMT has a much simpler beam-search decoding algorithm
-since it generates translations word-by-word from left to right. One can modify
+Unlike phrase-based SMT, NMT has a much simpler beam-search decoding algorithm
+since it generates translations word-by-word from left to right \edit{and does 
+not have to explicitly explore different places on the source side to pay
+attention to}.\footnote{\edit{In SMT, a source coverage set is maintained to
+indicate which words have been translated. As translation progresses, an SMT 
+system base on the coverage set and pick untranslated source words to continue.
+Such an idea of coverage set later re-emerges in NMT which we will describe more in Chapter~\ref{c:conclude}.}} One can modify
 the greedy decoding algorithm as follows to build a beam-search decoder: (a) at
 each timestep on the decoder side, we keep track of the top $B$ (the beam size) best
 translations together with their corresponding hidden states; (b) in Line 7 of
@@ -1100,12 +1217,22 @@ Extra care needs to be taken to make sure that in step (c) we select correct
 hidden states for the new set of $B$ best translations. \newcite{sutskever14}
 observed that for NMT, a minimal beam size of $2$ already provides a significant
 boost in translation quality. A beam of size $10$ is often used, which is
-significant smaller that what phrase-based SMT tends to use $> 1000$.
+significant smaller that what phrase-based SMT tends to use, about $100-200$.
 
-Lastly, to achieve the very best result, one simple strategy which has been
+Furthermore, to achieve the very best result, one simple strategy which has been
 widely adopted for deep neural networks is to use an ensemble of models. For NMT
 decoding, using multiple models is pretty straightforward. The idea is that each
-model produces a distribution at each timestep in the decoder (Line~6 of
+model produces a distribution at each timestep in the decoder (line~6 of
 \algo{a:nmt_greedy}). These different distributions are then averaged to produce
-a new ensemble distribution which we can be used for both greedy and beam-search
+a new ensemble distribution which we can use for both greedy and beam-search
 decoders as if we decode from a single model.
+
+\edit{In summary, we have covered all the necessary background knowledge to understand
+this thesis entirely. We start with language modeling, an important concept in
+natural language processing, which turns out to be the basis of NMT. One can
+simply view NMT as a source-conditioned language model. To make NMT possible, we
+have covered the fundamentals of recurrent neural networks which allow us to
+handle variable-length sequences, in our case, the sentences. We have particularly 
+studied Long Short-term Memory, a specific type of RNN that
+is more effective at handling long sequences, in depth. Finally, given these building blocks,
+language modeling and RNN, we have discussed NMT in details from training to testing.}
