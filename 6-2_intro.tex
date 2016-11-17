@@ -1,0 +1,37 @@
+%Neural Machine Translation (NMT) is a simple new architecture for translating
+%texts from one language into another
+%\cite{sutskever2014sequence,cho14}. NMT is a single deep 
+%neural network that is trained end-to-end, holding several advantages such as the
+%ability to capture long-range dependencies in
+%sentences, and generalization to unseen texts. Despite being relatively new, NMT has already
+%achieved state-of-the-art translation results for several language pairs 
+%including English-French \cite{luong2015addressing}, English-German
+%\cite{jean2015using,luong2015effective,luong15iwslt,sennrich16mono}, English-Turkish
+%\cite{sennrich16mono}, and English-Czech
+%\cite{jean15wmt,luong16char}. 
+%Figure~\ref{fig:nmt_simple} gives an example of an NMT system.
+
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.4\textwidth]{img/6-2_nmt_simple} %, trim = 78mm 80mm 133mm 70mm,clip
+%\caption{A simplified diagram of NMT.}
+%\label{fig:nmt_simple}
+%\end{figure}
+
+
+While NMT has a significantly smaller memory footprint than traditional phrase-based approaches (which need to store gigantic phrase-tables and
+language models), the model size of NMT is still prohibitively large for mobile devices.
+For example, a recent state-of-the-art NMT system requires over 200 million
+parameters, resulting in a storage size of hundreds of megabytes
+\cite{luong15attn}. 
+Though the trend for bigger and deeper neural networks has brought great progress, it has also introduced over-parameterization, resulting in long running times, overfitting, and the storage size issue discussed above. 
+A solution to the over-parameterization problem could potentially aid all three issues, though the first (long running times) is outside the scope of this paper.
+
+\biformat{Our contribution.}
+In this section, we investigate the efficacy of weight pruning for NMT as a means of compression.
+We show that despite its simplicity, magnitude-based pruning with retraining is highly effective, and we compare three magnitude-based pruning schemes --- \textit{class-blind}, \textit{class-uniform} and \textit{class-distribution}.
+Though recent work has chosen to use the latter two, we find the first and simplest scheme --- \textit{class-blind} --- the most successful.
+We are able to prune 40\% of the weights of a state-of-the-art NMT system with negligible performance loss, and by adding a retraining phase after pruning, we can prune 80\% with no performance loss.
+Our pruning experiments also reveal some patterns in the distribution of
+redundancy in NMT. In particular, we find that higher layers, attention and softmax weights are the most important, while lower layers and the embedding weights hold a lot of redundancy. 
+For the Long Short-Term Memory (LSTM) architecture, we find that at lower layers the parameters for the input are most crucial, but at higher layers the parameters for the gates also become important.

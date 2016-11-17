@@ -1,0 +1,26 @@
+% !TEX root = acl2016.tex
+
+We evaluate the effectiveness of our pruning approaches on a state-of-the-art
+NMT model.\footnote{We thank the authors of \cite{luong2015effective}
+for providing their trained models and assistance in using the codebase
+at \url{https://github.com/lmthang/nmt.matlab}.} 
+Specifically, an attention-based English-German NMT system from
+\cite{luong2015effective} is considered. 
+%This system uses the global attention mechanism with the dot-product function and the input-feeding approach. 
+Training data was obtained from WMT'14 consisting
+of 4.5M sentence pairs (116M English words, 110M German words). For
+more details on training hyperparameters, we refer readers to Section 4.1 of
+\cite{luong2015effective}.
+All models are tested on newstest2014 (2737 sentences). 
+The model achieves a
+perplexity of 6.1 and a BLEU score of
+20.5 (after unknown word replacement).\footnote{The performance of this model
+is reported under row {\it global (dot)} in Table 4 of
+\cite{luong2015effective}.}
+
+When {\it retraining} pruned NMT systems, we use the following settings: (a) we start
+with a smaller learning rate of 0.5 (the original model uses a learning rate of
+1.0), (b) we train for fewer epochs, 4 instead of 12, using plain SGD, (c) a simple learning
+rate schedule is employed; after 2 epochs, we begin to halve the learning rate
+every half an epoch, and (d) all other hyperparameters are the same, such as
+mini-batch size 128, maximum gradient norm 5, and dropout with probability 0.2.

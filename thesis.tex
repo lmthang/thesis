@@ -35,6 +35,7 @@
 \renewcommand{\epigraphsize}{\normalsize} %\large} %\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
 \usepackage{pstricks} % for overlay latex on top of images
+\usepackage{pgfplots}
 
 \newcommand{\edit}[1]{{\color{blue} #1}}
 
@@ -70,6 +71,7 @@
 \newcommand{\nlms}{NLMs}
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\algo}[1]{Algorithm~\ref{#1}}
+\newcommand{\biformat}[1]{\textbf{\textit{#1}}}
 
 % math operators
 %\DeclareMathOperator*{\argmax}{\arg\,\max}
@@ -195,7 +197,7 @@
 
 %% Chapter 5
 \newcommand{\hide}[1]{}
-\newcommand{\source}[1]{\bi{#1}}
+\newcommand{\source}[1]{\biformat{#1}}
 \newcommand{\close}[1]{\underline{\color{brown} #1}}
 % char
 \newcommand{\Ww}{\MB{W}} % W_h 

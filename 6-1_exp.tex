@@ -3,8 +3,8 @@ sequence-to-sequence tasks: constituency parsing, image caption
 generation, machine translation, and a number of unsupervised learning as
 summarized in Table~\ref{t:tasks}.
 
-\subsection{Data}
-\label{subsec:data}
+\paragraph{Data}
+%\label{subsec:data}
 Our experiments are centered around the {\it translation} task, where we aim to determine 
 whether other tasks can improve translation and vice versa. We use the WMT'15 data
 \citep{bojar15} for the English$\leftrightarrows$German
@@ -51,7 +51,7 @@ Lastly, for {\it image caption generation}, we use a dataset of image and captio
 
 % together with various training details.
 %\citep{vinyals15caption}\citep{luong15attn}\citep{dai15,kiros15skip}
-\subsection{Training Details}
+\paragraph{Training Details}
 
 In all experiments, following \citet{sutskever14} and \citet{luong15}, we train deep LSTM
 models as follows: (a) we use 4 LSTM layers each of which has
@@ -65,7 +65,7 @@ epochs, we halve the learning rate every $y$ epochs. The values $x$ and $y$
 are referred as {\it finetune start} and {\it finetune cycle} in
 Table~\ref{t:tasks} together with the number of training epochs per task.
 
-As described in Section~\ref{sec:multi}, for each multi-task
+As described in Section~\ref{subsec:multi}, for each multi-task
 experiment, we need to choose one task to be the {\it reference
 task} (which corresponds to $\alpha_1 = 1$). The choice of the
 reference task helps specify the number of training epochs and the
@@ -108,7 +108,7 @@ and how frequent we halve the learning rates ({\it finetuning}).}
 \label{t:tasks} 
 \end{table}
 
-\subsection{Results}
+\subsubsection{Results}
 We explore several multi-task learning scenarios by combining a {\it
 large} task (machine translation) with: (a) a {\it small} task -- Penn
 Tree Bank (PTB) parsing, (b) a {\it medium-sized} task -- image
@@ -118,16 +118,15 @@ such as autoencoders and skip-thought vectors. In terms of evaluation metrics,
 we report both validation and test perplexities for all tasks. Additionally, we
 also compute test BLEU scores \citep{Papineni02bleu} for the translation task.
 
-\subsubsection{Large Tasks with Small Tasks} % -- {\it translation \& parsing}}
-\label{subsubsec:big_small}
-
+\paragraph{Large Tasks with Small Tasks} % -- {\it translation \& parsing}}
+% \label{subsubsec:big_small}
 In this setting, we want to understand if a small task such as {\it
 PTB parsing} can help improve the performance of a large task such as
 translation.  Since the parsing task maps from a sequence of English
 words to a sequence of parsing tags \citep{vinyals15grammar}, only the
 encoder can be shared with an English$\rightarrow$German translation
 task.  As a result, this is a {\it one-to-many}
-MTL scenario ($\S$\ref{subsec:otm}).
+MTL scenario ($\S$\ref{subsec:multi}).
 
 To our surprise, the results in Table~\ref{t:big_small} suggest that
 by adding a very small number of parsing mini-batches (with mixing ratio $0.01$,
@@ -197,13 +196,13 @@ highlighted in boldface.}
 \label{t:big_small}
 \end{table}
 
-\subsubsection{Large Tasks With Medium Tasks} % -- {\it translation \& captioning}}
+\paragraph{Large Tasks With Medium Tasks} % -- {\it translation \& captioning}}
 We investigate whether the same pattern carries over to a medium task
 such as {\it image caption generation}. Since the image caption
 generation task maps images to a sequence of
 English words \citep{vinyals15caption,xu15}, only the decoder can be
 shared with a German$\rightarrow$English translation task. Hence, this
-setting falls under the {\it many-to-one} MTL setting ($\S$\ref{subsec:mto}).
+setting falls under the {\it many-to-one} MTL setting ($\S$\ref{subsec:multi}).
 
 The results in Table~\ref{t:big_medium} show the same trend we observed
 before, that is, by training on another task for a very small
@@ -267,10 +266,12 @@ mean (stddev)} format.} %; others are for 1 run only.}
 \end{table}
 
 
-\subsubsection{Large Tasks with Large Tasks}
+\paragraph{Large Tasks with Large Tasks}
 \label{subsub:ll}
-Our first set of experiments is almost the same as the one-to-many setting in
-Section~\ref{subsubsec:big_small} which combines {\it translation}, as the reference
+Our first set of experiments is almost the same as the one-to-many
+big-vs-small-task setting
+%in Section~\ref{subsubsec:big_small} 
+which combines {\it translation}, as the reference
 task, with parsing. The only difference is in terms of parsing data. Instead of using the
 small Penn Tree Bank corpus, we consider a large parsing resource, the
 high-confidence (HC) corpus, which is provided by \citet{vinyals15grammar}.
@@ -432,10 +433,10 @@ English constituent parsing with {\bf 93.0} F$_1$ score.
 %\label{t:big_big}
 %\end{table}
 
-\subsubsection{Multi-tasks and Unsupervised Learning}
+\paragraph{Multi-tasks and Unsupervised Learning}
 Our main focus in this section is to determine whether unsupervised
 learning can help improve translation. Specifically, we follow the {\it
-many-to-many} approach described in Section~\ref{subsec:mtm} to couple
+many-to-many} approach described in Section~\ref{subsec:multi} to couple
 the German$\rightarrow$English translation task with two unsupervised learning
 tasks on monolingual corpora, one per language.
 The results in Tables~\ref{t:unsupervised_de_en} show a similar trend as before,

@@ -6,8 +6,8 @@ settings.
 In addition, we will discuss the unsupervised learning tasks considered as well
 as the learning process.
 
-\subsection{One-to-Many Setting}
-\label{subsec:otm}
+\paragraph{One-to-Many Setting}
+%\label{subsec:otm}
 This scheme involves {\it one encoder} and {\it multiple decoders} for tasks in
 which the encoder can be shared, as illustrated in
 Figure~\ref{f:otm}. The input to each task is a sequence of
@@ -19,26 +19,26 @@ and (c) the same sequence of English words for autoencoders or a
 related sequence of English words for the skip-thought objective
 \citep{kiros15skip}.
 
-\begin{figure}
+\begin{figure}[tbh]
 \centering
 %\psgrid
 %\rput(7.5,2.6){$\alpha_1=1.0$}
 %\rput(7.5,1.5){$\alpha_2=0.1$}
 %\rput(7.5,0.4){$\alpha_3=0.5$}
-\includegraphics[width=0.5\textwidth, clip=true, trim= 0 0 0
+\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0
 0]{img/6-1_otm}
 \caption{{\bf One-to-many Setting} -- one encoder, multiple decoders. This scheme
 is useful for either multi-target translation as
 in \cite{dong15} or between different tasks. Here, English and
-German imply sequences of words in the respective languages. The $\alpha$ values
-give the proportions of parameter updates that are allocated for the different tasks.
-%, especially the {\it parsing} task in which only the encoder can be shared
+German imply sequences of words in the respective languages. 
+%The $\alpha$ values
+%give the proportions of parameter updates that are allocated for the different tasks.
 } 
 \label{f:otm}
 \end{figure}
 
-\subsection{Many-to-One Setting}
-\label{subsec:mto}
+\paragraph{Many-to-One Setting}
+%\label{subsec:mto}
 This scheme is the opposite of the {\it one-to-many}
 setting. As illustrated in Figure~\ref{f:mto}, it consists of {\it multiple
 encoders} and {\it one decoder}. This is useful for tasks in which only the
@@ -51,15 +51,15 @@ for neural MT by \cite{gulcehre2015using}.
 
 \begin{figure}[tbh]
 \centering
-\includegraphics[width=0.55\textwidth, clip=true, trim= 0 0 0
+\includegraphics[width=0.5\textwidth, clip=true, trim= 0 0 0
 0]{img/6-1_mto}
 \caption{{\bf Many-to-one setting} -- multiple encoders, one decoder. This scheme
 is handy for tasks in which only the decoders can be shared.}
 \label{f:mto}
 \end{figure}
 
-\subsection{Many-to-Many Setting}
-\label{subsec:mtm}
+\paragraph{Many-to-Many Setting}
+%\label{subsec:mtm}
 Lastly, as the name describes, this category is the most general one,
 consisting of multiple encoders and multiple decoders.
 %However, such
@@ -74,9 +74,9 @@ translation task, we will include two unsupervised
 objectives over the source and target languages as illustrated in
 Figure~\ref{f:mtm}.
 
-\begin{figure}
+\begin{figure}[tbh]
 \centering
-\includegraphics[width=0.75\textwidth, clip=true, trim= 0 0 0
+\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0
 0]{img/6-1_mtm}
 \caption{{\bf Many-to-many setting} -- multiple encoders, multiple decoders. We
 consider this scheme in a limited context of machine translation to utilize the large
@@ -85,7 +85,7 @@ consider a single translation task and two unsupervised autoencoder tasks.}
 \label{f:mtm}
 \end{figure}
 
-\subsection{Unsupervised Learning Tasks}
+\paragraph{Unsupervised Learning Tasks}
 
 Our very first unsupervised learning task involves learning {\it autoencoders} from
 monolingual corpora, which has recently been applied to sequence to sequence
@@ -105,8 +105,9 @@ many applications that include machine translation, we only have
 sentence-level data where the sentences are unordered. To
 address that, we split each sentence into two halves; we then use 
 one half to predict the other half.
-\subsection{Learning}
-\label{subsec:learning}
+
+\paragraph{Learning}
+%\label{subsec:learning}
 \cite{dong15} adopted an {\it alternating} training approach, where they
 optimize each task for a fixed number of parameter updates (or
 mini-batches) before switching to the next task (which is a different
