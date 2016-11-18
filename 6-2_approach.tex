@@ -21,17 +21,26 @@
 %(a) architecture, which can be unidirectional, bidirectional, or deep multi-layer RNN; 
 %and (b) RNN type, which can be Long Short-Term Memory (LSTM) \cite{hochreiter1997long} or the Gated Recurrent Unit \cite{cho14}. 
 
-In this work, we specifically consider the {\it deep multi-layer recurrent} architecture with {\it
-LSTM} as the hidden unit type.
-Figure \ref{fig:nmt_simple} illustrates an instance of that architecture during training in which the source and target sentence pair are input for supervised
-learning. During testing, the target sentence is not known in advance; instead, the most probable
-target words predicted by the model are fed as inputs into the next timestep.
-The network stops when it emits the end-of-sentence symbol --- a special `word' in the vocabulary, represented by a dash in Figure \ref{fig:nmt_simple}.
+%Figure \ref{fig:nmt_simple} illustrates an instance of that architecture during training in which the source and target sentence pair are input for supervised
+%learning. During testing, the target sentence is not known in advance; instead, the most probable
+%target words predicted by the model are fed as inputs into the next timestep.
+%The network stops when it emits the end-of-sentence symbol --- a special `word' in the vocabulary, represented by a dash in Figure \ref{fig:nmt_simple}.
 
 
 \subsubsection{Understanding NMT Weights}
 \label{subsubsec:lstm}
-Figure~\ref{fig:nmt_complex} shows the same system in more detail,
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{img/6-2_nmt_complex} %trim = 27mm 60mm 45mm 35mm, clip, 
+\caption[Weights of NMT architecture]{NMT architecture. This example has two layers, but our system has four. The different weight classes are indicated by arrows of different color (the black arrows in the top right represent simply choosing the highest-scoring word, and thus require no parameters).
+Best viewed in color.
+}
+\label{fig:nmt_complex}
+\end{figure*}
+
+In this work, we specifically consider the {\it deep multi-layer recurrent} architecture with {\it
+LSTM} as the hidden unit type.
+Figure~\ref{fig:nmt_complex} shows the system in detail,
 highlighting the different types of parameters, or weights, in the model.
 We will go through the architecture from bottom to top.
 First, a vocabulary is chosen for each language, assuming that the top $V$ frequent
@@ -54,15 +63,15 @@ time-step RNN block to the current time-step RNN block.
 
 The hidden state at the top layer of the decoder is fed through an
 \textit{attention} layer, which guides the translation by `paying attention' to relevant parts of the source sentence; 
-for more information see \cite{bahdanau2014neural} or Section 3 of \cite{luong2015effective}.
+for more information see \cite{bog15} or Section 3 of \cite{luong15attn}.
 Finally, for each target word, the top layer hidden unit is transformed by the
 \emph{softmax} weights into a score vector of length $V$. The target word with the highest score is selected as the output translation.
 
-\bi{Weight Subgroups in LSTM} -- For the aforementioned RNN block, we choose to
+{\it Weight Subgroups in LSTM} -- For the aforementioned RNN block, we choose to
 use LSTM as the hidden unit type. To facilitate our later discussion 
 on the different subgroups of weights
 within LSTM, we first review the details of LSTM as formulated by 
-\newcite{zaremba2014recurrent} as follows:
+\newcite{zaremba14} as follows:
 \begin{align}
 \begin{pmatrix}
 i\\
@@ -90,7 +99,6 @@ hidden and memory vectors ($h_t^l$, $c_t^l$) given the previous pair
 ($h_{t-1}^l$, $c_{t-1}^l$) and an input vector $h_t^{l-1}$ (either from the LSTM block below or
 the embedding weights if $l\!=\!1$). All of these vectors
 have length $n$.
-
 The core of a LSTM block is the weight matrix $T_{4n,2n}$ of size $4n \times
 2n$. This matrix can be decomposed into 8 subgroups that are responsible for the
 interactions between $\{$input gate $i$, forget gate $f$, output gate $o$,
@@ -134,7 +142,8 @@ those weights are small, regardless of their locations in the architecture.
 Class-uniform pruning and class-distribution pruning both seek to prune
 proportionally within each weight class, either absolutely, or relative to the
 standard deviation of that class.
-We find that class-blind pruning outperforms both other schemes (see Section~\ref{subsec:exp_schemes}).
+We find that class-blind pruning outperforms both other schemes (see
+Section~\ref{subsubsec:exp_schemes}).
 
 \subsubsection{Retraining}
 \label{subsubsec:approach_retraining}
@@ -146,5 +155,19 @@ to ignore updates to weights at pruned locations.
 This implementation has the advantage of simplicity as it requires minimal changes to the training and deployment code, 
 but we note that a more complex implementation utilizing sparse matrices and sparse matrix multiplication could potentially yield speed improvements.
 However, such an implementation is beyond the scope of this paper.
+
+\begin{figure}
+\centering
+\input{img/6-2_pruningmethods.tikz}
+\caption{Effects of different pruning schemes.}
+\label{fig:pruning_methods}
+\end{figure}
+
+\begin{figure*}
+\centering
+\input{img/6-2_breakdown.tikz}
+\caption[`Breakdown' of performance loss]{`Breakdown' of performance loss (i.e., perplexity increase) by weight class, when pruning 90\% of weights using each of the three pruning schemes. Each of the first eight classes have 8 million weights, attention has 2 million, and the last three have 50 million weights each.}
+\label{fig:breakdown}
+\end{figure*}
 
 

@@ -27,8 +27,8 @@ parameters, resulting in a storage size of hundreds of megabytes
 Though the trend for bigger and deeper neural networks has brought great progress, it has also introduced over-parameterization, resulting in long running times, overfitting, and the storage size issue discussed above. 
 A solution to the over-parameterization problem could potentially aid all three issues, though the first (long running times) is outside the scope of this paper.
 
-\biformat{Our contribution.}
-In this section, we investigate the efficacy of weight pruning for NMT as a means of compression.
+{\it Our contribution.}
+We investigate the efficacy of weight pruning for NMT as a means of compression.
 We show that despite its simplicity, magnitude-based pruning with retraining is highly effective, and we compare three magnitude-based pruning schemes --- \textit{class-blind}, \textit{class-uniform} and \textit{class-distribution}.
 Though recent work has chosen to use the latter two, we find the first and simplest scheme --- \textit{class-blind} --- the most successful.
 We are able to prune 40\% of the weights of a state-of-the-art NMT system with negligible performance loss, and by adding a retraining phase after pruning, we can prune 80\% with no performance loss.

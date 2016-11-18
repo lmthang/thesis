@@ -100,7 +100,7 @@ High-Confidence Corpus Parsing & 11.0M & 1700 & 2416 & 50K & 104 & 6 & 4 & 0.5 \
 Image Captioning & 596K & 4115 & -  & - & 50K & 10 & 5 & 1 \\ 
 \end{tabular}
 }
-\caption{{\bf Data \& Training Details} -- Information about the different
+\caption[Data \& Training Details]{{\bf Data \& Training Details} -- Information about the different
 datasets used in this work. For each task, we display the following
 statistics: (a) the number of training examples, (b) the sizes of the
 vocabulary, (c) the number of training epochs, and (d) details on when
@@ -186,7 +186,8 @@ PTB Parsing & - & - & - & 43.3 (1.7) \\
 15.8} (0.4) & 39.8 (2.7) \\
 \end{tabular}
 %}
-\caption{{\bf English$\rightarrow$German WMT'14 translation \& Penn Tree Bank parsing results} --
+\caption[Translation \& Penn Tree Bank parsing
+results]{{\bf English$\rightarrow$German WMT'14 translation \& Penn Tree Bank parsing results} --
 shown are perplexities (ppl), BLEU scores, and parsing F$_1$ for various systems. For muli-task
 models, {\it reference} tasks are in
 italic with the mixing ratio in parentheses. Our results are averaged over two
@@ -254,7 +255,7 @@ Captioning & - & - & - & 30.8 (1.3) \\ % & \\
 %{\it Captioning} + Translation (5x) & 12.0 (0.0) & & & 27.9 (0.0) & \\
 \end{tabular}
 %}
-\caption{{\bf German$\rightarrow$English WMT'15 translation \& captioning results} -- shown are
+\caption[Translation \& captioning results]{{\bf German$\rightarrow$English WMT'15 translation \& captioning results} -- shown are
 perplexities (ppl) and BLEU scores 
 for various tasks with similar format as
 in Table~\ref{t:big_small}. {\it Reference} tasks are in italic with mixing
@@ -302,7 +303,8 @@ Translation & 8.8 (0.3) & 8.3 (0.2) & 14.3 (0.3)\\
 {\it Translation} + HC Parsing (0.05x) &  8.4 (0.0) & 8.0 (0.1) & 14.8 (0.2) \\
 \end{tabular}
 %}
-\caption{{\bf English$\rightarrow$German WMT'14 translation} -- shown are
+\caption[Translation \& Large-Corpus parsing
+results]{{\bf English$\rightarrow$German WMT'14 translation} -- shown are
 perplexities (ppl) and BLEU scores of various translation models. Our
 multi-task systems combine translation and parsing on the
 high-confidence corpus together. Mixing
@@ -346,7 +348,7 @@ HC Parsing & 1.12/1.12 & 92.2 (0.1) \\
 Ensemble of 6 multi-task systems & - & {\bf 93.0} \\
 \end{tabular}
 %}
-\caption{{\bf Large-Corpus parsing results} -- shown are
+\caption[Large-Corpus parsing results \& translation]{{\bf Large-Corpus parsing results} -- shown are
 perplexities (ppl) and F$_1$ scores 
 for various parsing models. Mixing ratios are in parentheses and the average
 results over 2 runs are in {\it mean (stddev)} format. We show the individual perplexities for all runs
@@ -480,7 +482,8 @@ Translation & 11.0 (0.0) & 12.5 (0.2) & 17.8 (0.1) & - & - \\
 & 76.3 (0.8) & 142.4 (2.7) \\ % 69.5 (0.4) & 165.3 (3.6)\\
 \end{tabular}
 }
-\caption{{\bf German$\rightarrow$English WMT'15 translation \& unsupervised learning results} -- shown are perplexities
+\caption[German$\rightarrow$English WMT'15 translation \& unsupervised learning
+results]{{\bf German$\rightarrow$English WMT'15 translation \& unsupervised learning results} -- shown are perplexities
 for translation and unsupervised learning tasks. We experiment with both {\it
 autoencoders} and {\it skip-thought vectors} for the unsupervised objectives. Numbers in {\it
 mean (stddev)} format are the average results of 2 runs; others are for 1 run
