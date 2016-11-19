@@ -1,0 +1,33 @@
+% !TEX root = acl2016.tex
+
+\begin{tikzpicture}
+\begin{semilogyaxis}[
+width=0.95\columnwidth,
+height=5cm,
+xlabel={magnitude of largest deleted weight}, 
+ylabel={perplexity change},
+xmin=0,
+xmax=0.5,
+]
+\addplot[
+only marks,
+color=red,
+mark=x,
+]
+table[row sep=crcr]
+{
+0.22513		0.471137\\
+0.244492		0.561763\\
+0.270999		1.829927\\
+0.330704		3.628541\\
+0.261247		0.422055\\
+0.265832		0.457759\\
+0.295644		0.473893\\
+0.336088		7.545939\\
+0.458583		6.362093\\
+0.257479		16.277336\\
+0.157486		0.335614\\
+0.14194		0.226382\\
+};
+\end{semilogyaxis}
+\end{tikzpicture}

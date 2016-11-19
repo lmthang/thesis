@@ -1,0 +1,68 @@
+% !TEX root = acl2016.tex
+
+
+%\begin{tikzpicture}
+%    \begin{axis}[
+%width=0.8\textwidth,
+%height=8cm,
+%%at={(0\figurewidth,0\figureheight)},
+%%scale only axis,
+%        major y tick style = transparent,
+%        xbar,
+%        bar width=4pt,
+%        xmajorgrids = true,
+%        xlabel = {perplexity change},
+%        symbolic y coords={source layer 1, source layer 2, source layer 3, source layer 4, target layer 1, target layer 2, target layer 3, target layer 4, attention, top layer, source embedding, target embedding},
+%        ytick = data,
+%        y=20pt,
+%        scaled x ticks = false,
+%     legend pos = south east,   
+%    ]
+%        \addplot[style={blue,fill=blue!50,mark=none}]
+%            coordinates {(0.46659,source layer 1)  (0.362434,source layer 2)  (0.796254,source layer 3)  (0.794582,source layer 4)  (0.201001,target layer 1)  (0.222658,target layer 2)  (-0.291916,target layer 3)  (1.108432,target layer 4)  (0.4164,attention)  (7.803921,top layer)  (2.962925,source embedding)  (2.351362,target embedding)  };
+%            
+%        \addplot[style={red,fill=red!50,mark=none}]
+%            coordinates {(0.471137,source layer 1)  (0.561763,source layer 2)  (1.829927,source layer 3)  (3.628541,source layer 4)  (0.422055,target layer 1)  (0.457759,target layer 2)  (0.473893,target layer 3)  (7.545939,target layer 4)  (6.362093,attention)  (16.277336,top layer)  (0.335614,source embedding)  (0.226382,target embedding)  };
+%
+%        \addplot[style={green,fill=green!50,mark=none}]
+%            coordinates {(0.458798,source layer 1)  (0.543843,source layer 2)  (1.818222,source layer 3)  (3.93477,source layer 4)  (0.428267,target layer 1)  (0.46657,target layer 2)  (0.494273,target layer 3)  (8.308794,target layer 4)  (6.34294,attention)  (15.723167,top layer)  (0.311599,source embedding)  (0.253745,target embedding) };
+%
+%
+%        \legend{delete smallest, uniform, standard deviation}
+%    \end{axis}
+%\end{tikzpicture}
+
+
+
+
+\begin{tikzpicture}
+    \begin{axis}[
+width=\textwidth,
+height=6cm,
+%at={(0\figurewidth,0\figureheight)},
+%scale only axis,
+        major x tick style = transparent,
+        ybar,
+        bar width=4.5pt,
+        ymajorgrids = true,
+        ylabel = {perplexity change},
+        symbolic x coords={source layer 1, source layer 2, source layer 3, source layer 4, target layer 1, target layer 2, target layer 3, target layer 4, attention, softmax, source embedding, target embedding},
+        x tick label style={rotate=45, anchor=north east, inner sep=0mm}, % inner sep controls how close the labels are to the plot
+        xtick = data,
+        x=30pt, % gap between groups of bars
+        scaled y ticks = false,
+     legend pos = north west,   
+     legend cell align = left,
+    ]
+        \addplot[style={blue!50,fill=blue!50,mark=none}]
+            coordinates {(source layer 1,0.46659)  (source layer 2,0.362434)  (source layer 3,0.796254)  (source layer 4,0.794582)  (target layer 1,0.201001)  (target layer 2,0.222658)  (target layer 3,-0.291916)  (target layer 4,1.108432)  (attention,0.4164)  (softmax,7.803921)  (source embedding,2.962925)  (target embedding,2.351362)};
+            
+        \addplot[style={red!50,fill=red!50,mark=none}]
+            coordinates {(source layer 1,0.471137)  (source layer 2,0.561763)  (source layer 3,1.829927)  (source layer 4,3.628541)  (target layer 1,0.422055)  (target layer 2,0.457759)  (target layer 3,0.473893)  (target layer 4,7.545939)  (attention,6.362093)  (softmax,16.277336)  (source embedding,0.335614)  (target embedding,0.226382) };
+
+        \addplot[style={green!50,fill=green!50,mark=none}]
+            coordinates {(source layer 1,0.458798)  (source layer 2,0.543843)  (source layer 3,1.818222)  (source layer 4,3.93477)  (target layer 1,0.428267)  (target layer 2,0.46657)  (target layer 3,0.494273)  (target layer 4,8.308794)  (attention,6.34294)  (softmax,15.723167)  (source embedding,0.311599)  (target embedding,0.253745) 
+ };
+        \legend{class-blind, class-uniform, class-distribution}
+    \end{axis}
+\end{tikzpicture}

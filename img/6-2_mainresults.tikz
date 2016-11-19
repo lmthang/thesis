@@ -1,0 +1,62 @@
+% !TEX root = acl2016.tex
+
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=0.8\columnwidth,
+height=4cm,
+scale only axis,
+xmin=0,
+xmax=90,
+xtick={0,10, 20, 30, 40, 50, 60, 70, 80, 90},
+xlabel={percentage pruned},
+ymin=0,
+ymax=25,
+yminorticks=true,
+ylabel={BLEU score},
+axis background/.style={fill=white},
+legend pos = south west,
+legend cell align=left,
+]
+\addplot [color=blue,solid,mark=x,mark options={solid}]
+  table[row sep=crcr]{%
+  0	20.48\\
+10	20.44\\
+20	20.44\\
+30	20.31\\
+40	20.15\\
+50	19.55\\
+60	18.81\\
+70	16.41\\
+80	10.99\\
+90	1.2\\
+};
+\addlegendentry{pruned}
+
+\addplot [color=orange,solid,mark=x,mark options={solid}]
+  table[row sep=crcr]{%
+50	21.03\\
+60	21.24\\
+70	21.02\\
+80	20.91\\
+90	20.13\\
+};
+\addlegendentry{pruned and retrained}
+
+\addplot [color=purple,solid,mark=x,mark options={solid}]
+  table[row sep=crcr]{%
+50	19.95\\
+60	20.24\\
+70	20.13\\
+80	19.98\\
+90	19.09\\
+};
+\addlegendentry{sparse from the beginning}
+
+\addplot [color=black,dashed]
+  table[row sep=crcr]{%
+0	20.48\\
+90	20.48\\
+};
+\end{axis}
+\end{tikzpicture}%
