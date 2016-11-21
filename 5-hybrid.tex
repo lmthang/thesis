@@ -512,13 +512,13 @@ diacritics. % than Russian
   \hdashline
   \# Tokens & 254M & 1,269M & 224M & 1,347M \\ 
 % \hline
-% \multicolumn{5}{c}{\bi{Full}} \\
+% \multicolumn{5}{c}{\biformat{Full}} \\
  \hdashline
   \# Types & 1,172K & 2003 & 1,760K & 2053\\ 
   \hline
   200-char & \multicolumn{2}{c|}{98.1\%} & \multicolumn{2}{c}{98.8\%} \\
 % \hline
-% \multicolumn{5}{c}{\bi{Filtered} (top 500K words)} \\
+% \multicolumn{5}{c}{\biformat{Filtered} (top 500K words)} \\
 % \hline
 %  Vocab & 500K & 818 & 500K & 525\\ 
 %  \hdashline
@@ -558,13 +558,13 @@ represent more than 98\% of the vocabulary.
 & & & w & c & & \\
   \hline
 (a) & Best WMT'15, big data \cite{bojar15wmt} & % -- {\it large data}
-- & - & - & \bi{18.8} & - \\
+- & - & - & \biformat{18.8} & - \\
   \hline
 \multicolumn{7}{c}{{\it Existing} NMT}\\
   \hline
 (b) & RNNsearch + unk replace \cite{jean15wmt} & 200K & - & - & 15.7 & - \\
 %  \hdashline
-(c) & \bi{Ensemble} 4 models + unk replace \cite{jean15wmt} & 200K & - & - & 18.3 & - \\
+(c) & \biformat{Ensemble} 4 models + unk replace \cite{jean15wmt} & 200K & - & - & 18.3 & - \\
   \hline
 \multicolumn{7}{c}{Our {\it word-based} NMT}\\
   \hline
@@ -572,13 +572,13 @@ represent more than 98\% of the vocabulary.
 %  \hdashline
 (d) & Base + attention + unk replace & 50K & 5.9 & - & 17.5 & 42.4 \\
 %  \hdashline
-(e) & \bi{Ensemble} 4 models + unk replace & 50K & - & - & 18.4 & 43.9 \\
+(e) & \biformat{Ensemble} 4 models + unk replace & 50K & - & - & 18.4 & 43.9 \\
   \hline
 \multicolumn{7}{c}{Our {\it character-based} NMT}\\
   \hline
 (f) & Base-512 (600-step backprop) & 200 & - & 2.4 & 3.8 & 25.9\\
 (g) & Base-512 + attention (600-step backprop) & 200 & - & 1.6 & 17.5 &
-\bi{46.6} \\
+\biformat{46.6} \\
   \hdashline
 (h) & Base-1024 + attention (300-step backprop) & 200 & - & 1.9 & 15.7 & 41.1 \\
   \hline
@@ -588,12 +588,12 @@ represent more than 98\% of the vocabulary.
 % \hdashline
 (i) & Base + attention + same-path & 10K & 4.9 & 1.7 & 14.1 & 37.2 \\
 (j) & Base + attention + separate-path & 10K & 4.9 & 1.7 & 15.6 & 39.6 \\
-(k) & Base + attention + separate-path + 2-layer char & 10K & 4.7 & 1.6 & \bi{17.7} & 44.1 \\
-% (m) & Base + attention + {\it separate}-path + 2-layer char & 10K & 200 & 4.6 & {\bf 1.59} & \bi{17.5} (11.3) & 43.4 \\
+(k) & Base + attention + separate-path + 2-layer char & 10K & 4.7 & 1.6 & \biformat{17.7} & 44.1 \\
+% (m) & Base + attention + {\it separate}-path + 2-layer char & 10K & 200 & 4.6 & {\bf 1.59} & \biformat{17.5} (11.3) & 43.4 \\
   \hdashline
 (l) & Base + attention + separate-path + 2-layer char & 50K & 5.7 & 1.6 & 19.6 & 46.5 \\
 %(n) & Base + attention + {\it separate}-path & 50K & 6.2 & 1.73 & 18.0 (15.5) & 44.4 \\
-(m) & \bi{Ensemble} 4 models & 50K & - & - & {\bf \ensbleu{}} & {\bf 47.5} \\
+(m) & \biformat{Ensemble} 4 models & 50K & - & - & {\bf \ensbleu{}} & {\bf 47.5} \\
 \end{tabular}
 }
 \caption[WMT'15 English-Czech results]{{\bf WMT'15 English-Czech results} -- shown are 
@@ -602,7 +602,7 @@ the vocabulary sizes, perplexities, BLEU, and \chr{} scores of various systems o
 categories, word (w) and character (c). 
 % For BLEU scores, we report results before \unk{} tokens are handled in parentheses. 
 {\bf Best} and
-\bi{important} results per
+\biformat{important} results per
 metric are highlighed.
 % and give {\it progressive} improvements in italic between
 % consecutive systems.  
@@ -748,9 +748,9 @@ When extending to 50K words, we further improve the translation quality.
 Our best single model, system \model{} with $19.6$ BLEU, is already better than all
 existing systems.
 Our ensemble model {\it (m)} further advances the SOTA
-result to \bi{\ensbleu} BLEU, outperforming
+result to \biformat{\ensbleu} BLEU, outperforming
 the winning entry in the WMT'15 English-Czech translation task by a large margin
-of +$1.9$ points. Our ensemble model is also best in terms of \chr{} with \bi{47.5} points.
+of +$1.9$ points. Our ensemble model is also best in terms of \chr{} with \biformat{47.5} points.
 %\footnote{Note that, our other models
 %combining both the separate-path approach and the 2-layer character-level
 %components have not converged yet. We expect to obtain even better results in
@@ -832,7 +832,7 @@ margin. Our performance is also competitive to the best Glove embeddings
   \hdashline
 \modelsmall{} & Hybrid & 0.3B & 10K & 42.4 \\
   \hdashline
-\model{} & Hybrid & 0.3B & 50K & \bi{47.1} \\
+\model{} & Hybrid & 0.3B & 50K & \biformat{47.1} \\
 \end{tabular}
 %}
 \caption[Word similarity task]{{\bf Word similarity task} -- shown are Spearman's correlation
