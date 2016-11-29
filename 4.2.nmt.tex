@@ -19,21 +19,20 @@ works which utilized a bidirectional RNN for the encoder.}
 
 In more detail, one can parameterize the probability of decoding each word $y_j$ as:
 \begin{equation}
-p\left(\tgt{j}|\tgt{<j},\MB{s}\right) = \softmax\open{g\open{\h{j}}}
+p\left(\tgt{j}|\tgt{<j},\MB{s}\right) = \softmax\open{g\open{\hid{j}}}
 \end{equation}
 with $g$ being the transformation function that outputs a vocabulary-sized
 vector.\footnote{One can provide $g$ with other inputs such as the currently
-predicted word $\tgt{j}$ as in \cite{bog15}.} Here, $\h{j}$ is the RNN hidden
+predicted word $\tgt{j}$ as in \cite{bog15}.} Here, $\hid{j}$ is the RNN hidden
 unit, abstractly computed as:
 \begin{equation}
-\h{j} = f(\h{j-1}, \MB{s}),
+\hid{j} = f(\hid{j-1}, \MB{s}),
 \end{equation}
 where $f$ computes the current hidden state given the previous hidden state and
-can be either a vanilla RNN unit, a GRU, or an LSTM unit. In \cite{kal13,sutskever14,cho14,luong15}, the source representation $\MB{s}$ is only used once to initialize the decoder hidden state. On the other hand, in \cite{bog15,jean15} and this work, $\MB{s}$, in fact, implies a set of source hidden states which are consulted throughout the entire course of the translation process. Such an approach is referred to as an attention mechanism, which we will discuss next.
+can be either a vanilla RNN unit, a GRU, or an LSTM unit. In \cite{kal13,sutskever14,cho14,luong15}, the source representation $\MB{s}$ is only used once to initialize the decoder hidden state. On the other hand, in \cite{bog15,jean15} and this work, $\MB{s}$, in fact, implies a set of source hidden states which are consulted throughout the entire course of the translation process. Such an approach is referred to as an attention mechanism, which I will discuss next.
 
-In this work, following \cite{sutskever14,luong15}, we use the stacking LSTM architecture for our NMT systems, as illustrated in Figure~\ref{f:lstm}.
-%In addition, we added an extra {\it attention} layer between the top LSTM layer and the final softmax layer, as illustrated abstractly in Figure~\ref{f:attn}. 
-We use the LSTM unit defined in \cite{zaremba15}. Our training objective is formulated as follows:
+In this work, following \cite{sutskever14,luong15}, I use the stacking LSTM architecture for our NMT systems, as illustrated in Figure~\ref{f:lstm}.
+I use the LSTM unit defined in \cite{zaremba14}. My training objective is formulated as follows:
 \begin{equation}
 J_t = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
 \label{e:j_t}

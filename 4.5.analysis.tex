@@ -1,10 +1,10 @@
-We conduct extensive analysis to better understand our models in terms
+I conduct extensive analysis to better understand my models in terms
 of learning, the ability to handle long sentences, 
 choices of attentional architectures, and alignment quality. All results
 reported here are on English-German newstest2014.
 
 \subsection{Learning curves}
-We compare models built on top of one another %with the {\it additive} features
+I compare models built on top of one another %with the {\it additive} features
 %: source reverse, dropout, global attention, input
 %feeding, and local attention with predictive alignments. Figure~\ref{f:learn}
 %shows that these learning curves well reflect the performances of their
@@ -25,11 +25,11 @@ as time goes by, it becomes more robust in terms of minimizing test errors.
 \end{figure}
 
 \subsection{Effects of Translating Long Sentences}
-We follow \cite{bog15} to group sentences of similar lengths together and
+I follow \cite{bog15} to group sentences of similar lengths together and
 compute a BLEU score per group. Figure~\ref{f:length} shows that
-our attentional models are more effective than the non-attentional one in
+my attentional models are more effective than the non-attentional one in
 handling long sentences: the quality does not degrade as sentences
-become longer. Our best model (the blue + curve) outperforms all other systems in all length buckets.
+become longer. My best model (the blue + curve) outperforms all other systems in all length buckets.
 
 \begin{figure}[tbh!]
 \centering
@@ -41,27 +41,27 @@ systems as sentences become longer.
 \end{figure}
 
 \subsection{Choices of Attentional Architectures}
-We examine different attention models ({\it global, local-m, local-p}) and different
+I examine different attention models ({\it global, local-m, local-p}) and different
 alignment functions ({\it location, dot, general, concat}) as described in
 Section~\ref{sec:attn}. Due to limited
-resources, we cannot run all the possible combinations.
+resources, I cannot run all the possible combinations.
 However, results in Table~\ref{t:attnChoices} do give us some idea about
 different choices. 
 The {\it location-based} function does not learn good
 alignments: the {\it global (location)} model can only obtain a small
 gain when performing unknown word replacement compared to using other alignment
-functions.\footnote{There is a subtle difference in how we retrieve alignments
-for the different alignment functions. At time step $t$ in which we receive
+functions.\footnote{There is a subtle difference in how I retrieve alignments
+for the different alignment functions. At time step $t$ in which I receive
 $\tgt{t-1}$ as input and then compute $\hi, \al, \co$, and $\hs$ before
 predicting $\tgt{t}$, the alignment vector $\al$ is used as alignment
 weights for (a) the predicted word $\tgt{t}$ in the {\it location-based}
 alignment functions and (b) the input word $\tgt{t-1}$ in the {\it content-based}
 functions.}
-For {\it content-based} functions, our implementation {\it concat} does not yield good performances
+For {\it content-based} functions, my implementation {\it concat} does not yield good performances
 and more analysis should be done to understand the
 reason.\footnote{With {\it concat}, the perplexities achieved by different models are 6.7 (global), 7.1
 (local-m), and 7.1 (local-p). Such high perplexities could be due to the fact
-that we simplify the matrix \MB{W_a} to set the part that corresponds to $\his$
+that I simplify the matrix \MB{W_a} to set the part that corresponds to $\his$
 to identity.} It is interesting to observe that {\it dot} works
 well for the global attention and {\it general} is better for the local
 attention.
@@ -91,7 +91,7 @@ local-p (general) & {\bf 5.9} & {\bf 19} & {\bf 20.9 (+1.9)} \\
 %}
 \caption[Attentional Architectures]{{\bf Attentional Architectures} -- performances of different
 attentional
-models. We trained two local-m (dot) models; both have
+models. I trained two local-m (dot) models; both have
 ppl $>7.0$.}
 \label{t:attnChoices}
 \end{table}
@@ -100,7 +100,7 @@ ppl $>7.0$.}
 A by-product of attentional models are word alignments. While \cite{bog15}
 visualized alignments for some sample sentences and 
 observed gains in translation quality as an indication of a working attention
-model, no work has assessed the alignments learned as a whole. In contrast, we
+model, no work has assessed the alignments learned as a whole. In contrast, I
 set out to evaluate the alignment quality using the alignment error rate (AER)
 metric.
 
@@ -124,30 +124,30 @@ metric.
 \end{table}
 
 Given the gold alignment data provided by RWTH for 508 English-German
-Europarl sentences, we ``force'' decode our attentional models to
-produce translations that match the references. We extract only one-to-one
+Europarl sentences, I ``force'' decode my attentional models to
+produce translations that match the references. I extract only one-to-one
 alignments by selecting the source word with the highest alignment
-weight per target word. Nevertheless, as shown in Table~\ref{t:alignment}, we were able to achieve AER scores
+weight per target word. Nevertheless, as shown in Table~\ref{t:alignment}, I were able to achieve AER scores
 comparable to the one-to-many alignments obtained by the Berkeley aligner
-\cite{liang06alignment}.\footnote{We concatenate the 508 sentence pairs with 1M
+\cite{liang06alignment}.\footnote{I concatenate the 508 sentence pairs with 1M
 sentence pairs from WMT and run the Berkeley aligner.}
 
-We also found that the alignments produced by local attention models achieve
+I also found that the alignments produced by local attention models achieve
 lower AERs than those of the global one. The AER obtained by the ensemble, while
 good, is not better than the local-m AER, suggesting the well-known
 observation that AER and translation scores are not well correlated \cite{fraser07}.
-Due to space constraint, we can only show alignment visualizations in the arXiv version of our
-paper.\footnote{\url{http://arxiv.org/abs/1508.04025}}
+%Due to space constraint, we can only show alignment visualizations in the arXiv version of our
+%paper.\footnote{\url{http://arxiv.org/abs/1508.04025}}
 %We show some alignment visualizations in Appendix~\ref{sec:visual}.
 
 \subsection{Sample Translations}
 \label{sec:sample}
-We show in Table~\ref{t:sample} sample translations in both directions. It it
+I show in Table~\ref{t:sample} sample translations in both directions. It it
 appealing to observe the effect of attentional models in correctly translating
 names such as ``Miranda Kerr'' and ``Roger Dow''. Non-attentional models, while producing sensible names from a language
 model perspective, lack the direct connections from the source side to make
 correct translations. % as with the case of attention-based NMT systems. 
-We also observed an interesting case in the second
+I also observed an interesting case in the second
 example, which requires translating the {\it doubly-negated} phrase, ``not incompatible''.
 The attentional model correctly produces ``nicht $\dots$ unvereinbar'';
 whereas the non-attentional model generates ``nicht vereinbar'', meaning
@@ -210,9 +210,9 @@ base & Because of the pressure \wrong{imposed by the European Central Bank and t
 \end{tabular}
 }
 \caption[Sample translations]{{\bf Sample translations} -- %examples in both translation directions.
-for each example, we show the source ({\it src}), the human translation ({\it
-ref}), the translation from our best model ({\it best}), and the
-translation of a non-attentional model ({\it base}).  We italicize some
+for each example, I show the source ({\it src}), the human translation ({\it
+ref}), the translation from my best model ({\it best}), and the
+translation of a non-attentional model ({\it base}).  I italicize some
 \correct{correct} translation segments and highlight a few \wrong{wrong} ones in
 bold.} % See Appendix~\ref{sec:sample} for detailed descriptions.}
 \label{t:sample}
