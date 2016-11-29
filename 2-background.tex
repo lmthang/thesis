@@ -565,6 +565,7 @@ $d\hid{t-1} \leftarrow \tp{\W{hh}} \cdot \paren{\sigma'(\rnn \z{t}) \edot d\hid{
 
 %\subsection{Better Training RNNs}
 \subsection{Long Short-Term Memory} %Advanced RNN \& 
+\label{subsec:LSTM}
 Even though computing RNN gradients is straightforward once 
 the BPTT algorithm has been plotted out, training is inherently difficult due to the nonlinear
 iterative nature of RNNs. Among all reasons, 
@@ -1048,6 +1049,7 @@ $\hid{t}^{(0)} \leftarrow \text{\texttt{Emb\_LookUp}}(s_t, \W{e})$ \;
 \caption{NMT training algorithm -- {\it forward} pass.}
 \label{a:nmt_forward}
 \end{algorithm}
+
 
 \begin{algorithm}
 %$\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{decoder}}, \lstm^{\text{decoder}}$ \tcp*{Decoder weights}
