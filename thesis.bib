@@ -1,6 +1,58 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Neural Machine Translation %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@ARTICLE{systran16,
+   author = {{Crego}, J. and {Kim}, J. and {Klein}, G. and {Rebollo}, A. and 
+  {Yang}, K. and {Senellart}, J. and {Akhanov}, E. and {Brunelle}, P. and 
+  {Coquard}, A. and {Deng}, Y. and {Enoue}, S. and {Geiss}, C. and 
+  {Johanson}, J. and {Khalsa}, A. and {Khiari}, R. and {Ko}, B. and 
+  {Kobus}, C. and {Lorieux}, J. and {Martins}, L. and {Nguyen}, D.-C. and 
+  {Priori}, A. and {Riccardi}, T. and {Segal}, N. and {Servan}, C. and 
+  {Tiquet}, C. and {Wang}, B. and {Yang}, J. and {Zhang}, D. and 
+  {Zhou}, J. and {Zoldan}, P.},
+    title = "{SYSTRAN's Pure Neural Machine Translation Systems}",
+  journal = {arXiv preprint 1610.05540},
+     year = 2016,
+}
+
+@article{gnmt16,
+  author    = {Yonghui Wu and
+               Mike Schuster and
+               Zhifeng Chen and
+               Quoc V. Le and
+               Mohammad Norouzi and
+               Wolfgang Macherey and
+               Maxim Krikun and
+               Yuan Cao and
+               Qin Gao and
+               Klaus Macherey and
+               Jeff Klingner and
+               Apurva Shah and
+               Melvin Johnson and
+               Xiaobing Liu and
+               Lukasz Kaiser and
+               Stephan Gouws and
+               Yoshikiyo Kato and
+               Taku Kudo and
+               Hideto Kazawa and
+               Keith Stevens and
+               George Kurian and
+               Nishant Patil and
+               Wei Wang and
+               Cliff Young and
+               Jason Smith and
+               Jason Riesa and
+               Alex Rudnick and
+               Oriol Vinyals and
+               Greg Corrado and
+               Macduff Hughes and
+               Jeffrey Dean},
+  title     = {Google's Neural Machine Translation System: Bridging the Gap between
+               Human and Machine Translation},
+  journal = {arXiv preprint 1609.08144},
+  year      = {2016},
+}
+
 @inproceedings{kim16distill,
   author    = {Yoon Kim and
                Alexander M. Rush},
@@ -653,6 +705,52 @@ pages="18--32",
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Sequence to Sequence Models / RNNs %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@inproceedings{wiseman16,
+  author    = {Sam Wiseman and
+               Alexander M. Rush},
+  title     = {Sequence-to-Sequence Learning as Beam-Search Optimization},
+  booktitle = {EMNLP},
+  year      = {2016},
+}
+
+@inproceedings{shen16,
+  author    = {Shiqi Shen and
+               Yong Cheng and
+               Zhongjun He and
+               Wei He and
+               Hua Wu and
+               Maosong Sun and
+               Yang Liu},
+  title     = {Minimum Risk Training for Neural Machine Translation},
+  booktitle = {ACL},
+  year      = {2016},
+}
+
+@article{bahdanau16actor,
+  author    = {Dzmitry Bahdanau and
+               Philemon Brakel and
+               Kelvin Xu and
+               Anirudh Goyal and
+               Ryan Lowe and
+               Joelle Pineau and
+               Aaron C. Courville and
+               Yoshua Bengio},
+  title     = {An Actor-Critic Algorithm for Sequence Prediction},
+  journal = {arXiv preprint arXiv:1607.07086},
+  year      = {2016},
+}
+
+@inproceedings{ranzato16,
+  author    = {Marc'Aurelio Ranzato and
+               Sumit Chopra and
+               Michael Auli and
+               Wojciech Zaremba},
+  title     = {Sequence Level Training with Recurrent Neural Networks},
+  booktitle = {ICLR},
+  year      = {2016},
+}
+
+
 @InProceedings{li16,
   author    = {Li, Jiwei  and  Galley, Michel  and  Brockett, Chris  and  Spithourakis, Georgios  and  Gao, Jianfeng  and  Dolan, Bill},
   title     = {A Persona-Based Neural Conversation Model},
@@ -685,6 +783,14 @@ pages="18--32",
   booktitle = {AAAI},
   year      = {2016},
 }
+
+@inproceedings{bengio15,
+title = {Scheduled Sampling for Sequence Prediction with Recurrent Neural Networks},
+author  = {Samy Bengio and Oriol Vinyals and Navdeep Jaitly and Noam M. Shazeer},
+year  = 2015,
+booktitle = {NIPS}
+}
+
 
 @inproceedings{jozefowicz15,
   author = {J\'{o}zefowicz, Rafal and Zaremba, Wojciech and Sutskever, Ilya},
@@ -855,6 +961,19 @@ year = {2009},
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Deep Learning / Machine Learning %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@inproceedings{norouzi16,
+  author    = {Mohammad Norouzi and
+               Samy Bengio and
+               Zhifeng Chen and
+               Navdeep Jaitly and
+               Mike Schuster and
+               Yonghui Wu and
+               Dale Schuurmans},
+  title     = {Reward Augmented Maximum Likelihood for Neural Structured Prediction},
+  booktitle = {NIPS},
+  year      = {2016},
+}
+
 @article{hinton15,
    author = {{Hinton}, G. and {Vinyals}, O. and {Dean}, J.},
    title = "{Distilling the Knowledge in a Neural Network}",
@@ -1012,14 +1131,12 @@ year = {2009},
   year      = {2005},
 }
 
-@article{goller:ieeenn00,
-  author       = {Goller, C. and Küchler, A.},
-  journal = {IEEE Transactions on Neural Networks},
-  pages        = {347--352},
-  title        = {Learning Task-Dependent Distributed Representations by Backpropagation Through Structure},
-  volume       = {1},
-  year         = {1996},
-}
+@inproceedings{lafferty01,
+ author = {Lafferty, John D. and McCallum, Andrew and Pereira, Fernando C. N.},
+ title = {Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data},
+ booktitle = {ICML},
+ year = {2001},
+} 
 
 @article{Gers00,
  author = {Gers, Felix A. and Schmidhuber, J\"{u}rgen A. and Cummins, Fred A.},
@@ -1041,6 +1158,16 @@ year = {2009},
   volume       = {9},
   year         = {1997},
 }
+
+@article{goller96,
+  author       = {Goller, C. and Küchler, A.},
+  journal = {IEEE Transactions on Neural Networks},
+  pages        = {347--352},
+  title        = {Learning Task-Dependent Distributed Representations by Backpropagation Through Structure},
+  volume       = {1},
+  year         = {1996},
+}
+
 
 @ARTICLE{lin96, 
   author={Tsungnan Lin and Bill G. Horne and Peter Ti\u{n}o and C. Lee Giles}, 
@@ -1073,6 +1200,14 @@ year = {2009},
     title = {Mixture density networks},
     institution = {Aston University},
     year = {1994}
+}
+
+@INPROCEEDINGS{reinforce,
+    author = {Ronald J. Williams},
+    title = {Simple statistical gradient-following algorithms for connectionist reinforcement learning},
+    booktitle = {Machine Learning},
+    year = {1992},
+    pages = {229--256}
 }
 
 @inproceedings{elman90,

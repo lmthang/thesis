@@ -433,7 +433,7 @@ these gradients as $\{d\W{xh}, d\W{hh}, d\W{hy}, d\x{t}, d\hid{t-1}\}$
 respectively and define intermediate gradients $d\s{t}, d\hid{t}$ similarly
 with $\s{t}$ and $\hid{t}$ being used in \eq{e:score} and \eq{e:prob}. 
 Starting with the loss $l_t$, we employ backpropagation through structures
-\cite{goller:ieeenn00} to derive each gradient one by one in the following
+\cite{goller96} to derive each gradient one by one in the following
 order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
 \{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. 
 %To simplify the math, we will utilize
