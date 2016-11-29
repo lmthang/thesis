@@ -6,6 +6,7 @@ a few translation examples where our models succeed in correctly translating OOV
 several failures.
 
 \subsection{Rare Word Analysis}
+\begin{sloppypar}
 To analyze the effect of rare words on translation quality, 
 we follow Sutskever et al.~\cite{sutskever14} and sort sentences in 
 newstest2014 by the average inverse frequency of their words. 
@@ -14,6 +15,7 @@ We split the test sentences into groups where the sentences within each group ha
 systems before and after translating the OOV words and compare with 
 the standard MT systems -- we use the best system from the WMT'14 contest \cite{durrani-EtAl:2014:W14-33},
 and neural MT systems -- we use the ensemble systems described in \cite{sutskever14} and Section~\ref{sec:exp}.
+\end{sloppypar}
 
 Rare word translation is challenging for neural machine translation systems as
 shown in Figure~\ref{f:rare}. Specifically, the translation quality of our

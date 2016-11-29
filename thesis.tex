@@ -29,6 +29,8 @@
 % (paper compilation hacks)
 \def\newcite#1{\citet{#1}}
 \def\cite#1{\citep{#1}}
+% http://tex.stackexchange.com/questions/2773/how-do-i-make-latex-push-long-citations-to-a-new-line
+%\usepackage{microtype}
 
 %% Thang
 \usepackage{epigraph}
@@ -37,7 +39,7 @@
 \usepackage{pstricks} % for overlay latex on top of images
 \usepackage{pgfplots}
 
-\newcommand{\edit}[1]{{\color{blue} #1}}
+\newcommand{\edit}[1]{{#1}} %\color{blue} 
 
 % to split on hyphens for long urls
 %\usepackage{url}

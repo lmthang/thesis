@@ -93,7 +93,7 @@ bank}.
 \word{promenade le long de la} as in
 traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
 South Bank} to lower uncertainty in its prediction.
-\error{Plot a figure on NPLMs?}
+%\error{Plot a figure on NPLMs?}
 } 
 \label{f:nnjm}
 \end{figure}
@@ -521,8 +521,10 @@ d\W{hh} &=  \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\hid{t-1}} \lab
 }
 
 \paragraph{Backpropagation Through Time (BPTT)}
+\begin{sloppypar}
 Having defined a single-timestep backpropagation procedure, we are now ready to
-go through the BPTT algorithm \cite{Rumelhart:1986:LPT,werbos1990}. Inspired by 
+go through the BPTT algorithm \cite{Rumelhart:1986:LPT,werbos1990}. 
+Inspired by 
 \newcite{sutskever12}, we summarize the BPTT algorithm for RNNs below with the
 following remarks: (a) Lines 3, 5, 6, 7 accumulate the gradients of RNN weights
 $\{\W{hy}, \W{xh}, \W{hh}, \W{e}\}$ over time; (b) In line 7, $d\x{t}$ refers to
@@ -532,6 +534,7 @@ RNNs, $d\x{t}$ is used to send gradients down to the below layers.} and (c) Line
 4 accumulates gradients for the current hidden state $\hid{t}$ by considering two paths,
 a ``vertical'' one from  the current loss at time $t$ and a ``recurrent'' one from the timestep
 $t+1$ which was set in Line 8 earlier.
+\end{sloppypar}
 
 \begin{algorithm}
 \For{$t=T \rightarrow 1$}

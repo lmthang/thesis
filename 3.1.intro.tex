@@ -1,25 +1,26 @@
+%\begin{sloppypar}
+%Neural Machine
+%Translation (NMT) is a novel approach to MT that has 
+%achieved promising results \cite{kal13,sutskever14,cho14,bog15,jean15}. 
+%An NMT system is a conceptually simple large neural network that 
+%reads the entire source sentence and produces an output translation one word at a time.
+%NMT systems are appealing because they use minimal domain knowledge which
+%makes them well-suited to any problem that can be formulated as mapping an input sequence 
+%to an output sequence \cite{sutskever14}.
+%In addition, the natural ability of neural networks to generalize implies that 
+%NMT systems will also generalize to novel word phrases and sentences that do not occur in the
+%training set. 
+%In addition, NMT systems potentially remove the need to store explicit phrase tables 
+%and language models which are used in conventional systems. 
+%Finally, the decoder of an NMT system is easy to implement, unlike the highly
+%intricate decoders used by phrase-based systems \cite{Koehn:2003:SMT}.
+%\end{sloppypar}
 
-Neural Machine
-Translation (NMT) is a novel approach to MT that has 
-achieved promising results \cite{kal13,sutskever14,cho14,bog15,jean15}. 
-An NMT system is a conceptually simple large neural network that 
-reads the entire source sentence and produces an output translation one word at a time.
-NMT systems are appealing because they use minimal domain knowledge which
-makes them well-suited to any problem that can be formulated as mapping an input sequence 
-to an output sequence \cite{sutskever14}.
-In addition, the natural ability of neural networks to generalize implies that 
-NMT systems will also generalize to novel word phrases and sentences that do not occur in the
-training set. 
-In addition, NMT systems potentially remove the need to store explicit phrase tables 
-and language models which are used in conventional systems. 
-Finally, the decoder of an NMT system is easy to implement, unlike the highly
-intricate decoders used by phrase-based systems \cite{Koehn:2003:SMT}.
-
-Despite these advantages, conventional NMT systems are incapable of translating rare 
+Despite all of the advantages mentioned in the previous chapter, basic NMT systems are incapable of translating rare 
 words because they have a fixed modest-sized vocabulary\footnote{ Due to the computationally intensive nature of the softmax, NMT systems often limit 
 their vocabularies to be the top 30K-80K most frequent words in each language. However, \newcite{jean15}
 has very recently proposed an efficient approximation to the softmax that allows
-for training NTMs with very large vocabularies. As discussed in Section~\ref{sec:nmt}, this technique is complementary to ours.}
+for training NMTs with very large vocabularies. As discussed in Section~\ref{sec:nmt}, this technique is complementary to ours.}
 %, although decoding time grows linearly with the size of the
 %vocabulary. {\bf ILYA: their paper used a candidate list to speed up decoding.}}
 which forces them to use the \unksym{} symbol to 

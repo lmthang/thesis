@@ -23,6 +23,7 @@ We discard sentence pairs in which the source or the target sentence exceed 100 
 
 \subsection{Training Details}
 \label{subsec:train_details}
+\begin{sloppypar}
 Our training procedure and hyperparameter choices are similar to those used by
 \newcite{sutskever14}. In more details, we train multi-layer deep LSTMs, each of which has 
 1000 cells, with 1000 dimensional embeddings. Like \newcite{sutskever14}, 
@@ -33,6 +34,7 @@ in [-0.08, 0.08] for 4-layer models and [-0.06, 0.06] for 6-layer models, (b) SG
 5 epochs, we begin to halve the learning rate every 0.5 epoch), (d) the size of the mini-batch is 128, 
 and (e) we rescale the normalized gradient to ensure that its norm does not
 exceed 5 \cite{pascanu13}.
+\end{sloppypar}
 
 We also follow the GPU parallelization scheme proposed in \cite{sutskever14}, allowing us to  
 reach a training speed of 5.4K words per second to train a depth-6 model with 200K source and 80K target vocabularies  

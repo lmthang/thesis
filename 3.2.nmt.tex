@@ -14,6 +14,8 @@ of the target sentence given the source sentence
 \begin{equation}
 \log p(t|s) = \sum_{j=1}^m  \log p\left(t_j|t_{<j},s_{\leq n}\right)
 \end{equation}
+
+\begin{sloppypar}
 There are many ways to parameterize these conditional distributions.
 For example, \newcite{kal13} used a combination of a
 convolutional neural network and a recurrent neural network, \newcite{sutskever14} used a deep Long Short-Term Memory
@@ -21,7 +23,6 @@ convolutional neural network and a recurrent neural network, \newcite{sutskever1
 \newcite{bog15} used a more elaborate neural network
 architecture that uses an attentional mechanism over the input sequence, 
 similar to \newcite{graves13c} and \newcite{graves14}.  
-
 In this work, we use the model of \newcite{sutskever14}, which 
 uses a deep LSTM to encode the input sequence and a separate deep LSTM 
 to output the translation. The encoder reads the 
@@ -30,6 +31,7 @@ a large vector that represents the entire source sentence.
 The decoder is initialized with this vector
 and generates a translation, one word at a time, 
 until it emits the end-of-sentence symbol \eossym{}.
+\end{sloppypar}
 
 None the early work in neural machine translation systems has addressed the rare word problem,
 but the recent work of \newcite{jean15} has tackled it with 
