@@ -1,10 +1,26 @@
-Neural Machine Translation (NMT) is a simple new architecture for getting
-machines to translate. At its core, NMT is a single deep 
-neural network that is trained end-to-end with several advantages such as
-simplicity and generalization. Despite being relatively new, NMT has already
+%Neural Machine Translation (NMT) is a simple new architecture for getting
+%machines to translate. At its core, NMT is a single deep 
+%neural network that is trained end-to-end with several advantages such as
+%simplicity and generalization. 
+
+\begin{sloppypar}
+In the previous chapters, I showed that despite being relatively new, NMT has already
 achieved state-of-the-art translation results for several language pairs 
 such as English-French \cite{luong15}, English-German
 \cite{jean15,luong15attn,luong15iwslt}, and English-Czech \cite{jean15wmt}. 
+While NMT offers many advantages over traditional phrase-based approaches, such as
+small memory footprint and simple decoder implementation, nearly all previous
+work in NMT has used quite restricted vocabularies, crudely treating all other
+words the same with an \unk{} symbol. Sometimes, a post-processing step that
+patches in unknown words is introduced to alleviate this problem. %For example,
+In Chapter~\ref{c:copy}, I propose to annotate occurrences of target \unk{} with positional information to
+track their alignments, after which simple word dictionary
+lookup or identity copy can be performed to replace \unk{} in the translation.
+\newcite{jean15} approach the problem similarly but obtain the alignments for unknown
+words from the attention mechanism. I refer to these as the {\it
+unk replacement} technique.
+\end{sloppypar}
+
 \begin{figure}%[tbh]
 \centering
 \includegraphics[width=0.6\textwidth, clip=true, trim= 0 0 0 0]{img/5-nmt_hybrid}
@@ -17,17 +33,6 @@ boundaries.}
 \label{f:hybrid}
 \end{figure}
 
-While NMT offers many advantages over traditional phrase-based approaches, such as
-small memory footprint and simple decoder implementation, nearly all previous
-work in NMT has used quite restricted vocabularies, crudely treating all other
-words the same with an \unk{} symbol. Sometimes, a post-processing step that
-patches in unknown words is introduced to alleviate this problem. %For example,
-\newcite{luong15} propose to annotate occurrences of target \unk{} with positional information to
-track their alignments, after which simple word dictionary
-lookup or identity copy can be performed to replace \unk{} in the translation.
-\newcite{jean15} approach the problem similarly but obtain the alignments for unknown
-words from the attention mechanism. We refer to these as the {\it
-unk replacement} technique.
 
 Though simple, these approaches ignore several important
 properties of languages. First, {\it monolingually}, words are morphologically
@@ -41,34 +46,34 @@ possible surface word translations such as name transliteration between
 \word{Christopher} (English) and \word{Kry\u{s}tof} (Czech). See more on this problem
 in \cite{sennrich16sub}.
 
-To overcome these shortcomings, we propose a novel {\it hybrid} architecture for NMT
+To overcome these shortcomings, I propose a novel {\it hybrid} architecture for NMT
 that translates mostly at the word level and consults the character
 components for rare words when necessary. As illustrated in
-Figure~\ref{f:hybrid}, our hybrid model consists of a word-based NMT that
+Figure~\ref{f:hybrid}, my hybrid model consists of a word-based NMT that
 performs most of the translation job, except for the two (hypothetically) rare words,
 \word{cute} and \word{joli}, that are handled separately. On the {\it source}
 side, representations for rare words, \word{cute}, are
 computed on-the-fly using a deep recurrent neural network that operates at the
-character level. On the {\it target} side, we have a separate model that
+character level. On the {\it target} side, I have a separate model that
 recovers the surface forms, \word{joli}, of \unk{} tokens character-by-character.
 These components are learned jointly end-to-end, removing the need for a separate
 unk replacement step as in current NMT practice.
 
-Our hybrid NMT offers a twofold advantage: it is much faster and easier to
+My hybrid NMT offers a twofold advantage: it is much faster and easier to
 train than character-based models; at the same time, it never produces unknown
 words as in the case of word-based ones.
-We demonstrate at scale that on the WMT'15 English to
+I demonstrate at scale that on the WMT'15 English to
 Czech translation task, such a hybrid approach provides
 an additional boost of +$\gain{}$ BLEU points over models 
 that already handle unknown words.
-We achieve a new state-of-the-art result with
+I achieve a new state-of-the-art result with
 $\ensbleu{}$ BLEU score.
-Our analysis demonstrates that our character models can successfully learn to not
+My analysis demonstrates that my character models can successfully learn to not
 only generate well-formed words for Czech, a
 highly-inflected language with a very complex vocabulary, but also build correct
 representations for English source words.
 
-We provide code, data, and models at \url{http://nlp.stanford.edu/projects/nmt}.
+I provide code, data, and models at \url{http://nlp.stanford.edu/projects/nmt}.
 
 \section{Related Work}
 There has been a recent line of work on end-to-end character-based neural models
@@ -86,18 +91,19 @@ comparable results from past NMT work.}
 translate just like at the word level, which does not learn to understand
 relationships among words.
 
-Our work takes inspiration from \cite{luong13} and 
-\cite{li15}. Similar to the former, we build representations for rare words
-on-the-fly from subword units. However, we utilize recurrent neural networks
+My work takes inspiration from \cite{luong13} and 
+\cite{li15}. Similar to the former, I build representations for rare words
+on-the-fly from subword units. However, I utilize recurrent neural networks
 with characters as the basic units; whereas \newcite{luong13} use recursive neural
 networks with morphemes as units, which requires existence of a
-morphological analyzer. In comparison with \cite{li15}, our hybrid architecture
+morphological analyzer. In comparison with \cite{li15}, my hybrid architecture
 is also a hierarchical sequence-to-sequence model, but operates at a different
 granularity level, word-character. In contrast, \newcite{li15} build
 hierarchical models at the sentence-word level for paragraphs and documents.
 
-\section{Background \& Our Models}
+\section{Background \& My Models}
 \label{sec:nmt}
+\begin{sloppypar}
 Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
 a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
 It accomplishes this goal through an {\it encoder-decoder} framework
@@ -105,6 +111,8 @@ It accomplishes this goal through an {\it encoder-decoder} framework
 for each source sentence. Based on that source representation,
 the {\it decoder} generates a translation, one target word at a time, and hence,
 decomposes the log conditional probability as:
+\end{sloppypar}
+
 \begin{equation}
 \log p(\tgt{}|\src{}) = \sum_{t=1}^m \nolimits \log
 p\open{\tgt{t}|\tgt{<t},\MB{s}}
@@ -117,21 +125,8 @@ Papers, however, differ in terms of: (a) architecture -- from unidirectional, to
 bidirectional, and deep multi-layer RNNs; and (b) RNN type -- which are long
 short-term memory (LSTM)
 \cite{lstm97} and the gated recurrent unit \cite{cho14}. 
-All our models utilize the {\it deep multi-layer} architecture with {\it
+All my models utilize the {\it deep multi-layer} architecture with {\it
 LSTM} as the recurrent unit; detailed formulations are in \cite{zaremba14}.
-
-%A natural choice to model such a decomposition in the decoder is to use a
-%recurrent neural network (RNN) architecture, which most of the recent NMT work have in common. They,
-%however, differ in terms of the RNN architectures used and how the encoder computes the source representation $\MB{s}$.
-%%, e.g., vanilla RNN, long-short term memory (LSTM) \cite{lstm97} or gated recurrent units \cite{cho14}
-%\newcite{kal13} used an RNN with the vanilla RNN unit for the decoder and a
-%convolutional neural network for encoding the source. On
-%the other hand, \newcite{sutskever14,luong15,luong15attn} built deep RNNs with the Long Short-Term Memory (LSTM) unit
-%\cite{lstm97} for both the encoder and the decoder. \newcite{cho14,bog15,jean15} all adopted an
-%LSTM-inspired hidden unit, the gated recurrent unit (GRU), and used bidirectional
-%RNNs for the encoder.
-%%\footnote{They all used a single RNN layer except for the latter two
-%%works which utilized a bidirectional RNN for the encoder.}
 
 Considering the top recurrent layer in a deep LSTM, 
 with $\hd{t}$ being the current target hidden state as in Figure~\ref{f:attn}, one can compute the probability of decoding each target word $y_t$ as:
@@ -140,7 +135,7 @@ p\left(\tgt{t}|\tgt{<t},\MB{s}\right) = \softmax\open{\hd{t}}
 \label{e:softmax}
 \end{equation}
 
-For a parallel corpus $\mathbb{D}$, we train our model by minimizing the below
+For a parallel corpus $\mathbb{D}$, I train my model by minimizing the below
 cross-entropy loss:
 \begin{equation}
 J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
@@ -150,7 +145,7 @@ J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
 \noindent {\bf Attention Mechanism} -- 
 %Another important difference between NMT work lies in what constitutes the
 %input representation $\MB{s}$.
-The early NMT approaches \cite{sutskever14,cho14}, which we have described above, use only the last encoder state
+The early NMT approaches \cite{sutskever14,cho14}, which I have described above, use only the last encoder state
  to initialize the decoder, i.e., setting the input representation $\MB{s}$ in
  \eq{e:s2s} to $[\hb{n}]$. Recently, \newcite{bog15} propose an {\it attention
  mechanism}, a form of random access memory for NMT to 
@@ -164,7 +159,7 @@ strategies to place the attention.
 %{\it global} -- utilize all source hidden
 %states at all target timesteps and {\it local} -- focus on a small subset of
 %source hidden states per target timestep.
-In all our models, we utilize the {\it global} attention mechanism and the {\it
+In all my models, I utilize the {\it global} attention mechanism and the {\it
 bilinear form} for the attention scoring function similar to 
 \cite{luong15attn}.
 
@@ -190,7 +185,7 @@ bilinear form} for the attention scoring function similar to
 \label{f:attn}
 \end{figure}
 
-Specifically, we set $\MB{s}$ in \eq{e:s2s} to
+Specifically, I set $\MB{s}$ in \eq{e:s2s} to
 the set of source hidden states at the top layer, $[\hb{1}, \dots, \hb{n}]$. 
 As illustrated in Figure~\ref{f:attn}, the attention mechanism consists of two stages: (a) {\it
 context vector} -- the current hidden state $\hd{t}$ is compared with
@@ -208,7 +203,7 @@ predicting the next word.
 
 \section{Hybrid Neural Machine Translation}
 \label{sec:hybrid}
-Our hybrid architecture, illustrated in Figure~\ref{f:hybrid}, leverages the power of both words
+My hybrid architecture, illustrated in Figure~\ref{f:hybrid}, leverages the power of both words
 and characters to achieve the goal of open vocabulary NMT. The core of the
 design is a {\it word}-level NMT with the advantage of being fast and easy to
 train.
@@ -224,7 +219,7 @@ originally produced as \unk{}.
 %\begin{figure}%[tbh]
 %\centering
 %\includegraphics[width=0.4\textwidth, clip=true, trim= 0 0 0 0]{nmt_word.\imgExt}
-%\caption{{\bf Word-based NMT} -- the backbone of our hybrid architecture. Boxes
+%\caption{{\bf Word-based NMT} -- the backbone of my hybrid architecture. Boxes
 %mark the character-level components for: (a) computing source word
 %representations and (b) generating target words.}
 %%to take advantages of the
@@ -232,57 +227,57 @@ originally produced as \unk{}.
 %\label{f:word}
 %\end{figure}
 
-The core of our hybrid NMT is a deep LSTM encoder-decoder that translates at
-the {\it word} level as described in Section~\ref{sec:nmt}. We maintain a
+The core of my hybrid NMT is a deep LSTM encoder-decoder that translates at
+the {\it word} level as described in Section~\ref{sec:nmt}. I maintain a
 vocabulary of $|V|$ frequent words for each language. Other words not inside these
 lists are represented by a universal symbol \unk{}, one per language.
-We translate just like a word-based NMT system with respect to these source and
+I translate just like a word-based NMT system with respect to these source and
 target vocabularies, except for cases that involve \unk{} in the source input or 
 the target output. These correspond to the character-level components 
-%that we will expand next to accomplish the full architecture as 
+%that I will expand next to accomplish the full architecture as 
 illustrated in Figure~\ref{f:hybrid}.
 %and are highlighted by the two boxes in 
 %Figure~\ref{f:word}.
-%Note that we leave \unk{} on the target input which helps simplify the training
+%Note that I leave \unk{} on the target input which helps simplify the training
 %and testing phases as detailed in Section~\ref{subsubsec:strategy}.
 
-A nice property of our hybrid approach is that by varying the vocabulary size,
+A nice property of my hybrid approach is that by varying the vocabulary size,
  one can control how much to blend the
 word- and character-based models; hence, taking the best of both
 worlds. 
-%We illustrate that unified view in Figure~\ref{f:vocabulary}.
+%I illustrate that unified view in Figure~\ref{f:vocabulary}.
 
 
 \subsection{Source Character-based Representation}
 \label{subsec:src}
-%We now describe box (a) in Figure~\ref{f:word}. 
+%I now describe box (a) in Figure~\ref{f:word}. 
 In regular word-based
 NMT, for all rare words outside the source vocabulary, one feeds the
 universal embedding representing \unk{} as input to the encoder. This is
 problematic because it discards valuable information about the source word. To
-fix that, we learn a deep LSTM model over characters
+fix that, I learn a deep LSTM model over characters
 of source words. 
-%In our running example, % for the word \word{cute}, 
-For example, in Figure~\ref{f:hybrid}, we run
-our deep character-based LSTM over `c', `u', `t', `e', and `\_' (the boundary
+%In my running example, % for the word \word{cute}, 
+For example, in Figure~\ref{f:hybrid}, I run
+my deep character-based LSTM over `c', `u', `t', `e', and `\_' (the boundary
 symbol). The final hidden state at the top layer will be used as the on-the-fly
 representation for the current rare word.
 %as illustrated in the bottom-left part of Figure~\ref{f:hybrid}.
 
 The layers of the deep character-based LSTM are always initialized with {\it
 zero} states. One might propose to connect hidden
-states of the word-based LSTM to the character-based model; however, we chose this design
+states of the word-based LSTM to the character-based model; however, I chose this design
 for various reasons. First, it simplifies the architecture. Second, it allows
-for efficiency through {\it precomputation}: before each mini-batch, we can compute
+for efficiency through {\it precomputation}: before each mini-batch, I can compute
 representations for rare source words all at once. All instances of the same
 word share the same embedding, so the computation is per {\it type}.\footnote{While \newcite{ling15char} found that it is slow and difficult to train
-source character-level models and had to resort to pretraining, we demonstrate
-later that we can train our deep character-level LSTM %in the experiment section 
+source character-level models and had to resort to pretraining, I demonstrate
+later that I can train my deep character-level LSTM %in the experiment section 
 perfectly fine in an end-to-end fashion.} 
 
 %This approach is inspired by the work
 %of \cite{luong13} which also computes on-the-fly representations
-%for rare words. Their work, however, is different from ours in that the representations
+%for rare words. Their work, however, is different from mine in that the representations
 %are derived from morphemes, with recursive neural networks, and for
 %the language modeling task.
 
@@ -290,7 +285,7 @@ perfectly fine in an end-to-end fashion.}
 %\centering
 %\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0 0]{vocabulary.\imgExt}
 %\caption{{\bf A unified view of hybrid NMT} -- as the word vocabulary size
-%approaches zero, we obtain character-based NMT; whereas, large vocabulary
+%approaches zero, I obtain character-based NMT; whereas, large vocabulary
 %sizes lead to word-based NMT.}
 %\label{f:vocabulary}
 %\end{figure}
@@ -298,7 +293,7 @@ perfectly fine in an end-to-end fashion.}
 
 \subsection{Target Character-level Generation}
 \label{subsec:tgt}
-%Next, we describe box (b) in Figure~\ref{f:word}.
+%Next, I describe box (b) in Figure~\ref{f:word}.
 General word-based NMT allows generation of \unk{} in the target output.
 %will accept the fact when generating target words, \unk{} can be emitted. 
 Afterwards, there is usually a post-processing step that handles
@@ -309,16 +304,16 @@ While this approach works, it suffers from various problems such as alphabet
 mismatches between the source and target vocabularies and multi-word
 alignments.
 %, as detailed in Section~\ref{subsec:rare}. 
-Our goal is to address all
+My goal is to address all
 these issues and create a
 coherent framework that handles an unlimited output vocabulary.
 %virtually has the ``post-processing'' step baked in and
 %learned automatically end-to-end. 
 
-Our solution is to have a separate deep LSTM that ``translates'' at the
-character level given the current word-level state. We train our system such
+My solution is to have a separate deep LSTM that ``translates'' at the
+character level given the current word-level state. I train my system such
 that whenever the word-level NMT
-produces an \unk{}, we can consult this character-level decoder to recover the correct surface form of the
+produces an \unk{}, I can consult this character-level decoder to recover the correct surface form of the
 unknown target word. This is illustrated in Figure~\ref{f:hybrid}.
 The training objective in \eq{e:obj} now becomes: %consists of two components:
 \begin{equation}
@@ -326,13 +321,13 @@ J = J_{w} + \alpha J_{c}
 \label{e:char_obj}
 \end{equation}
 Here, $J_{w}$ refers to the usual loss of the word-level NMT; in
-our example, it is the sum of the negative log likelihood of
+my example, it is the sum of the negative log likelihood of
 generating $\{\mbox{``un'', ``\unk{}'', ``chat'', ``\_''}\}$. The remaining component $J_c$
 corresponds to the loss incurred by the character-level 
 decoder when predicting characters, e.g., $\{\mbox{`j', `o', `l', `i',
 `\_'}\}$, of those rare words not in the
 target vocabulary. 
-%In our running example, the predicted characters are .
+%In my running example, the predicted characters are .
 
 
 \paragraph{Hidden-state Initialization} %Separated-path Target Generation}
@@ -342,7 +337,7 @@ context-independent, the target character-level generation requires the
 current word-level context to produce meaningful translation.
 This brings up an important
 question about what can best represent the current context so as to
-initialize the character-level decoder. We answer this question in the context
+initialize the character-level decoder. I answer this question in the context
 of the attention mechanism ($\S$\ref{sec:nmt}). 
 %, which has now become the defacto standard in NMT.
 
@@ -350,7 +345,7 @@ The final vector $\hs$, just before the
 softmax as shown in Figure~\ref{f:attn}, seems to be a good candidate to initialize the character-level decoder.
 The reason is that $\hs$ combines
 information from both the context vector $\co$ and the top-level recurrent
-state $\hi$. We refer to it later in our
+state $\hi$. I refer to it later in my
 experiments as the \textit{same-path} target generation approach.
 
 On the other hand, the same-path approach worries us because all vectors $\hs$
@@ -360,17 +355,17 @@ The reason is because $\hs$ is directly used in the softmax, \eq{e:softmax}, to 
 That might pose some challenges for the model to learn useful representations
 that can be used to accomplish two tasks at the same time, that is to predict
 \unk{} and to generate character sequences.
-To address that concern, we propose another approach called
+To address that concern, I propose another approach called
 the \textit{separate-path} target generation.
 
-Our separate-path target generation approach works as follows. We mimic the
+My separate-path target generation approach works as follows. I mimic the
 process described in \eq{e:hs} to create a counterpart vector $\hc$ that will be
 used to seed the character-level decoder:
 \begin{equation}
 \hc = \tanh(\Wc[\co; \hi])
 \label{e:hc}
 \end{equation} 
-Here, $\Wc$ is a new learnable parameter matrix, with which we
+Here, $\Wc$ is a new learnable parameter matrix, with which I
 hope to release $\W{}$ from the pressure of having to extract information
 relevant to both the word- and character-generation processes.
 %This approach is illustrated in Figure~\ref{f:tgtGen}.
@@ -390,7 +385,7 @@ LSTM cells of all layers and the hidden states of higher layers, all start with 
 %\rput(5.1,4.9){$\hs$}
 %%\rput(0.9,1.9){$\his$}
 %\includegraphics[width=0.35\textwidth, clip=true, trim= 0 0 0 0]{tgtGen.\imgExt}
-%\caption{{\bf Target generation for rare words} -- the backbone of our hybrid architecture. Boxes
+%\caption{{\bf Target generation for rare words} -- the backbone of my hybrid architecture. Boxes
 %mark the character-level components for: (a) computing source word
 %representations and (b) generating target words.}
 %%to take advantages of the
@@ -404,21 +399,21 @@ character component ($\S$\ref{subsec:src}).
 This is because of the context-dependent nature of the decoder.
 %\footnote{For memory efficiency, the character-level backward pass can be executed right
 %after the character-level forward pass
-%and we can split these computations into
+%and I can split these computations into
 %mini-batches if the number of \unk{} is large.}
 
 %initialized hidden states are different across time steps and across sentences even if the surface
 %forms to be generated are the same. 
 
-%For speed efficiency, we run a forward pass
-%over the word-level decoder first. Then, we invoke, in batch mode, a forward
+%For speed efficiency, I run a forward pass
+%over the word-level decoder first. Then, I invoke, in batch mode, a forward
 %pass over the character-level decoder for the surface forms of all the \unk{} tokens.
 
 \paragraph{Word-Character Generation Strategy}
 \label{subsubsec:strategy}
-With the character-level decoder, we can view the final hidden states as representations for
+With the character-level decoder, I can view the final hidden states as representations for
 the surface forms of unknown tokens and could have fed these to the next
-time step. However, we chose not to do so for the efficiency reason explained
+time step. However, I chose not to do so for the efficiency reason explained
 next; instead, \unk{} is fed to the word-level decoder
 ``as is'' using its corresponding word embedding.
 % as illustrated in Figure~\ref{f:word}. 
@@ -427,11 +422,11 @@ During {\it training}, this design choice decouples all executions over \unk{} i
 character-level decoder as soon the word-level NMT
 completes. As such, the forward and backward passes of the character-level
 decoder over rare words can be invoked in batch mode. At {\it test} time,
-our strategy is to first run a beam search decoder at the word level to
+my strategy is to first run a beam search decoder at the word level to
 find the best translations given by the
-word-level NMT. Such translations contains \unk{} tokens, so we utilize our
+word-level NMT. Such translations contains \unk{} tokens, so I utilize my
 character-level decoder with beam search to generate actual words for these \unk{}.
-%We aggregate the word- and charater-level
+%I aggregate the word- and charater-level
 %decoding scores according to the formula in \eq{e:char_obj} and find the best
 %translation according to the combined scores.
 % \todo{Implement this scheme to take
@@ -439,22 +434,22 @@ character-level decoder with beam search to generate actual words for these \unk
 
 \hide{
 \subsection{Sampling for Better Rare Word Learning}
-When the vocabulary size is large, i.e., when our hybrid NMT system is closer to a
+When the vocabulary size is large, i.e., when my hybrid NMT system is closer to a
 word-based one, it is often the case that a frequent word appears in
 the vocabulary but not its derived forms. In
 these cases, character-level models will only be able to learn to represent
 rare words, e.g., ``distinctiveness'', but not their related but frequent forms, e.g.,
 ``distinct''. This implies
-that our hybrid NMT may have ignored valuable information about the
+that my hybrid NMT may have ignored valuable information about the
 relationship among many words. 
 
-To tackle this problem, we
+To tackle this problem, I
 propose a sampling approach to occasionally select frequent words in a
 training mini-batch and view them as rare
 words so that character-level models can learn from them.
-The number of frequent words we sample per 
+The number of frequent words I sample per 
 mini-batch is counted by {\it type} on the source side  and by {\it
-token} on the target side. This is in accordance with how we sample rare words
+token} on the target side. This is in accordance with how I sample rare words
 to build character-based representations and perform character-level generation in
 Section~\ref{subsec:src} and \ref{subsec:tgt} respectively. 
 
@@ -471,15 +466,15 @@ even if the target words to be predicted are not \unk{}.
 
 \section{Experiments}
 \label{sec:exp}
-We evaluate the effectiveness of our models on the publicly available WMT'15
+I evaluate the effectiveness of my models on the publicly available WMT'15
 translation task from English into Czech with 
 {\it newstest2013} (3000 sentences) as
-a development set % to select our hyperparameters. 
+a development set % to select my hyperparameters. 
 and {\it newstest2015} (2656 sentences) as a test set. Two metrics are used: case-sensitive NIST BLEU \cite{Papineni02bleu}
-and \chr{} \cite{chrf}.\footnote{For NIST BLEU, we first run
+and \chr{} \cite{chrf}.\footnote{For NIST BLEU, I first run
 \texttt{detokenizer.pl} % with default setting 
 and then use \texttt{mteval-v13a}
-to compute the scores as per WMT guideline. For \chr{}, we utilize the implementation here
+to compute the scores as per WMT guideline. For \chr{}, I utilize the implementation here
 \url{https://github.com/rsennrich/subword-nmt}.}
 The latter measures the amounts of overlapping character $n$-grams and has
 been argued to be a better metric for translation tasks out of English.
@@ -487,7 +482,7 @@ been argued to be a better metric for translation tasks out of English.
 \subsection{Data}
 Among the available language pairs in WMT'15, all involving English, 
 %between English and German, French, Finnish, Czech, and Russian, 
-we choose {\it Czech} as a target language for several reasons. First and
+I choose {\it Czech} as a target language for several reasons. First and
 foremost, Czech is a Slavic language with not only rich
 and complex inflection,
 but also fusional morphology in which a single morpheme can encode multiple
@@ -496,7 +491,7 @@ vocabulary (about 1.5 to 2 times bigger than that of English according to
 statistics in Table~\ref{t:data}) and is a challenging language to translate
 into. Furthermore, this language pair has a large
 amount of training data, so %, much bigger than English-Finnish and English-German
-we can evaluate at scale. Lastly, though our techniques are language
+I can evaluate at scale. Lastly, though my techniques are language
 independent, it is easier for us to work with Czech since Czech uses the Latin alphabet with some
 diacritics. % than Russian 
 
@@ -525,26 +520,26 @@ diacritics. % than Russian
 %  200-char & \multicolumn{2}{c|}{98.7\%} & \multicolumn{2}{c}{99.5\%}
 \end{tabular}
 %}
-\caption[WMT'15 English-Czech data]{{\bf WMT'15 English-Czech data} -- shown are various statistics of our training
+\caption[WMT'15 English-Czech data]{{\bf WMT'15 English-Czech data} -- shown are various statistics of my training
 data such as {\it sentence}, {\it token} (word and character counts), as well as
 {\it type} (sizes of the word and character vocabularies).
 %under two conditions, {\it
 %full} (all words) and {\it filtered} (top 500K frequent words). 
-We show in addition the amount of words in a vocabulary expressed by a list of 200 characters found
+I show in addition the amount of words in a vocabulary expressed by a list of 200 characters found
 in frequent words.}
 \label{t:data}
 \end{table}
 
-In terms of preprocessing, we apply only the standard tokenization practice.\footnote{Use \texttt{tokenizer.perl} in Moses with
-default settings.} We choose for each language a list of 200
+In terms of preprocessing, I apply only the standard tokenization practice.\footnote{Use \texttt{tokenizer.perl} in Moses with
+default settings.} I choose for each language a list of 200
 characters found in frequent words, which, as shown in Table~\ref{t:data}, can
 represent more than 98\% of the vocabulary. 
 
-%In our current experiments, we only consider
+%In my current experiments, I only consider
 %the top 500K frequent words per language.\footnote{All remaining words are
 %represented by a \rare{} token. This is mostly historical when
-%training our early models. Better models trained on full vocabularies are under
-%the way and we will report results in the next version.}
+%training my early models. Better models trained on full vocabularies are under
+%the way and I will report results in the next version.}
 
 \begin{table*}%[tbh!]
 \centering
@@ -566,7 +561,7 @@ represent more than 98\% of the vocabulary.
 %  \hdashline
 (c) & \biformat{Ensemble} 4 models + unk replace \cite{jean15wmt} & 200K & - & - & 18.3 & - \\
   \hline
-\multicolumn{7}{c}{Our {\it word-based} NMT}\\
+\multicolumn{7}{c}{My {\it word-based} NMT}\\
   \hline
 %(d) & Base & 50K & - & 8.7 & - & 12.6 & 32.8\\
 %  \hdashline
@@ -574,7 +569,7 @@ represent more than 98\% of the vocabulary.
 %  \hdashline
 (e) & \biformat{Ensemble} 4 models + unk replace & 50K & - & - & 18.4 & 43.9 \\
   \hline
-\multicolumn{7}{c}{Our {\it character-based} NMT}\\
+\multicolumn{7}{c}{My {\it character-based} NMT}\\
   \hline
 (f) & Base-512 (600-step backprop) & 200 & - & 2.4 & 3.8 & 25.9\\
 (g) & Base-512 + attention (600-step backprop) & 200 & - & 1.6 & 17.5 &
@@ -582,7 +577,7 @@ represent more than 98\% of the vocabulary.
   \hdashline
 (h) & Base-1024 + attention (300-step backprop) & 200 & - & 1.9 & 15.7 & 41.1 \\
   \hline
-\multicolumn{7}{c}{Our {\it hybrid} NMT}\\
+\multicolumn{7}{c}{My {\it hybrid} NMT}\\
   \hline
 %(j) & Base + attention + same-path & 1K & 200 & 3.3 & 1.72 & 12.9 (5.0) & 36.3\\
 % \hdashline
@@ -600,7 +595,7 @@ represent more than 98\% of the vocabulary.
 the vocabulary sizes, perplexities, BLEU, and \chr{} scores of various systems on
 {\it newstest2015}. Perplexities are listed under two
 categories, word (w) and character (c). 
-% For BLEU scores, we report results before \unk{} tokens are handled in parentheses. 
+% For BLEU scores, I report results before \unk{} tokens are handled in parentheses. 
 {\bf Best} and
 \biformat{important} results per
 metric are highlighed.
@@ -612,13 +607,13 @@ metric are highlighed.
 
 
 \subsection{Training Details}
-We train three types of systems, purely {\it word-based}, purely {\it
+I train three types of systems, purely {\it word-based}, purely {\it
 character-based}, and {\it hybrid}.
 Common to these architectures is a word-based NMT since the
 character-based systems are essentially word-based ones with
 longer sequences and the core of hybrid models is also a word-based NMT.
 
-In training word-based NMT, we follow \newcite{luong15attn} to use the global attention mechanism together with
+In training word-based NMT, I follow \newcite{luong15attn} to use the global attention mechanism together with
 similar hyperparameters: (a) deep LSTM models, 4 layers, 1024
 cells, and 1024-dimensional embeddings, (b) uniform initialization of
 parameters in $[-0.1, 0.1]$, (c) 6-epoch training with plain SGD and a simple learning
@@ -627,18 +622,18 @@ halve the learning rate every 0.5 epoch, (d) mini-batches are of
 size 128 and shuffled, (e) the gradient is rescaled whenever its norm exceeds 5, and (f)
 dropout is used with probability $0.2$ according to 
 \cite{pham2014dropout}.
-%Unless otherwise stated, the above settings are used for most of our systems. 
-We now detail differences across the three architectures.
-%Our code is implemented in MATLAB. %\footnote{Publicly available at \url{http://annonymized}.} 
-%When running on a single GPU device Tesla K40, we achieve a speed of 1K {\it
+%Unless otherwise stated, the above settings are used for most of my systems. 
+I now detail differences across the three architectures.
+%My code is implemented in MATLAB. %\footnote{Publicly available at \url{http://annonymized}.} 
+%When running on a single GPU device Tesla K40, I achieve a speed of 1K {\it
 %target} words per second. It takes 7--10 days to completely train a model.
 
 
-{\bf Word-based NMT} -- We constrain our source and target sequences to
+{\bf Word-based NMT} -- I constrain my source and target sequences to
 have a maximum length of 50 each; words that go past the boundary are ignored.
 The vocabularies are limited to the top $|V|$ most % 50K most
 frequent words in both languages. Words not in these vocabularies
-are converted into \unk{}. After translating, we will perform
+are converted into \unk{}. After translating, I will perform
 dictionary\footnote{Obtained from the alignment links produced by the Berkeley
 aligner \cite{liang06alignment} over
 the training corpus.} lookup or
@@ -648,23 +643,23 @@ technique \cite{luong15,jean15}.
 
 {\bf Character-based NMT} -- The source and
 target sequences at the character level are often about 5 times longer than their counterparts in the
-word-based models as we can infer from the statistics in
-Table~\ref{t:data}. Due to memory constraint in GPUs, we limit our source and
-target sequences to a maximum length of 150 each, i.e., we backpropagate
+word-based models as I can infer from the statistics in
+Table~\ref{t:data}. Due to memory constraint in GPUs, I limit my source and
+target sequences to a maximum length of 150 each, i.e., I backpropagate
 through at most 300 timesteps from the decoder to the encoder. With
-smaller 512-dimensional models, we can afford to have longer sequences with up
+smaller 512-dimensional models, I can afford to have longer sequences with up
 to 600-step backpropagation. 
 %The vocabularies are limited to the first 200 characters appearing in top frequent
 %words of each language.
 
 {\bf Hybrid NMT} -- The {\it word}-level component uses the
 same settings as the purely word-based NMT. For the {\it character}-level source
-and target components, we experiment with both shallow and deep 1024-dimensional models of
+and target components, I experiment with both shallow and deep 1024-dimensional models of
 1 and 2 LSTM layers. 
 %Similar to the purely
-%character-based NMT, we use a vocabulary of 200 characters per language. 
-We
-set the weight $\alpha$ in \eq{e:char_obj} for our character-level loss to
+%character-based NMT, I use a vocabulary of 200 characters per language. 
+I
+set the weight $\alpha$ in \eq{e:char_obj} for my character-level loss to
 $1.0$.
 
 {\bf Training Time} -- It takes about 3 weeks to train a word-based model with
@@ -674,7 +669,7 @@ models with the same vocabulary size.
 
 \subsection{Results}
 
-We compare our models with several strong systems. These include the
+I compare my models with several strong systems. These include the
 winning entry in WMT'15, which was
 trained on a much larger amount of data, 52.6M parallel
  and 393.0M monolingual sentences \cite{bojar15wmt}.\footnote{This
@@ -685,22 +680,22 @@ post-editing system with hand-crafted rules to correct errors
 in morphological agreement and semantic meanings, e.g., loss of negation.}
 % 14.83 + 0.65 + 33.25 + 3.82 = 52.55
 % 305.41 + 38.42 + 0.2 + 4.81 + 44.08 = 392.92M
-In contrast, we merely use the
+In contrast, I merely use the
 provided parallel corpus of 15.8M sentences. % as shown in Table~\ref{t:data}.
-For NMT, to the best of our knowledge, \cite{jean15wmt} has
+For NMT, to the best of my knowledge, \cite{jean15wmt} has
 the best published performance on English-Czech.
-%We present results for some of our models and 
+%I present results for some of my models and 
 %analyze the rest in Section~\ref{sec:analysis} later. 
 
 As shown in Table~\ref{t:encs}, for a purely {\it word-based} approach, 
-%we achieve
+%I achieve
 %progressive improvements when using attention and performing unk replacement.
-our single NMT model outperforms the best single model in \cite{jean15wmt} by
+my single NMT model outperforms the best single model in \cite{jean15wmt} by
 +$1.8$ points despite
 using a smaller vocabulary of only 50K words versus 200K words. 
-Our ensemble system {\it (e)} slightly outperforms the best previous NMT system with $18.4$ BLEU.
+My ensemble system {\it (e)} slightly outperforms the best previous NMT system with $18.4$ BLEU.
 
-To our surprise, purely {\it character-based} models, though extremely slow to
+To my surprise, purely {\it character-based} models, though extremely slow to
 train and test, perform quite well. The $512$-dimensional attention-based model \modelchar{} is
 best, surpassing the single word-based model in
 \cite{jean15wmt} despite having much fewer parameters. It even outperforms most NMT
@@ -708,15 +703,15 @@ systems
 on \chr{} with $46.6$ points. This indicates that this model translate words that closely but
 not exactly match the reference ones as evidenced in
 Section~\ref{subsec:samples}. 
-We notice two interesting observations. First,
+I notice two interesting observations. First,
 attention is critical for character-based models to work as is obvious from the
 poor performance of the non-attentional model; this has also been shown in speech
 recognition \cite{chan16}. Second, long time-step backpropagation is more important
 as reflected by the fact that the larger $1024$-dimensional model {\it (h)} with shorter
 backprogration is inferior to \modelchar{}. 
 
-%Lastly, % for our {\it hybrid} models, 
-%results in Table~\ref{t:encs} justify why our proposed {\it hybrid} 
+%Lastly, % for my {\it hybrid} models, 
+%results in Table~\ref{t:encs} justify why my proposed {\it hybrid} 
 %architecture is needed. With only 1K words, the model {\it (j)} achieves a
 %non-trivial performance of $12.9$ BLEU thanks to an improvement of +$7.9$ points
 %given by the character-level components when replacing \unk{}.\footnote{A purely word-based model with 1K words (trained
@@ -726,42 +721,42 @@ backprogration is inferior to \modelchar{}.
 %This suggests
 %that an extreme hybrid system with $W\!=\!0$, a close approximation to those of
 %\cite{ling15char}, will not work well. As such, among similar hierarchical
-%models, our word-character approach is preferred.
+%models, my word-character approach is preferred.
 
 
-Our {\it hybrid} models achieve the best results. 
-At 10K words, we demonstrate that our {\it
+My {\it hybrid} models achieve the best results. 
+At 10K words, I demonstrate that my {\it
 separate-path} strategy for the character-level target generation
 ($\S$\ref{subsubsec:h}) is effective, yielding an improvement of +$1.5$ BLEU
 points when comparing systems {\it (j)} vs. {\it (i)}. A {\it deeper} character-level architecture of 2 LSTM
 layers provides another significant
 boost of +$2.1$ BLEU. % for the system \modelsmall{}, 
 %with the lowest character-level perplexity of $1.59$.
-With $17.7$ BLEU points, our hybrid system \modelsmall{} has
+With $17.7$ BLEU points, my hybrid system \modelsmall{} has
 surpassed word-level NMT models.
-%This proves that our hybrid model has successfully replaced the
+%This proves that my hybrid model has successfully replaced the
 %standard unk replacement
 %process, offering a large improvement of +$6.2$ BLEU over the case
 %when \unk{} is not handled.
 
-When extending to 50K words, we further improve the translation quality.
-Our best single model, system \model{} with $19.6$ BLEU, is already better than all
+When extending to 50K words, I further improve the translation quality.
+My best single model, system \model{} with $19.6$ BLEU, is already better than all
 existing systems.
-Our ensemble model {\it (m)} further advances the SOTA
+My ensemble model {\it (m)} further advances the SOTA
 result to \biformat{\ensbleu} BLEU, outperforming
 the winning entry in the WMT'15 English-Czech translation task by a large margin
-of +$1.9$ points. Our ensemble model is also best in terms of \chr{} with \biformat{47.5} points.
-%\footnote{Note that, our other models
+of +$1.9$ points. My ensemble model is also best in terms of \chr{} with \biformat{47.5} points.
+%\footnote{Note that, my other models
 %combining both the separate-path approach and the 2-layer character-level
-%components have not converged yet. We expect to obtain even better results in
-%the next version of our paper.}
+%components have not converged yet. I expect to obtain even better results in
+%the next version of my paper.}
 
 \begin{figure}%[tbh]
 \centering
 \includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/5-vocab}
 \caption[Vocabulary size effect]{{\bf Vocabulary size effect} -- shown are the performances of different
-systems as we vary their vocabulary sizes. We highlight the improvements obtained
-by our hybrid models over word-based systems which already handle unknown words.}
+systems as I vary their vocabulary sizes. I highlight the improvements obtained
+by my hybrid models over word-based systems which already handle unknown words.}
 \label{f:vocab}
 \end{figure}
 
@@ -770,10 +765,10 @@ by our hybrid models over word-based systems which already handle unknown words.
 \centering
 \includegraphics[width=\textwidth, clip=true, trim= 100 50 0 20]{img/5-emb}
 \caption[Barnes-Hut-SNE visualization of source word representations]{{\bf Barnes-Hut-SNE visualization of source word representations} --
-shown are sample words from the {\it Rare Word} dataset. We differentiate two types of
+shown are sample words from the {\it Rare Word} dataset. I differentiate two types of
 embeddings: {\color{blue} frequent} words in which encoder embeddings are looked up directly and {\it {\color{magenta} rare}} words
-where we build representations from characters. Boxes highlight examples that
-we will discuss in the text. We use the hybrid model \model{} in this visualization.}
+where I build representations from characters. Boxes highlight examples that
+I will discuss in the text. I use the hybrid model \model{} in this visualization.}
 \label{f:visual}
 \end{figure*}
 
@@ -781,39 +776,39 @@ we will discuss in the text. We use the hybrid model \model{} in this visualizat
 \section{Analysis}
 \label{sec:analysis}
 This section first studies the effects of vocabulary sizes towards
-translation quality. We then analyze more carefully 
-our character-level components by visualizing and evaluating rare word
+translation quality. I then analyze more carefully 
+my character-level components by visualizing and evaluating rare word
 embeddings as well as examining sample translations.
 
 \subsection{Effects of Vocabulary Sizes}
-As shown in Figure~\ref{f:vocab}, our hybrid models offer large gains of
+As shown in Figure~\ref{f:vocab}, my hybrid models offer large gains of
 +\gain{} BLEU points over strong word-based systems which already handle unknown words.
-With only a small vocabulary, e.g., 1000 words, our hybrid approach can produce
+With only a small vocabulary, e.g., 1000 words, my hybrid approach can produce
 systems that are better than word-based models that possess much larger
-vocabularies. While it appears from the plot that gains diminish as we
-increase the vocabulary size, we argue that our hybrid models are still
+vocabularies. While it appears from the plot that gains diminish as I
+increase the vocabulary size, I argue that my hybrid models are still
 preferable since they understand word structures and can handle new complex
 words at test time as illustrated in Section~\ref{subsec:samples}.
 %Lastly, it is desirable to continue increasing the
-%vocabulary size to see at which point we stop benefiting from the hybrid
+%vocabulary size to see at which point I stop benefiting from the hybrid
 %approach. It is also very interesting to  
 
 
 \subsection{Rare Word Embeddings}
-We evaluate the {\it source} character-level model by building representations
+I evaluate the {\it source} character-level model by building representations
 for rare words and measuring how good these embeddings are.
 
-Quantitatively, we follow \newcite{luong13} in using the word similarity task,
+Quantitatively, I follow \newcite{luong13} in using the word similarity task,
 specifically on the {\it Rare Word} dataset, to judge the learned representations for
 complex words. The evaluation metric is the Spearman's correlation $\rho$
 between similarity scores assigned by a model and by human annotators.
-From the results in Table~\ref{t:word_sim}, we can see that source representations produced by
-our hybrid\footnote{We look up the encoder embeddings for frequent words and build representations for
+From the results in Table~\ref{t:word_sim}, I can see that source representations produced by
+my hybrid\footnote{I look up the encoder embeddings for frequent words and build representations for
 rare word from characters.}  models
-are significantly better than those of the word-based one. It is noteworthy that our deep recurrent
+are significantly better than those of the word-based one. It is noteworthy that my deep recurrent
 character-level models can outperform the model of \cite{luong13}, which uses
 recursive neural networks and requires a complex morphological analyzer, by a large
-margin. Our performance is also competitive to the best Glove embeddings
+margin. My performance is also competitive to the best Glove embeddings
 \cite{pennington2014} which were trained on a much larger dataset.
 \begin{table}[tbh!]
 \centering
@@ -826,7 +821,7 @@ margin. Our performance is also competitive to the best Glove embeddings
 \multicolumn{2}{l|}{\multirow{2}{*}{Glove \cite{pennington2014}}} & 6B & 400K & 38.1 \\
 \multicolumn{2}{l|}{} & 42B & 400K & \bf{47.8} \\
   \hline
-\multicolumn{4}{c}{{\it Our NMT models}}\\
+\multicolumn{4}{c}{{\it My NMT models}}\\
   \hline
 \modelword{} & Word-based & 0.3B & 50K & 20.4 \\
   \hdashline
@@ -843,11 +838,11 @@ of various models (with different vocab sizes $|V|$).
 \end{table}
 
 
-Qualitatively, we visualize embeddings produced by the hybrid model \model{} for
+Qualitatively, I visualize embeddings produced by the hybrid model \model{} for
 selected words in the Rare Word dataset.
 Figure~\ref{f:visual} shows the two-dimensional representations of words
 computed by the
-Barnes-Hut-SNE algorithm \cite{bhsne}.\footnote{We run Barnes-Hut-SNE algorithm
+Barnes-Hut-SNE algorithm \cite{bhsne}.\footnote{I run Barnes-Hut-SNE algorithm
 over a set of 91 words, but filter out 27 words for displaying clarity.} It is extremely interesting to observe that
 words are clustered together not only by the word structures but also by
 the meanings. For example, in the top-left box,
@@ -855,7 +850,7 @@ the {\it character}-based representations for \word{loveless}, \word{spiritless}
 but clearly separated into two groups. Similarly, in the center boxes, {\it
 word}-based embeddings of
 \word{acceptable}, \word{satisfactory}, \word{unacceptable}, and \word{unsatisfactory}, are
-close by but separated by meanings. Lastly, the remaining boxes demonstrate that our
+close by but separated by meanings. Lastly, the remaining boxes demonstrate that my
 character-level models are able to build representations comparable to the
 word-based ones, e.g., \word{impossibilities} vs.\ \word{impossible} and \word{antagonize}
 vs.\ \word{antagonist}. All of this evidence strongly supports that the source
@@ -966,9 +961,9 @@ Bartov\'a} , \u{r}\'ikala ,
 \end{tabular}
 }
 \caption[Sample translations on newstest2015]{{\bf Sample translations on newstest2015} -- %examples in both translation directions.
-for each example, we show the {\it source}, {\it human} translation, and
+for each example, I show the {\it source}, {\it human} translation, and
 translations of the following NMT systems: {\it word} model \modelword{},
-{\it char} model \modelchar{}, and {\it hybrid} model \modelsmall{}. We show the
+{\it char} model \modelchar{}, and {\it hybrid} model \modelsmall{}. I show the
 translations before replacing \unk{} tokens (if any) for the word-based 
 and hybrid models. The following formats are used to highlight
 \correct{correct}, \wrong{wrong}, and \close{close} translation segments.}
@@ -979,8 +974,8 @@ and hybrid models. The following formats are used to highlight
 \subsection{Sample Translations}
 \label{subsec:samples}
 
-We show in Table~\ref{t:sample} sample translations between various systems. 
-In the first example, our hybrid model translates perfectly. The word-based
+I show in Table~\ref{t:sample} sample translations between various systems. 
+In the first example, my hybrid model translates perfectly. The word-based
 model fails to translate \word{diagnosis} because the second \unk{} was incorrectly
 aligned to the word \word{after}. The character-based model, on the other hand,
 makes a mistake in translating names.
@@ -999,7 +994,7 @@ their ability to translate compound words exactly, e.g., \word{11-year-old} and
 strategy of the word-based model fails.
 %The hybrid model is better than the character-based models in many translation
 %examples, e.g., ``na'', ``obvin\u{e}n\'im'', ``Glasgow'' etc. 
-Of course, our hybrid model does make mistakes, e.g., it fails to translate the name
+Of course, my hybrid model does make mistakes, e.g., it fails to translate the name
 \word{Shani Bart}. 
 Overall, these examples highlight how challenging translating
 into Czech is and that being able to translate at the character level helps
@@ -1007,26 +1002,26 @@ improve the quality.
 
 \section{Conclusion}
 \label{sec:conclude}
-We have proposed a novel {\it hybrid} architecture that combines the strength
+I have proposed a novel {\it hybrid} architecture that combines the strength
 of both word- and character-based models. Word-level models are fast to train
 and offer high-quality translation; whereas, character-level models help achieve
 the goal of open vocabulary NMT. 
-We have demonstrated these two aspects through our experimental results and
+I have demonstrated these two aspects through my experimental results and
 translation examples.
 
-Our best hybrid model has surpassed the performance of both the best word-based
+My best hybrid model has surpassed the performance of both the best word-based
 NMT system and the best non-neural model to establish a new state-of-the-art result for 
 English-Czech translation in WMT'15 with $\ensbleu{}$ BLEU.
-Moreover, we have succeeded in replacing the standard unk replacement technique
-in NMT with our character-level components, yielding an improvement of 
-+$\gain{}$ BLEU points. Our analysis has shown that our model has the ability to
+Moreover, I have succeeded in replacing the standard unk replacement technique
+in NMT with my character-level components, yielding an improvement of 
++$\gain{}$ BLEU points. My analysis has shown that my model has the ability to
 not only generate well-formed words for
 Czech, a highly inflected language with an enormous and complex vocabulary, but
 also build accurate representations for English source words.
 
-Additionally, we have demonstrated the potential of purely character-based
+Additionally, I have demonstrated the potential of purely character-based
 models in producing good translations;
-they have outperformed past word-level NMT models. For future work, we hope to be able to improve the memory usage and
+they have outperformed past word-level NMT models. For future work, I hope to be able to improve the memory usage and
 speed of purely character-based models.
 
 
