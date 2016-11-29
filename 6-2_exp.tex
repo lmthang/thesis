@@ -1,7 +1,7 @@
 % !TEX root = acl2016.tex
 
-We evaluate the effectiveness of our pruning approaches on a state-of-the-art
-NMT model.\footnote{We thank the authors of \cite{luong15attn}
+I evaluate the effectiveness of my pruning approaches on a state-of-the-art
+NMT model.\footnote{I thank the authors of \cite{luong15attn}
 for providing their trained models and assistance in using the codebase
 at \url{https://github.com/lmthang/nmt.matlab}.} 
 Specifically, an attention-based English-German NMT system from
@@ -9,7 +9,7 @@ Specifically, an attention-based English-German NMT system from
 %This system uses the global attention mechanism with the dot-product function and the input-feeding approach. 
 Training data was obtained from WMT'14 consisting
 of 4.5M sentence pairs (116M English words, 110M German words). For
-more details on training hyperparameters, we refer readers to Section 4.1 of
+more details on training hyperparameters, I refer readers to Section 4.1 of
 \cite{luong15attn}.
 All models are tested on newstest2014 (2737 sentences). 
 The model achieves a
@@ -18,31 +18,31 @@ perplexity of 6.1 and a BLEU score of
 is reported under row {\it global (dot)} in Table 4 of
 \cite{luong15attn}.}
 
-When {\it retraining} pruned NMT systems, we use the following settings: (a) we start
+When {\it retraining} pruned NMT systems, I use the following settings: (a) I start
 with a smaller learning rate of 0.5 (the original model uses a learning rate of
-1.0), (b) we train for fewer epochs, 4 instead of 12, using plain SGD, (c) a simple learning
-rate schedule is employed; after 2 epochs, we begin to halve the learning rate
+1.0), (b) I train for fewer epochs, 4 instead of 12, using plain SGD, (c) a simple learning
+rate schedule is employed; after 2 epochs, I begin to halve the learning rate
 every half an epoch, and (d) all other hyperparameters are the same, such as
 mini-batch size 128, maximum gradient norm 5, and dropout with probability 0.2.
 
 \subsubsection{Comparing pruning schemes}
 \label{subsubsec:exp_schemes}
-Despite its simplicity, we observe in Figure~\ref{fig:pruning_methods} that {\it
+Despite its simplicity, I observe in Figure~\ref{fig:pruning_methods} that {\it
 class-blind} pruning outperforms both other schemes in terms of translation
 quality at all pruning percentages.
-In order to understand this result, for each of the three pruning schemes, we pruned each class separately and recorded the effect on performance (as measured by perplexity).
-Figure \ref{fig:breakdown} shows that with class-uniform pruning, the overall performance loss is caused disproportionately by a few classes: target layer 4, attention and softmax weights. Looking at Figure \ref{fig:scatter}, we see that the most damaging classes to prune also tend to be those with weights of greater magnitude --- these classes have much larger weights than others at the same percentile, so pruning them under the class-uniform pruning scheme is more damaging. The situation is similar for class-distribution pruning.
+In order to understand this result, for each of the three pruning schemes, I pruned each class separately and recorded the effect on performance (as measured by perplexity).
+Figure \ref{fig:breakdown} shows that with class-uniform pruning, the overall performance loss is caused disproportionately by a few classes: target layer 4, attention and softmax weights. Looking at Figure \ref{fig:scatter}, I see that the most damaging classes to prune also tend to be those with weights of greater magnitude --- these classes have much larger weights than others at the same percentile, so pruning them under the class-uniform pruning scheme is more damaging. The situation is similar for class-distribution pruning.
 
 
 
 By contrast, Figure \ref{fig:breakdown} shows that under class-blind pruning, the damage caused by pruning softmax, attention and target layer 4 weights is greatly decreased, and the contribution of each class towards the performance loss is overall more uniform.
 In fact, the distribution begins to reflect the number of parameters in each class --- for example, the source and target embedding classes have larger contributions because they have more weights. 
-We use only class-blind pruning for the rest of the experiments.
+I use only class-blind pruning for the rest of the experiments.
 
 Figure \ref{fig:breakdown} also reveals some interesting information about the
 distribution of redundancy in NMT architectures --- namely it seems that higher
 layers are more important than lower layers, and that attention and softmax
-weights are crucial. We will explore the distribution of redundancy further in
+weights are crucial. I will explore the distribution of redundancy further in
 Section \ref{subsubsec:redundancy}.
 
 \begin{figure}
@@ -59,11 +59,11 @@ pruning.}
 
 
 Pruning has an immediate negative impact on performance (as measured by BLEU) that is exponential in pruning percentage; this is demonstrated by the blue line in Figure \ref{fig:main_results}.
-However we find that up to about 40\% pruning, performance is mostly unaffected, indicating a large amount of redundancy and over-parameterization in NMT.
+However I find that up to about 40\% pruning, performance is mostly unaffected, indicating a large amount of redundancy and over-parameterization in NMT.
 
-We now consider the effect of retraining pruned models.
+I now consider the effect of retraining pruned models.
 The orange line in Figure \ref{fig:main_results} shows that after retraining the pruned models, baseline performance (20.48 BLEU) is both recovered and improved upon, up to 80\% pruning (20.91 BLEU), with only a small performance loss at 90\% pruning (20.13 BLEU).
-This may seem surprising, as we might not expect a sparse model to significantly out-perform a model with five times as many parameters.
+This may seem surprising, as I might not expect a sparse model to significantly out-perform a model with five times as many parameters.
 There are several possible explanations, two of which are given below.
 \begin{figure}
 \centering
@@ -74,7 +74,7 @@ Section \ref{subsec:sparse}).}
 \label{fig:main_results}
 \end{figure}
 
-Firstly, we found that the less-pruned models perform better on the training set than the validation set, whereas the more-pruned models have closer performance on the two sets. 
+Firstly, I found that the less-pruned models perform better on the training set than the validation set, whereas the more-pruned models have closer performance on the two sets. 
 This indicates that pruning has a regularizing effect on the retraining phase, though clearly more is not always better, as the 50\% pruned and retrained model has better validation set performance than the 90\% pruned and retrained model.
 Nonetheless, this regularization effect may explain why the pruned and retrained models outperform the baseline.
 \begin{figure}[tbh]
@@ -90,7 +90,7 @@ Nonetheless, this regularization effect may explain why the pruned and retrained
 \includegraphics[width=\textwidth]{img/6-2_redundancy_good} %trim = 0mm 130mm 300mm 0mm, clip, 
 \caption[Graphical representation of the location of small weights]{Graphical representation of the location of small weights in various parts of the model. 
 Black pixels represent weights with absolute size in the bottom 80\%; white pixels represent those with absolute size in the top 20\%.
-Equivalently, these pictures illustrate which parameters remain after pruning 80\% using our class-blind pruning scheme.
+Equivalently, these pictures illustrate which parameters remain after pruning 80\% using my class-blind pruning scheme.
 }
 \label{fig:redundancy_location}
 \end{figure*}
@@ -99,76 +99,76 @@ Equivalently, these pictures illustrate which parameters remain after pruning 80
 
 Alternatively, pruning may serve as a means to escape a local optimum. 
 Figure \ref{fig:loss_curve} shows the loss function over time during the training, pruning and retraining process.
-During the original training process, the loss curve flattens out and seems to converge (note that we use early stopping to obtain our baseline model, so the original model was trained for longer than shown in Figure \ref{fig:loss_curve}).
+During the original training process, the loss curve flattens out and seems to converge (note that I use early stopping to obtain my baseline model, so the original model was trained for longer than shown in Figure \ref{fig:loss_curve}).
 Pruning causes an immediate increase in the loss function, but enables further gradient descent, allowing the retraining process to find a new, better local optimum.
 It seems that the disruption caused by pruning is beneficial in the long-run.
 
 \subsubsection{Starting with sparse models}
 \label{subsec:sparse}
-The favorable performance of the pruned and retrained models raises the question: can we get a shortcut to this performance by \emph{starting} with sparse models?
-That is, rather than train, prune, and retrain, what if we simply prune then train?
-To test this, we took the sparsity structure of our 50\%--90\% pruned models, and trained completely new models with the same sparsity structure.
+The favorable performance of the pruned and retrained models raises the question: can I get a shortcut to this performance by \emph{starting} with sparse models?
+That is, rather than train, prune, and retrain, what if I simply prune then train?
+To test this, I took the sparsity structure of my 50\%--90\% pruned models, and trained completely new models with the same sparsity structure.
 The purple line in Figure \ref{fig:main_results} shows that the `sparse from the beginning' models do not perform as well as the pruned and retrained models, but they do come close to the baseline performance.
 This shows that while the sparsity structure alone contains useful information about redundancy and can therefore produce a competitive compressed model, it is important to interleave pruning with training.
 
-Though our method involves just one pruning stage, other pruning methods interleave pruning with training more closely by including several iterations \cite{collins2014memory,han2015learning}.
-We expect that implementing this for NMT would likely result in further compression and performance improvements.
+Though my method involves just one pruning stage, other pruning methods interleave pruning with training more closely by including several iterations \cite{collins2014memory,han2015learning}.
+I expect that implementing this for NMT would likely result in further compression and performance improvements.
 
 
 
 \subsubsection{Storage size}
 The original unpruned model (a MATLAB file) has size 782MB.
 The 80\% pruned and retrained model is 272MB, which is a 65.2\% reduction.
-In this work we focus on compression in terms of number of parameters rather than storage size, because it is invariant across implementations.
+In this work I focus on compression in terms of number of parameters rather than storage size, because it is invariant across implementations.
 
 \subsubsection{Distribution of redundancy in NMT}
 \label{subsubsec:redundancy}
 
-We visualize in Figure~\ref{fig:redundancy_location} the redundancy structore of
-our NMT baseline model.
+I visualize in Figure~\ref{fig:redundancy_location} the redundancy structore of
+my NMT baseline model.
 {\it Black} pixels represent weights near to zero (those that can be pruned); {\it white} pixels represent larger ones.
-First we consider the embedding weight matrices, whose columns correspond to words in the vocabulary.
-Unsurprisingly, in Figure \ref{fig:redundancy_location}, we see that the parameters corresponding to the less common words are more dispensable.
+First I consider the embedding weight matrices, whose columns correspond to words in the vocabulary.
+Unsurprisingly, in Figure \ref{fig:redundancy_location}, I see that the parameters corresponding to the less common words are more dispensable.
 In fact, at the 80\% pruning rate, for 100 uncommon source words and 1194
-uncommon target words, we delete \emph{all} parameters corresponding to that word.
+uncommon target words, I delete \emph{all} parameters corresponding to that word.
 This is not quite the same as removing the word from the vocabulary --- true out-of-vocabulary words are mapped to the embedding for the `unknown word' symbol, whereas these `pruned-out' words are mapped to a zero embedding.
 However in the original unpruned model these uncommon words already had near-zero embeddings, indicating that the model was unable to learn sufficiently distinctive representations.
 
 Returning to Figure \ref{fig:redundancy_location}, now look at the eight weight matrices for the source and target connections at each of the four layers.
 Each matrix corresponds to the $4n \times 2n$ matrix $T_{4n,2n}$ in Equation (\ref{eqn:lstm_1}).
-In all eight matrices, we observe --- as does \cite{lu2016learning} --- that the weights connecting to the input $\hat{h}$ are most crucial, followed by the input gate $i$, then the output gate $o$, then the forget gate $f$. 
+In all eight matrices, I observe --- as does \cite{lu2016learning} --- that the weights connecting to the input $\hat{h}$ are most crucial, followed by the input gate $i$, then the output gate $o$, then the forget gate $f$. 
 This is particularly true of the lower layers, which focus primarily on the input $\hat{h}$. 
 However for higher layers, especially on the target side, weights connecting to the gates are as important as those connecting to the input $\hat{h}$.
 The gates represent the LSTM's ability to add to, delete from or retrieve information from the memory cell.
 Figure \ref{fig:redundancy_location} therefore shows that these sophisticated memory cell abilities are most important at the \emph{end} of the NMT pipeline (the top layer of the decoder).
-This is reasonable, as we expect higher-level features to be learned later in a deep learning pipeline.
+This is reasonable, as I expect higher-level features to be learned later in a deep learning pipeline.
 
-We also observe that for lower layers, the feed-forward input is much more important than the recurrent input, whereas for higher layers the recurrent input becomes more important.
+I also observe that for lower layers, the feed-forward input is much more important than the recurrent input, whereas for higher layers the recurrent input becomes more important.
 This makes sense: lower layers concentrate on the low-level information from the current word embedding (the feed-forward input), whereas higher layers make use of the higher-level representation of the sentence so far (the recurrent input).
 
-Lastly, on close inspection, we notice several white diagonals emerging within
+Lastly, on close inspection, I notice several white diagonals emerging within
 some subsquares of the matrices in Figure \ref{fig:redundancy_location},
 indicating that even without initializing the weights to identity matrices
 (as is sometimes done \cite{le2015simple}),
 an identity-like weight matrix is learned. At higher pruning percentages, these diagonals become more pronounced.
 
-\subsection{Generalizability of our results}
-To test the generalizability of our results, we also test our pruning approach
+\subsection{Generalizability of my results}
+To test the generalizability of my results, I also test my pruning approach
 on a smaller, non-state-of-the-art NMT model trained on the WIT3 Vietnamese-English 
-dataset \cite{cettoloEtAl:EAMT2012}, which consists of 133,000 sentence pairs.
+dataset \cite{iwslt15}, which consists of 133,000 sentence pairs.
 This model is effectively a scaled-down version of the state-of-the-art model in \cite{luong15attn},
 with fewer layers, smaller vocabulary size, smaller hidden layer size, no attention mechanism,
 and about 11\% as many parameters in total.
 It achieves a BLEU score of 9.61 on the validation set.
 
-Although this model and its training set are on a different scale to our main model, 
+Although this model and its training set are on a different scale to my main model, 
 and the language pair is different, 
-we found very similar results. 
+I found very similar results. 
 For this model, it is possible to prune 60\% of parameters with no immediate performance loss,
 and with retraining it is possible to prune 90\%, and regain original performance.
-Our main observations from Section \ref{subsubsec:exp_schemes} %to \ref{subsubsec:redundancy}
+My main observations from Section \ref{subsubsec:exp_schemes} %to \ref{subsubsec:redundancy}
 are also replicated; in particular, class-blind pruning is most successful,
 `sparse from the beginning' models are less successful than pruned and retrained models,
-and we observe the same patterns as seen in Figure \ref{fig:redundancy_location}.
+and I observe the same patterns as seen in Figure \ref{fig:redundancy_location}.
 
 

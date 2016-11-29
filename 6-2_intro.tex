@@ -27,11 +27,11 @@ parameters, resulting in a storage size of hundreds of megabytes
 Though the trend for bigger and deeper neural networks has brought great progress, it has also introduced over-parameterization, resulting in long running times, overfitting, and the storage size issue discussed above. 
 A solution to the over-parameterization problem could potentially aid all three issues, though the first (long running times) is outside the scope of this paper.
 
-{\it Our contribution.}
-We investigate the efficacy of weight pruning for NMT as a means of compression.
-We show that despite its simplicity, magnitude-based pruning with retraining is highly effective, and we compare three magnitude-based pruning schemes --- \textit{class-blind}, \textit{class-uniform} and \textit{class-distribution}.
-Though recent work has chosen to use the latter two, we find the first and simplest scheme --- \textit{class-blind} --- the most successful.
-We are able to prune 40\% of the weights of a state-of-the-art NMT system with negligible performance loss, and by adding a retraining phase after pruning, we can prune 80\% with no performance loss.
-Our pruning experiments also reveal some patterns in the distribution of
-redundancy in NMT. In particular, we find that higher layers, attention and softmax weights are the most important, while lower layers and the embedding weights hold a lot of redundancy. 
-For the Long Short-Term Memory (LSTM) architecture, we find that at lower layers the parameters for the input are most crucial, but at higher layers the parameters for the gates also become important.
+{\it My contribution.}
+I investigate the efficacy of weight pruning for NMT as a means of compression.
+I show that despite its simplicity, magnitude-based pruning with retraining is highly effective, and I compare three magnitude-based pruning schemes --- \textit{class-blind}, \textit{class-uniform} and \textit{class-distribution}.
+Though recent work has chosen to use the latter two, I find the first and simplest scheme --- \textit{class-blind} --- the most successful.
+I are able to prune 40\% of the weights of a state-of-the-art NMT system with negligible performance loss, and by adding a retraining phase after pruning, I can prune 80\% with no performance loss.
+My pruning experiments also reveal some patterns in the distribution of
+redundancy in NMT. In particular, I find that higher layers, attention and softmax weights are the most important, while lower layers and the embedding Iights hold a lot of redundancy. 
+For the Long Short-Term Memory (LSTM) architecture, I find that at lower layers the parameters for the input are most crucial, but at higher layers the parameters for the gates also become important.

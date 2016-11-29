@@ -12,15 +12,17 @@ Magnitude-based pruning with iterative retraining has yielded strong results for
 Other approaches focus on pruning neurons rather than parameters, via sparsity-inducing regularizers \cite{murray2015auto} or `wiring together' pairs of neurons with similar input weights \cite{srinivas2015data}. These approaches are much more constrained than weight-pruning schemes; they necessitate finding entire zero rows of weight matrices, or near-identical pairs of rows, in order to prune a single neuron. By contrast weight-pruning approaches allow weights to be pruned freely and independently of each other. The neuron-pruning approach of \cite{srinivas2015data} was shown to perform poorly (it suffered performance loss after removing only 35\% of AlexNet parameters) compared to the weight-pruning approach of \cite{han2015learning}. 
 Though \cite{murray2015auto} demonstrates neuron-pruning for language modeling as part of a (non-neural) Machine Translation pipeline, their approach is more geared towards architecture selection than compression.
 
+\begin{sloppypar}
 There are many other compression techniques for neural networks, including approaches based on on low-rank approximations for weight matrices \cite{jaderberg2014speeding,denton2014exploiting}, or weight sharing  via hash functions \cite{chen2015compressing}.
 Several methods involve reducing the precision of the weights or activations \cite{courbariaux2014low}, sometimes in conjunction with specialized hardware \cite{gupta2015deep}, or even using binary weights \cite{lin2015neural}.
 The `knowledge distillation' technique of \cite{hinton2015distilling} involves training a small `student' network on the soft outputs of a large `teacher' network.
 Some approaches use a sophisticated pipeline of several techniques to achieve impressive feats of compression \cite{han2015deep,iandola2016squeezenet}.
+\end{sloppypar}
 
 Most of the above work has focused on compressing CNNs for vision tasks. 
-We extend the magnitude-based pruning approach of \cite{han2015learning} to recurrent neural networks (RNN), in particular LSTM architectures for NMT, and to our knowledge we are the first to do so.
+I extend the magnitude-based pruning approach of \cite{han2015learning} to recurrent neural networks (RNN), in particular LSTM architectures for NMT, and to my knowledge I are the first to do so.
 There has been some recent work on compression for RNNs \cite{lu2016learning,prabhavalkar2016compression}, but it focuses on other, non-pruning compression techniques. 
-Nonetheless, our general observations on the distribution of redundancy in a
+Nonetheless, my general observations on the distribution of redundancy in a
 LSTM, detailed in Section \ref{subsubsec:redundancy}, are corroborated by \cite{lu2016learning}.
 
 
