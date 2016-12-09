@@ -1,5 +1,4 @@
 \documentclass[12pt]{report}
-%\usepackage[online]{suthesis-2e}
 \usepackage{suthesis}
 
 % -- Imports --
@@ -29,27 +28,14 @@
 % (paper compilation hacks)
 \def\newcite#1{\citet{#1}}
 \def\cite#1{\citep{#1}}
-% http://tex.stackexchange.com/questions/2773/how-do-i-make-latex-push-long-citations-to-a-new-line
-%\usepackage{microtype}
 
-%% Thang
 \usepackage{epigraph}
-\renewcommand{\epigraphsize}{\normalsize} %\large} %\small}
+\renewcommand{\epigraphsize}{\normalsize}
 \setlength{\epigraphwidth}{0.8\textwidth}
 \usepackage{pstricks} % for overlay latex on top of images
 \usepackage{pgfplots}
 
 \newcommand{\edit}[1]{{#1}} %\color{blue} 
-
-% to split on hyphens for long urls
-%\usepackage{url}
-%\makeatletter
-%\g@addto@macro{\UrlBreaks}{\UrlOrds}
-%\makeatother
-
-% the below works for pdflatex
-%\usepackage[hyphens]{url} 
-%\usepackage{hyperref}
 
 % latex
 \usepackage{hyperref}
@@ -76,10 +62,6 @@
 \newcommand{\biformat}[1]{\textbf{\textit{#1}}}
 
 % math operators
-%\DeclareMathOperator*{\argmax}{\arg\,\max}
-%\DeclareMathOperator{\diag}{diag}
-%\newcommand{\me}{\mathrm{e}}
-%\DeclareMathOperator{\e}{e}
 \DeclareMathOperator{\trace}{Tr}
 \DeclareMathOperator{\sigm}{sigm}
 \DeclareMathOperator{\sigmoid}{sigmoid}
@@ -128,9 +110,6 @@
 \newcommand{\fg}{\bm{f}_{t}}
 \newcommand{\og}{\bm{o}_{t}}
 \newcommand{\hg}{\MB{\hat{h}_t}}
-%\newcommand{\iparam}{\MB{T}_{\text{i}}} % input params 
-%\newcommand{\fparam}{\MB{T}_{\text{f}}} % forget params 
-%\newcommand{\oparam}{\MB{T}_{\text{o}}} % output params 
 \newcommand{\hparam}{\MB{T}_{\text{h}}} % hidden params 
 \newcommand{\xparam}{\MB{T}_{\text{x}}} % hidden params 
 \newcommand{\ut}{\bm{u}_t}
@@ -144,9 +123,7 @@
 \newcommand{\hs}{\MB{\tilde{h}}_{t}} %h softmax
 \newcommand{\hd}[1]{\MB{h}_{#1}} % hidden target 
 \newcommand{\hb}[1]{\MB{\bar{h}}_{#1}} % hidden source
-%\newcommand{\rnn}{\MB{T}_{d \times 2d}} % RNN
 \newcommand{\rnn}{\MB{T}_{\text{rnn}}} % RNN
-% \newcommand{\lstm}{\MB{T}_{4d \times 2d}} % lstm 
 \newcommand{\lstm}{\MB{T}_{\text{lstm}}} % LSTM 
 \newcommand{\hi}{\MB{h}_{t}} % hidden top
 \newcommand{\co}{\MB{c}_{t}} % context
@@ -159,9 +136,6 @@
 \newtheorem{corollary}{{\it Corollary}}
 \newcommand{\lemmaref}[1]{Lemma~\ref{#1}}
 \newcommand{\remarkref}[1]{Remark~\ref{#1}}
-%\newtheorem{theorem}{Theorem}
-%\newtheorem{definition}{Definition}
-%\newtheorem{claim}{Claim}
 
 %% Chapter 3
 \newcommand{\unkword}[1]{{\bf {\it {\underline{#1}}}}}
