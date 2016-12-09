@@ -1,7 +1,7 @@
 Multi-task learning (MTL) is an important machine learning paradigm that
 aims at improving the generalization performance of a task using other related
 tasks. 
-Such framework has been widely studied by
+This framework has been widely studied by
 \newcite{thrun96,caruana97,evgeniou04,ando05,argyriou07,kumar12}, among many
 others. In the context of deep neural networks, MTL has
 been applied successfully to various problems ranging from language
@@ -10,11 +10,13 @@ been applied successfully to various problems ranging from language
 and speech \cite{heigold13,huang2013cross}.
 
 \begin{sloppypar}
-Recently, sequence to sequence (\ssl{}) learning
-\cite{kal13,sutskever14,cho14} emerges as an effective paradigm for dealing with
-variable-length inputs and outputs. \ssl{} learning, at its core, uses
-recurrent neural networks to map variable-length input sequences to
-variable-length output sequences.  While relatively new, the \ssl{}
+As we have seen in earlier chapters, sequence to sequence (\ssl{}) learning
+\cite{kal13,sutskever14,cho14} has emerged as an effective paradigm for dealing with
+variable-length inputs and outputs. 
+%\ssl{} learning, at its core, uses
+%recurrent neural networks to map variable-length input sequences to
+%variable-length output sequences.  
+While relatively new, the \ssl{}
 approach has achieved state-of-the-art results in not only its original
 application -- machine translation --
 \cite{luong15,jean15,luong15attn,jean15wmt,luong15iwslt}, but also image caption generation \cite{vinyals15caption},
@@ -44,10 +46,8 @@ Furthermore, I have established a new {\it state-of-the-art} result in
 constituent parsing with 93.0 F$_1$.
 I also explore two unsupervised learning
 objectives, sequence autoencoders \cite{dai15} and skip-thought vectors
-\cite{kiros15skip}, and reveal their interesting properties in the MTL setting: autoencoder helps less in terms of
+\cite{kiros15skip}, and reveal their interesting properties in the MTL setting: the autoencoder helps less in terms of
   perplexities but more on BLEU scores compared to skip-thought.
-%My novel findings reveal that the skip-thought objective improves
-%translation while the sequence autoencoders does not.
 \begin{figure}%[tbh]
 \centering
 \includegraphics[width=1\textwidth, clip=true, trim= 0 0 0

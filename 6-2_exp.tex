@@ -1,22 +1,14 @@
-% !TEX root = acl2016.tex
-
-I evaluate the effectiveness of my pruning approaches on a state-of-the-art
-NMT model.\footnote{I thank the authors of \cite{luong15attn}
-for providing their trained models and assistance in using the codebase
-at \url{https://github.com/lmthang/nmt.matlab}.} 
-Specifically, an attention-based English-German NMT system from
-\cite{luong15attn} is considered. 
-%This system uses the global attention mechanism with the dot-product function and the input-feeding approach. 
+I evaluate the effectiveness of my pruning approaches on the attention-based English-German NMT system 
+from Chapter 4 \cite{luong15attn}. 
 Training data was obtained from WMT'14 consisting
 of 4.5M sentence pairs (116M English words, 110M German words). For
 more details on training hyperparameters, I refer readers to Section 4.1 of
-\cite{luong15attn}.
+the thesis.
 All models are tested on newstest2014 (2737 sentences). 
 The model achieves a
 perplexity of 6.1 and a BLEU score of
 20.5 (after unknown word replacement).\footnote{The performance of this model
-is reported under row {\it global (dot)} in Table 4 of
-\cite{luong15attn}.}
+is reported under row {\it global (dot)} in Table 4.1 of the thesis.}
 
 When {\it retraining} pruned NMT systems, I use the following settings: (a) I start
 with a smaller learning rate of 0.5 (the original model uses a learning rate of
@@ -156,7 +148,7 @@ an identity-like weight matrix is learned. At higher pruning percentages, these 
 To test the generalizability of my results, I also test my pruning approach
 on a smaller, non-state-of-the-art NMT model trained on the WIT3 Vietnamese-English 
 dataset \cite{iwslt15}, which consists of 133,000 sentence pairs.
-This model is effectively a scaled-down version of the state-of-the-art model in \cite{luong15attn},
+This model is effectively a scaled-down version of the state-of-the-art model in Chapter 4 \cite{luong15attn},
 with fewer layers, smaller vocabulary size, smaller hidden layer size, no attention mechanism,
 and about 11\% as many parameters in total.
 It achieves a BLEU score of 9.61 on the validation set.

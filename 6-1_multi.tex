@@ -1,7 +1,7 @@
 I generalize the work of \citet{dong15} to the multi-task sequence-to-sequence
 learning setting that includes the tasks of machine translation (MT),
-constituency parsing, and image caption generation. Depending which tasks 
-involved, I propose to categorize multi-task \ssl{} learning into three general
+constituency parsing, and image caption generation. Depending on which tasks 
+are involved, I propose to categorize multi-task \ssl{} learning into three general
 settings.
 In addition, I will discuss the unsupervised learning tasks considered as well
 as the learning process.
@@ -91,7 +91,7 @@ My very first unsupervised learning task involves learning {\it autoencoders} fr
 monolingual corpora, which has recently been applied to sequence to sequence
 learning \citep{dai15}. However, in \citet{dai15}'s work, the authors
 only experiment with pretraining and then finetuning, but not joint training which
-can be viewed as a form of multi-task learning (MTL). As such, I are
+can be viewed as a form of multi-task learning (MTL). As such, I am 
 very interested in knowing whether the same trend extends to my MTL settings.
 
 Additionally, I investigate the use of the {\it skip-thought}
@@ -99,7 +99,7 @@ vectors \citep{kiros15skip} in the context of my MTL framework.
 Skip-thought vectors are trained by training sequence to sequence
 models on pairs of consecutive sentences, which makes the skip-thought
 objective a natural \ssl{} learning candidate. A minor technical
-difficulty with skip-thought objective is that 
+difficulty with the skip-thought objective is that 
 the training data must consist of ordered sentences, e.g., paragraphs.  Unfortunately, in
 many applications that include machine translation, I only have
 sentence-level data where the sentences are unordered. To
@@ -128,7 +128,6 @@ trained for $\frac{\alpha_i}{\alpha_1}\cdot N$ parameter updates.
 Such convention makes it easier for us to fairly compare the same reference
 task in a single-task setting which has also been trained for exactly $N$
 parameter updates.
-
 When sharing an encoder or a decoder, I share both the recurrent connections
 and the corresponding embeddings.
 

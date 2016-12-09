@@ -1,32 +1,3 @@
-%I first give a brief overview of Neural Machine Translation before describing
-%the model architecture of interest, the deep multi-layer recurrent model with
-%LSTM. I then explain the different types of NMT weights
-%together with my approaches to pruning and retraining.
-%
-%\subsection{Neural Machine Translation}
-%Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
-%a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
-%It accomplishes this goal through an {\it encoder-decoder} framework
-%\cite{kal13,sutskever2014sequence,cho14}. The {\it encoder} computes a representation $\MB{s}$
-%for each source sentence. Based on that source representation,
-%the {\it decoder} generates a translation, one target word at a time, and hence,
-%decomposes the log conditional probability as:
-%\begin{equation}
-%\log p(\tgt{}|\src{}) = \sum_{t=1}^m \nolimits \log
-%p\open{\tgt{t}|\tgt{<t},\MB{s}}
-%\label{e:s2s}
-%\end{equation}
-%
-%Most NMT work uses RNNs, but approaches differ in terms of: 
-%(a) architecture, which can be unidirectional, bidirectional, or deep multi-layer RNN; 
-%and (b) RNN type, which can be Long Short-Term Memory (LSTM) \cite{hochreiter1997long} or the Gated Recurrent Unit \cite{cho14}. 
-
-%Figure \ref{fig:nmt_simple} illustrates an instance of that architecture during training in which the source and target sentence pair are input for supervised
-%learning. During testing, the target sentence is not known in advance; instead, the most probable
-%target words predicted by the model are fed as inputs into the next timestep.
-%The network stops when it emits the end-of-sentence symbol --- a special `word' in the vocabulary, represented by a dash in Figure \ref{fig:nmt_simple}.
-
-
 \subsubsection{Understanding NMT Weights}
 \label{subsubsec:lstm}
 \begin{figure*}[t]
@@ -38,7 +9,7 @@ Best viewed in color.
 \label{fig:nmt_complex}
 \end{figure*}
 
-In this work, I specifically consider the {\it deep multi-layer recurrent} architecture with {\it
+In this work, I am focusing on the {\it deep multi-layer recurrent} architecture with {\it
 LSTM} as the hidden unit type.
 Figure~\ref{fig:nmt_complex} shows the system in detail,
 highlighting the different types of parameters, or weights, in the model.
@@ -60,18 +31,16 @@ The \emph{feed-forward} (vertical) weights connect
 the hidden unit from the layer below to the upper RNN block, and the
 \emph{recurrent} (horizontal) weights connect the hidden unit from the previous
 time-step RNN block to the current time-step RNN block.
-
 The hidden state at the top layer of the decoder is fed through an
-\textit{attention} layer, which guides the translation by `paying attention' to relevant parts of the source sentence; 
-for more information see \cite{bog15} or Section 3 of \cite{luong15attn}.
+\textit{attention} layer, which guides the translation by `paying attention'
+to relevant parts of the source sentence.
 Finally, for each target word, the top layer hidden unit is transformed by the
 \emph{softmax} weights into a score vector of length $V$. The target word with the highest score is selected as the output translation.
 
 {\it Weight Subgroups in LSTM} -- For the aforementioned RNN block, I choose to
 use LSTM as the hidden unit type. To facilitate my later discussion 
 on the different subgroups of weights
-within LSTM, I first review the details of LSTM as formulated by 
-\newcite{zaremba14} as follows:
+within LSTM, recall the details of the LSTM presented in Chapter 2 (2.35-2.37):
 \begin{align}
 \begin{pmatrix}
 i\\
@@ -94,7 +63,7 @@ h_{t-1}^l
 c_t^l&=f \circ c_{t-1}^l + i \circ \hat{h} \label{eqn:lstm_2} \\
 h_t^l &= o \circ \text{tanh}(c_t^l) \label{eqn:lstm_3}
 \end{align}
-Here, each LSTM block at time $t$ and layer $l$ computes as output a pair of
+Each LSTM block at time $t$ and layer $l$ computes as output a pair of
 hidden and memory vectors ($h_t^l$, $c_t^l$) given the previous pair
 ($h_{t-1}^l$, $c_{t-1}^l$) and an input vector $h_t^{l-1}$ (either from the LSTM block below or
 the embedding weights if $l\!=\!1$). All of these vectors
@@ -154,7 +123,7 @@ and I use binary `mask' matrices, which represent the sparse structure of a netw
 to ignore updates to weights at pruned locations.
 This implementation has the advantage of simplicity as it requires minimal changes to the training and deployment code, 
 but I note that a more complex implementation utilizing sparse matrices and sparse matrix multiplication could potentially yield speed improvements.
-However, such an implementation is beyond the scope of this paper.
+However, such an implementation is beyond the scope of this work.
 
 \begin{figure}
 \centering
