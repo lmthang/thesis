@@ -12,19 +12,20 @@
 \usepackage{natbib}
 % (tikz)
 \usepackage{tikz}
+\usepackage{tikz-dependency,pifont}
 \usetikzlibrary{shapes.arrows,chains,positioning,automata,trees,calc}
 \usetikzlibrary{patterns}
 \usetikzlibrary{decorations.pathmorphing,decorations.markings}
-% (tikz dependency tree)
-\usepackage{tikz-dependency,pifont}
 % (print algorithms)
 \usepackage[ruled,lined,linesnumbered]{algorithm2e}
 \makeatletter 
 \g@addto@macro{\@algocf@init}{\SetKwInOut{Parameter}{Parameters}} 
 \makeatother
-% (custom)
+
+%% (custom)
 \input std-macros.tex
 \input macros.tex	
+
 % (paper compilation hacks)
 \def\newcite#1{\citet{#1}}
 \def\cite#1{\citep{#1}}
