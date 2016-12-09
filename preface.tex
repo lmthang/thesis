@@ -1,22 +1,28 @@
 \prefacesection{Abstract}
-%Being able to communicate seamlessly across the entire repertoire of human languages is, to me, an ultimately rewarding goal for an intelligent system. Despite great progress in the field of Statistical Machine Translation (SMT) over the past two decades, the translation quality has not yet been satisfactory; at the same time, SMT systems become increasing complex with many different components built separately, rendering it extremely difficult to make further advancement. Recently, Neural Machine Translation (NMT) emerges as a promising solution to the problem of machine translation. At its core, NMT consists of a single deep neural network with millions of neurons that learn to directly map source sentences to target sentences. NMT is powerful because it is an end-to-end deep-learning framework that is significantly better than SMT in capturing long-range dependencies in sentences and generalizing well to unseen texts.
+Being able to communicate seamlessly across the entire repertoire of human
+languages is, to me, an ultimately rewarding goal for an intelligent system.
+Despite great progress in the field of Statistical Machine Translation (SMT)
+over the past two decades, translation quality has not yet satisfied users;
+at the same time, SMT systems have become increasing complex with many different
+components built separately, rendering it extremely difficult to make further
+advancement. Recently, Neural Machine Translation (NMT) emerges as a promising
+solution to the problem of machine translation. At its core, NMT consists of a
+single deep neural network with millions of neurons that learn to directly map
+source sentences to target sentences. NMT is powerful because it is an
+end-to-end deep-learning framework that is significantly better than SMT in
+capturing long-range dependencies in sentences and generalizing well to unseen
+texts.
 
-This dissertation presents all of the essence of Neural Machine Translation (NMT), through which I discuss how I have pushed the limits of NMT, making it applicable to a wide variety of languages with state-of-the-art performance. My contributions include addressing the rare word problem with copy mechanisms, improving the attention mechanism to better select local contexts in the source sentence, and translating at the character level with a hybrid architecture. Towards the future of NMT, I discuss how to utilize data from a wide variety of tasks such as parsing, image caption generation, and unsupervised learning to improve translation; as well as how to compress NMT models for mobile devices. I conclude with how my work influences subsequent research as well as provide an in-depth coverage on the existing research landscape, highlight potential research directions, and speculate on future elements needed to further advance NMT.
-
-%The goal of this dissertation is to present to the readers all of the essence of Neural Machine Translation, through which I discuss how I have contributed to the development of NMT since its birth as a fringe research project in 2014 to its well-established status as a mainstream approach for machine translation including commercial deployments in 2016. 
-%
-%First, in the {\it Introduction} chapter, I will walk the readers through the history and fundamentals of machine translation together with drawbacks of existing approaches, leading to the development of NMT. After that, the {\it Background} chapter will provide readers with all the necessary knowledge to fully understand and build a vanilla NMT, which covers details of language model and recurrent neural network, a basic building block for NMT. Several key highlights in this chapter include a complete derivation for the gradients of LSTM and its backpropagation algorithm as well as the forward and backpropagation steps of multi-layer NMT models. 
-%
-%In Chapter 3, {\it Copy Mechanism}, I start discussing my contribution. When I was developing the work for this chapter in 2014,
-%NMT had just started with the seminal work of \newcite{sutskever14}. Despite its potential, NMT models at that time had not been able to surpass phrase-based models and suffered from the limited-vocabulary problem. Specifically, NMT models often use a single \unk{} token to represent all other words not in its vocabulary, but do not know how to handle them at translation time. My proposed copy mechanisms provide simple yet effective ways for alleviating that problem. By learning to align the target \unk{} with words on the source through additional annotations to the training data (no need to modify the models, i.e., treating any NMT models as a black box), I can post-process target unknown translations much easier through word dictionary translation and identity copy of source words. This approach provides a further lift to the performance of the vanilla NMT model, allowing me for the first time to build an English-French NMT system that achieves state-of-the-art performance.
-%
-%Chapter 4, {\it Attention Mechanism}, includes my deep exploration of what is now the de facto standard in NMT, the attention mechanism, which improves translation quality for long sentences. At the time of my work, there has been little study in useful architectures for attention-based NMT apart from the introduction of the attention mechanism to NMT in the seminal paper of \newcite{bog15}. My work experiments with various variants of the attention mechanism and analyzes the effects of different attentional components. I have also introduced a local attention mechanism that only focuses on a different subset of the source sentence at each time step. The result of this work is a new state-of-the-art NMT system for English-German, a harder language pair than English-French, which further convinces people on the superiority of NMT.
-%
-%Chapter 5, {\it Hybrid Models}, can be viewed as my continuing effort to completely solve the rare word problem in NMT which was introduced in Chapter 3.
-%Instead of having separate components to perform data annotation, train NMT models, and post-process, I build a single model that handles unlimited vocabulary. Motivating by the proven word-level seq2seq architecture for NMT and the flexibility of character-based models in handling complex and unknown words, I propose hybrid models that translate mostly at the word level and consult the character components for rare words only. The twofold advantage of such a hybrid approach is that it is much faster and easier to train than character-based ones; at the same time, it never produces unknown words as in the case of word-based models. This advance leads us to conquer (with state-of-the-art performance) another challenging language pair, English-Czech, in which the target is a highly-inflected language with a complex vocabulary. I have also demonstrated an impressive gain from 2.1 to 11.4 BLEU points over models that already handle unknown words.
-%
-%Chapter 6 examines two questions that I think are important to {\it the future of NMT}: whether other tasks can be utilized to improve translation and whether NMT models can be compressed. The former question is important because of the fact that the first NMT systems only utilize parallel corpora despite an abundant amount of available data from monolingual and multi-lingual corpora as well as data from related tasks. To answer, 
-%I demonstrate that translation quality can be improved with data from parsing, image caption, and unsupervised learning.
-% The latter question arises from the indispensable role of mobile devices in society nowadays and the fact that state-of-the-art NMT models are beyond the storage capacity of existing mobile gadgets. With simple pruning schemes, my results show that the parameters of NMT models can be pruned up to 80\% without any loss in performance as long as pruned models are retrained. Beside the aforementioned questions, in \secref{sec:outlook}, I cover in-depth the existing research landscape, highlight potential research directions, and speculate on future elements needed to further advance NMT.
-%
-%Chapter 7 concludes this thesis a big picture of what I have achieved in my dissertation and how it influences subsequent work.
+This dissertation presents all of the essence of Neural Machine Translation
+(NMT), through which I discuss how I have pushed the limits of NMT, making it
+applicable to a wide variety of languages with state-of-the-art performance. My
+contributions include addressing the rare word problem with copy mechanisms,
+improving the attention mechanism to better select local contexts in the source
+sentence, and translating at the character level with a hybrid architecture.
+Towards the future of NMT, I discuss how to utilize data from a wide variety of
+tasks such as parsing, image caption generation, and unsupervised learning to
+improve translation; as well as how to compress NMT models for mobile devices. I
+conclude with how my work influences subsequent research as well as provide an
+in-depth coverage on the existing research landscape, highlight potential
+research directions, and speculate on future elements needed to further advance
+NMT.
