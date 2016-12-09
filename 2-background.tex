@@ -1,33 +1,30 @@
-\edit{
 \epigraph{Give me a place to stand and I will move the earth.}{Archimedes.}
 %\epigraph{For neural machine translation, it all started from language modeling.}{Thang Luong.}
 
-In this chapter, we provide background knowledge on three main topics, namely
+In this chapter, I provide background knowledge on three main topics, namely
 language model (LM), recurrent neural network (RNN), and neural machine
 translation (NMT).
 Language modeling is an important concept in natural language processing to
 allow one to do {\it word prediction}, i.e., guessing which word will come next
 given a preceding context. As we shall see later, there is an interesting fact
 that for neural machine
-translation, it all started from language modeling. Before we get into NMT, 
+translation, it all started from language modeling. Before I get into NMT, 
 we will go through the basics of recurrent neural network, the heart of
 sequence-based NMT, to
 explain how RNNs can naturally and effectively model {\it variable-length} inputs, or
 sentences in the context of the translation task. 
-We cover in depth one particular type of RNN, the {\it Long Short-term Memory}
+I cover in depth one particular type of RNN, the {\it Long Short-term Memory}
 (LSTM), that makes training RNNs easier. Interested readers can find all the
 details of how to implement LSTM ``by hand'' with detailed formulas on gradient
 computation as compared to the automatic differentiation feature given by nowadays deep
 learning frameworks. The understanding of language modeling will allow us
 to extend RNNs into recurrent neural language models which enable {\it language
 generation}, a key step in NMT.
-Lastly, with RNN as a basic building block, we describe key elements of an NMT
+Lastly, with RNN as a basic building block, I describe key elements of an NMT
 system as well as tips and tricks for better training and testing NMT.
-}
 
 \section{Language Model}
-\edit{
-As we have discussed in \secref{sec:mt}, language modeling plays an indispensable
+As I have discussed in \secref{sec:mt}, language modeling plays an indispensable
 role in MT to ensure that systems produce fluent translations.
 % and has always been an active area of research.
 Specifically, the job of an LM is to specify a probability distribution over
@@ -107,7 +104,6 @@ translation with a goal of redesigning the entire MT pipeline completely. To sta
 first learn about recurrent neural network, a
 building block for NMT as well as a key component to address the local
 translation problem in statistical MT systems.
-}
 
 %Approaches to building \nlmtext{} (\nlms) using
 %feed-forward networks such as those initiated by \newcite{Bengio2003} and
@@ -127,7 +123,7 @@ translation problem in statistical MT systems.
 %coherence at the target side. 
 %As such, a significant amount of effort in
 %improving MT has centered around enhancing language modeling -- more specifically, the need to capture long-range
-%dependencies better. We start out with efforts to scale up traditional \ngram{} language models 
+%dependencies better. I start out with efforts to scale up traditional \ngram{} language models 
 
 
 \section{Recurrent Neural Network}
@@ -165,19 +161,19 @@ an optional bias term in \eq{e:vanilla_rnn}.}
 At each timestep $t$, an RNN can (optionally) emit an output symbol
 $y_t$ which can either be discrete or real-valued. For the discrete scenario,
 which is often the case for linguistic applications, a probability distribution $\bm{p}$ over a 
-set of output classes $Y$ is derived as:\footnote{For the real-valued case, we refer readers to mixture density
+set of output classes $Y$ is derived as:\footnote{For the real-valued case, I refer readers to mixture density
 models \cite{bishop94} which have been applied to RNN training, e.g., for
 hand-writing synthesis \cite{graves13c}.}
 \begin{align}
 \s{t} &= \W{hy}\hid{t} \label{e:score} \\
 \prob{t} &= \softmax(\s{t}) \label{e:prob}
 \end{align}
-Here, we introduce a new set of weights $\W{hy} \inR{|Y| \times d}$, with $d$ being the dimension of the RNN hidden
+Here, I introduce a new set of weights $\W{hy} \inR{|Y| \times d}$, with $d$ being the dimension of the RNN hidden
 state, to compute a score vector $\s{t}$, or {\it logits}, over
 different individual classes. Often, with a large output set $Y$, the
 matrix-vector multiplication in \eq{e:score} is a major computational
 bottleneck in RNNs, which results in several challenges for neural language modeling
-and machine translation that we will address in later chapters. 
+and machine translation that I will address in later chapters. 
 The $\softmax$ function transforms the score
 vector $\s{t}$ into a probability vector $\prob{t}$, which is defined for each specific
 element $y \in Y$ as below.
@@ -188,7 +184,7 @@ the vectors $\prob{t}$ and $\s{t}$ that correspond to $y$.
 \label{e:softmax}
 \end{align}
 
-With the above formulas, we have completely defined the RNN weight set $\thetav$
+With the above formulas, I have completely defined the RNN weight set $\thetav$
 %=\!\{\W{xh}, \W{hh}, \W{hy}\}$, 
 which consists of {\it input} connections $\W{xh}$, {\it
 recurrent} connections $\W{hh}$, and {\it output}
@@ -224,7 +220,7 @@ $\MB{W_{hh}}$, and output $\MB{W_{hy}}$  weights are shared across timesteps.
 \end{figure}
 }
 Throughout this thesis, RNNs will be discussed from a language
-learning perspective. For more details on general RNNs, we refer readers to the
+learning perspective. For more details on general RNNs, I refer readers to the
 following resources \cite{sutskever12,mikolov12,karpathy15rnn}.
 
 
@@ -249,7 +245,7 @@ Additionally, the input sequence is prepended with a special starting symbol
 Since the goal of a language model is to predict the next word, the output
 sequence is a shift-by-1 version of the input and ends
 with a special symbol \eos{} that marks the boundary, e.g., $y=\{$ ``I'', ``am'', ``a'',
-``student'', \eos$\}$. As we illustrate in \figref{f:rlm}, the word emitted at
+``student'', \eos$\}$. As I illustrate in \figref{f:rlm}, the word emitted at
 one timestep is used as an input to the next timestep.
 }
 
@@ -325,7 +321,7 @@ controls how much we update the weights along the optimization direction.}
 \paragraph{Mathematical Helpers}
 %\label{ss:misc}
 \edit{To simplify the maths for our backpropagation derivations in the next
-section, we present here a few simple remarks and lemmas on vector calculus and gradient
+section, I present here a few simple remarks and lemmas on vector calculus and gradient
 computation.}
 
 \begin{remark}
@@ -474,9 +470,9 @@ d\hid{t} &=  \tp{\W{hy}} \cdot d\s{t} \label{e:grad_ht}\\
 d\W{hy} &=  d\s{t} \cdot \tp{\hid{t}} \label{e:grad_Why}
 \end{align}
 
-At this point, we have derived part of the backpropation procedure which can be
+At this point, I have derived part of the backpropation procedure which can be
 applied to any hidden unit type, e.g., the aforementioned vanilla RNN or the
-LSTM unit that we will describe shortly in the next section. 
+LSTM unit that I will describe shortly in the next section. 
 
 {\it Vanilla RNN Backpropagation} \indent 
 %For the vanilla RNN formulation in \eq{e:vanilla_rnn}, we further backpropagate
@@ -500,12 +496,12 @@ d\z{t} &=  \tp{\rnn} \cdot
 d\rnn &=  \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\z{t}} \label{e:grad_rnn}
 \end{align}
 
-This is one of the {\it tricks} that we use to better utilize GPUs by creating
+This is one of the {\it tricks} that I use to better utilize GPUs by creating
 larger matrices and vectors, i.e., $\rnn$ and $\z{t}$. From \eq{e:grad_zt} and
 \eq{e:grad_rnn}, one can easily extract the following gradients:
-(a) $d\x{t}$ -- embedding gradients which we use to sparsely update the embedding weights $\W{e}$, (b) $d\hid{t-1}$
+(a) $d\x{t}$ -- embedding gradients which I use to sparsely update the embedding weights $\W{e}$, (b) $d\hid{t-1}$
  -- gradients of the previous hidden state, which is needed by the
- backpropagation-through-time algorithm that we will discuss next, and (c) $d\W{xh}$ as well
+ backpropagation-through-time algorithm that I will discuss next, and (c) $d\W{xh}$ as well
 as $d\W{hh}$ -- the RNN input and recurrent connections.\footnote{One can also
 separately derive these gradients as follows:
 \begin{align}
@@ -525,10 +521,10 @@ d\W{hh} &=  \paren{\sigma'(\rnn \z{t}) \edot d\hid{t}} \cdot \tp{\hid{t-1}} \lab
 Having defined a single-timestep backpropagation procedure, we are now ready to
 go through the BPTT algorithm \cite{Rumelhart:1986:LPT,werbos1990}. 
 Inspired by 
-\newcite{sutskever12}, we summarize the BPTT algorithm for RNNs below with the
+\newcite{sutskever12}, I summarize the BPTT algorithm for RNNs below with the
 following remarks: (a) Lines 3, 5, 6, 7 accumulate the gradients of RNN weights
 $\{\W{hy}, \W{xh}, \W{hh}, \W{e}\}$ over time; (b) In line 7, $d\x{t}$ refers to
-gradients of words participating in the current mini-batch which we use to
+gradients of words participating in the current mini-batch which I use to
 sparsely update $\W{e}$;\footnote{In multi-layer
 RNNs, $d\x{t}$ is used to send gradients down to the below layers.} and (c) Line
 4 accumulates gradients for the current hidden state $\hid{t}$ by considering two paths,
@@ -613,8 +609,8 @@ gradient vector $\bm{g}$ computed per mini-batch, if its norm
 $||\bm{g}||$ is greater than a threshold
 $\tau$, then we will use the following scaled gradient $\frac{\tau}{||\bm{g}||} \bm{g}$
 instead. The latter approach is widely used in many systems nowadays and
-can also be used in conjunction with the former. We take the combined approach
-in our implementations described later in this thesis. 
+can also be used in conjunction with the former. I take the combined approach
+in my implementations described later in this thesis. 
 
 \paragraph{Long Short-Term Memory}
 The vanishing gradient problem, on the other hand, is more challenging to
@@ -638,9 +634,9 @@ There are many implementation instances of LSTM, differing in terms of
 whether and which biases are used, how gates are built, etc; however, it turns
 out that these different choices do not matter much for most cases
 \cite{jozefowicz15,greff15}. As such, in this section and throughout this
-thesis, we will stick to the formulation described in \cite{zaremba14}.
+thesis, I will stick to the formulation described in \cite{zaremba14}.
 
-Instead of jumping directly into the detailed formulation, let us provide intuitions
+Instead of jumping directly into the detailed formulation, let me provide intuitions
 on how to gradually build up an LSTM architecture. First, we can construct a
 simple memory unit as follows:
 \begin{align}
@@ -669,7 +665,7 @@ forget, input, and output gates as follows:
 \W{hh}\hid{t-1}} \\
 \hid{t} &= \og \edot \sigma\paren{\mem{t}} \label{e:lstm_output})
 \end{align}
-We note that, in \eq{e:lstm_output}, 
+Note that, in \eq{e:lstm_output}, 
 the memory cell $\mem{t}$ is passed through a nonlinear function $\sigma$ before the output
 gate $\og$ is used to extract relevant information in the hope for better
 information retrieval.
@@ -751,7 +747,7 @@ Here, $g$ is a non-linear function applied element-wise and we define $g$ loosel
 
 \paragraph{LSTM Training}
 In the LSTM training pipeline, there are many components that are exactly the
-same or very similar to RNN training. We will now highlight some key
+same or very similar to RNN training. I will now highlight some key
 differences. First of all, LSTM extends the recurrence function to have not just
 the hidden states but also the memory cells as both inputs and outputs. The
 definition is as below:
@@ -906,13 +902,13 @@ translating a source sentence \word{I am a student} into a target sentence
 \label{f:nmt_details}
 \end{figure}
 
-In this thesis, all our NMT models are deep multi-layer RNNs which are 
-unidirectional and have an LSTM as the recurrent unit. We show an example of
+In this thesis, all my NMT models are deep multi-layer RNNs which are 
+unidirectional and have an LSTM as the recurrent unit. I show an example of
 such model in Figure~\ref{f:nmt_details}.
 %though it should be easy to extend to other RNN architectures. 
-In this example, we train our model to translate a source sentence
+In this example, I train my model to translate a source sentence
 \word{I am a student} into a target one \word{Je suis \'{e}tudiant}.
-At a high level, our NMT models consist of two recurrent neural networks as
+At a high level, my NMT models consist of two recurrent neural networks as
 described in \secref{sec:rnn}: the {\it encoder} RNN simply consumes the input
 source words without making any prediction; the {\it decoder}, on the other
 hand, processes
@@ -933,7 +929,7 @@ often the top $V$ frequent words are selected.
 These embedding weights, one set per language, are learned during training.
 While one can choose to initialize embedding weights with pretrained word
 representations, such as word2vec \cite{mikolov13nips} and Glove
-\cite{pennington2014}, we found, in this thesis, that these
+\cite{pennington2014}, I found, in this thesis, that these
 embeddings can be initialized randomly and learned from scratch given large training datasets.
 
 %, are different for the source words and the target words.
@@ -942,7 +938,7 @@ embeddings can be initialized randomly and learned from scratch given large trai
 Once retrieved, the word embeddings are then fed as input into the main network, which consists
 of two multi-layer RNNs `stuck together' --- an encoder for the source
 language and a decoder for the target language. \edit{These two RNNs, in
-principle, can share the same weights; however, in practice, we found that
+principle, can share the same weights; however, in practice, I found that
 having two different RNN parameters works better and less overfits to large
 training datasets.}
 The encoder RNN uses zero vectors as its starting states. The decoder, on the
@@ -950,14 +946,14 @@ other hand, needs to have access to the source information, so one simple way to
 achieve that is to
 initialize it with the last hidden state of the encoder.\footnote{This is not the only way to initialize the decoder,
 e.g., \newcite{cho14} connect the last encoder state to every timestep in the
-decoder as an extra input.} In Figure~\ref{f:nmt_details}, we pass  
+decoder as an extra input.} In Figure~\ref{f:nmt_details}, I pass  
 the hidden state at the source word \word{student} to the decoder side.
 The \emph{feed-forward} (vertical) weights connect
 the hidden unit from the layer below to the upper one; whereas, the
 \emph{recurrent} (horizontal) weights transfer the history knowlege from the previous
 timestep to the next one.
-Often, we use different weights across the encoder and decoder as well as
-across different layers; in the current example, we have 4 different LSTM
+Often, different weights can be used across the encoder and decoder as well as
+across different layers; in the current example, I have 4 different LSTM
 weight sets $\lstm$, detailed in \eq{e:lstm_notation}, over $\{\text{encoder,
 decoder}\} \times \{1^{\text{st}}, 2^{\text{nd}} \text{ layer}\}$.
 %The hidden state at the top layer of the decoder is fed through an
@@ -969,7 +965,7 @@ vocabulary of size $V$ according to \eq{e:score} and \eq{e:prob}.
 
 \subsection{Training}
 Training a neural machine translation system is similar to training a recurrent
-language model that we have discussed in \secref{sec:rnn} except that we need to
+language model that I have discussed in \secref{sec:rnn} except that we need to
 handle the conditioning on source sentences.
 The training objective for NMT is formulated as:
 \begin{equation}
@@ -983,13 +979,13 @@ almost the same as how we compute the regular RNN loss on just $y$.
 The only difference is that we have to first compute representations for the source
 sentence $x$ to initialize the decoder RNN instead of just starting
 from zero states. For the {\it backpropagation} phase, computing gradients for
-the decoder is the same as what we have described in
+the decoder is the same as what I have described in
 Algorithm~\ref{a:lstm_bptt} for regular RNNs. The last hidden-state gradient
 from the decoder is
-passed back to the encoder. We then continue backpropagating through the encoder
+passed back to the encoder. I then continue backpropagating through the encoder
 in a similar fashion as that of the decoder but without any prediction losses.
 
-More concretely, we present in
+More concretely, I present in
 \algo{a:nmt_forward} details of the forward pass of an NMT model which uses
 a deep multi-layer LSTM architecture. Since the encoder and decoder share
 many operations in common, we combine the source sentence $x$ (length
@@ -1101,9 +1097,9 @@ d\lstm^{(1..L)}$ \tcp*{Save encoder gradients}
 
 
 %% BPTT
-Next, we describe details of the backpropagation step in \algo{a:nmt_backward}.
+Next, I describe details of the backpropagation step in \algo{a:nmt_backward}.
 A quick glance through the algorithm reveals many similarities compared to the
-forward pass algorithm except that we have reversed the procedue. 
+forward pass algorithm except that we have reversed the procedure. 
 First, we initialize gradients of the recurrent layers at the final time step (line 1)
 as well the model weights on the decoder size (line 2) to zero.
 At time $m_x$, we switch to the encoder mode by saving the currently
@@ -1135,7 +1131,7 @@ accomplish this goal and how to decode with an ensemble of models.
 
 %\paragraph{Greedy Decoder} 
 The simplest strategy to translate a source sentence is to perform {\it greedy
-decoding} which we illustrate in \figref{f:nmt_test}. The idea is simple: (a) we
+decoding} which I illustrate in \figref{f:nmt_test}. The idea is simple: (a) we
 first encode the source sentence,
 \word{I am a student} in our example, similar to the training process; (b) the
 decoding process is started as soon as
@@ -1160,8 +1156,8 @@ source sentence \word{I am a student} using greedy search.
 \label{f:nmt_test}
 \end{figure}
 
-More concretely, we adopt the NMT forward algorithm to arrive at the greedy
-decoding strategy in \algo{a:nmt_greedy}. We present the greedy
+More concretely, I adopt the NMT forward algorithm to arrive at the greedy
+decoding strategy in \algo{a:nmt_greedy}. I present the greedy
 algorithm in a slightly more abstract way by reusing elements of the NMT forward
 pass in \algo{a:nmt_forward}. First, we run through the encoder in Line 1 to obtain a
 representation $\hid{0}, \mem{0}$ for the source sentence $x$ (length $m_x$). We
@@ -1210,7 +1206,8 @@ not have to explicitly explore different places on the source side to pay
 attention to}.\footnote{\edit{In SMT, a source coverage set is maintained to
 indicate which words have been translated. As translation progresses, an SMT 
 system base on the coverage set and pick untranslated source words to continue.
-Such an idea of coverage set later re-emerges in NMT which we will describe more in Chapter~\ref{c:conclude}.}} One can modify
+Such an idea of coverage set later re-emerges in NMT which I will describe more in Chapter~\ref{c:conclude}.}}
+One can modify
 the greedy decoding algorithm as follows to build a beam-search decoder: (a) at
 each timestep on the decoder side, we keep track of the top $B$ (the beam size) best
 translations together with their corresponding hidden states; (b) in Line 7 of
@@ -1232,12 +1229,12 @@ model produces a distribution at each timestep in the decoder (line~6 of
 a new ensemble distribution which we can use for both greedy and beam-search
 decoders as if we decode from a single model.
 
-\edit{In summary, we have covered all the necessary background knowledge to understand
+\edit{In summary, I have covered all the necessary background knowledge to understand
 this thesis entirely. We start with language modeling, an important concept in
 natural language processing, which turns out to be the basis of NMT. One can
-simply view NMT as a source-conditioned language model. To understand how NMT systems work, we
+simply view NMT as a source-conditioned language model. To understand how NMT systems work, I
 have covered the fundamentals of recurrent neural networks which allow us to
 handle variable-length sequences, in our case, the sentences. We have particularly 
 studied Long Short-term Memory, a specific type of RNN that
 is more effective at handling long sequences, in depth. Finally, given these building blocks,
-language modeling and RNN, we have discussed NMT in detail from training to testing.}
+language modeling and RNN, I have discussed NMT in detail from training to testing.}

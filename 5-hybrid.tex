@@ -72,7 +72,6 @@ My analysis demonstrates that my character models can successfully learn to not
 only generate well-formed words for Czech, a
 highly-inflected language with a very complex vocabulary, but also build correct
 representations for English source words.
-
 I provide code, data, and models at \url{http://nlp.stanford.edu/projects/nmt}.
 
 \section{Related Work}
@@ -80,126 +79,106 @@ There has been a recent line of work on end-to-end character-based neural models
 which achieve good results for part-of-speech tagging \cite{santos14,ling15function},
 dependency parsing \cite{ballesteros15}, text classification
 \cite{zhang15}, speech recognition \cite{chan16,bahdanau16}, and language
-modeling \cite{kim16,rafal16}. However, success has not been shown for
-cross-lingual tasks such as machine translation.\footnote{Recently,
-\newcite{ling15char} attempt character-level NMT; however,
-the experimental evidence is weak. The authors demonstrate only small
-improvements over word-level baselines and acknowledge that there are no differences of
-significance. Furthermore, only small datasets were used without
-comparable results from past NMT work.}
+modeling \cite{kim16,rafal16}. However, at the time of this work, success has not been shown for
+cross-lingual tasks such as machine translation.
+%\footnote{Recently,
+%\newcite{ling15char} attempt character-level NMT; however,
+%the experimental evidence is weak. The authors demonstrate only small
+%improvements over word-level baselines and acknowledge that there are no differences of
+%significance. Furthermore, only small datasets were used without
+%comparable results from past NMT work.}
 \newcite{sennrich16sub} propose to segment words into smaller units and
 translate just like at the word level, which does not learn to understand
 relationships among words.
 
 My work takes inspiration from \cite{luong13} and 
 \cite{li15}. Similar to the former, I build representations for rare words
-on-the-fly from subword units. However, I utilize recurrent neural networks
-with characters as the basic units; whereas \newcite{luong13} use recursive neural
-networks with morphemes as units, which requires existence of a
-morphological analyzer. In comparison with \cite{li15}, my hybrid architecture
+on-the-fly from subword units. However, instead of using recursive neural
+networks with morphemes as units as in \cite{luong13}, which requires existence of a
+morphological analyzer, I utilize recurrent neural networks
+with characters as the basic units. In comparison with \cite{li15}, my hybrid architecture
 is also a hierarchical sequence-to-sequence model, but operates at a different
 granularity level, word-character. In contrast, \newcite{li15} build
 hierarchical models at the sentence-word level for paragraphs and documents.
 
-\section{Background \& My Models}
-\label{sec:nmt}
-\begin{sloppypar}
-Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
-a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
-It accomplishes this goal through an {\it encoder-decoder} framework
-\cite{kal13,sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
-for each source sentence. Based on that source representation,
-the {\it decoder} generates a translation, one target word at a time, and hence,
-decomposes the log conditional probability as:
-\end{sloppypar}
-
-\begin{equation}
-\log p(\tgt{}|\src{}) = \sum_{t=1}^m \nolimits \log
-p\open{\tgt{t}|\tgt{<t},\MB{s}}
-\label{e:s2s}
-\end{equation}
-
-A natural model for sequential data is the recurrent
-neural network (RNN), used by most of the recent NMT work.
-Papers, however, differ in terms of: (a) architecture -- from unidirectional, to
-bidirectional, and deep multi-layer RNNs; and (b) RNN type -- which are long
-short-term memory (LSTM)
-\cite{lstm97} and the gated recurrent unit \cite{cho14}. 
-All my models utilize the {\it deep multi-layer} architecture with {\it
-LSTM} as the recurrent unit; detailed formulations are in \cite{zaremba14}.
-
-Considering the top recurrent layer in a deep LSTM, 
-with $\hd{t}$ being the current target hidden state as in Figure~\ref{f:attn}, one can compute the probability of decoding each target word $y_t$ as:
-\begin{equation}
-p\left(\tgt{t}|\tgt{<t},\MB{s}\right) = \softmax\open{\hd{t}}
-\label{e:softmax}
-\end{equation}
-
-For a parallel corpus $\mathbb{D}$, I train my model by minimizing the below
-cross-entropy loss:
-\begin{equation}
-J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
-\label{e:obj}
-\end{equation}
-
-\noindent {\bf Attention Mechanism} -- 
-%Another important difference between NMT work lies in what constitutes the
-%input representation $\MB{s}$.
-The early NMT approaches \cite{sutskever14,cho14}, which I have described above, use only the last encoder state
- to initialize the decoder, i.e., setting the input representation $\MB{s}$ in
- \eq{e:s2s} to $[\hb{n}]$. Recently, \newcite{bog15} propose an {\it attention
- mechanism}, a form of random access memory for NMT to 
-cope with long input sequences.
-%This is accomplished by setting
-%$\MB{s}$ to be the set of encoder hidden states already computed. % $[\hb{1}, \dots, \hb{n}]$
-\newcite{luong15attn} further extend the attention mechanism to different
-scoring functions, used to compare source and target
-hidden states, as well as different
-strategies to place the attention.
-%{\it global} -- utilize all source hidden
-%states at all target timesteps and {\it local} -- focus on a small subset of
-%source hidden states per target timestep.
-In all my models, I utilize the {\it global} attention mechanism and the {\it
-bilinear form} for the attention scoring function similar to 
-\cite{luong15attn}.
-
-\begin{figure}
-\centering
-%\psgrid
-\rput(4.3,6.5){$\tgt{t}$}
-\rput(1.4,5.6){$\co$}
-\rput(0.8,3.1){$\hb{1}$}
-\rput(2.9,3.1){$\hb{n}$}
-\rput(4.9,3.1){$\hd{t}$}
-\rput(4.9,6.0){$\hs$}
-%\rput(4.0,3.8){$\hd{t-1}$}
-\includegraphics[width=0.33\textwidth, clip=true, trim= 0 0 0 0]{img/5-attn} % , angle=-90
-\caption[Attention mechanism]{{\bf Attention mechanism}.
-% -- shown are the two steps of the attention mechanism described in \cite{luong15attn}
-%: first, compute a 
-%{\it context vector} $\co$ based on the current target hidden state $\hd{t}$ and all the source hidden
-%states $[\hb{1}, \dots, \hb{n}]$; second, use the context vector as an
-%additional input to derive
-%the {\it attentional} vector $\hs$.
-} 
-\label{f:attn}
-\end{figure}
-
-Specifically, I set $\MB{s}$ in \eq{e:s2s} to
-the set of source hidden states at the top layer, $[\hb{1}, \dots, \hb{n}]$. 
-As illustrated in Figure~\ref{f:attn}, the attention mechanism consists of two stages: (a) {\it
-context vector} -- the current hidden state $\hd{t}$ is compared with
-individual source hidden states in $\MB{s}$ to learn an alignment vector, which
-is then used to compute the context vector $\co$ as a weighted average of
-$\MB{s}$; and (b) {\it
-attentional hidden state} -- the context vector $\co$ is then used to derive a
-new attentional hidden state:
-\begin{equation}
-\hs = \tanh(\W{}[\co; \hi])
-\label{e:hs}
-\end{equation} 
-The attentional vector $\hs$ then replaces $\hd{t}$ in \eq{e:softmax} in
-predicting the next word.
+%\section{Background \& My Models}
+%\label{sec:nmt}
+%\begin{sloppypar}
+%Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
+%a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
+%It accomplishes this goal through an {\it encoder-decoder} framework
+%\cite{kal13,sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
+%for each source sentence. Based on that source representation,
+%the {\it decoder} generates a translation, one target word at a time, and hence,
+%decomposes the log conditional probability as:
+%\end{sloppypar}
+%
+%\begin{equation}
+%\log p(\tgt{}|\src{}) = \sum_{t=1}^m \nolimits \log
+%p\open{\tgt{t}|\tgt{<t},\MB{s}}
+%\label{e:s2s}
+%\end{equation}
+%
+%A natural model for sequential data is the recurrent
+%neural network (RNN), used by most of the recent NMT work.
+%Papers, however, differ in terms of: (a) architecture -- from unidirectional, to
+%bidirectional, and deep multi-layer RNNs; and (b) RNN type -- which are long
+%short-term memory (LSTM)
+%\cite{lstm97} and the gated recurrent unit \cite{cho14}. 
+%All my models utilize the {\it deep multi-layer} architecture with {\it
+%LSTM} as the recurrent unit; detailed formulations are in \cite{zaremba14}.
+%
+%Considering the top recurrent layer in a deep LSTM, 
+%with $\hd{t}$ being the current target hidden state as in Figure~\ref{f:attn}, one can compute the probability of decoding each target word $y_t$ as:
+%\begin{equation}
+%p\left(\tgt{t}|\tgt{<t},\MB{s}\right) = \softmax\open{\hd{t}}
+%\label{e:softmax}
+%\end{equation}
+%
+%For a parallel corpus $\mathbb{D}$, I train my model by minimizing the below
+%cross-entropy loss:
+%\begin{equation}
+%J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
+%\label{e:obj}
+%\end{equation}
+%
+%\noindent {\bf Attention Mechanism} -- 
+%%Another important difference between NMT work lies in what constitutes the
+%%input representation $\MB{s}$.
+%The early NMT approaches \cite{sutskever14,cho14}, which I have described above, use only the last encoder state
+% to initialize the decoder, i.e., setting the input representation $\MB{s}$ in
+% \eq{e:s2s} to $[\hb{n}]$. Recently, \newcite{bog15} propose an {\it attention
+% mechanism}, a form of random access memory for NMT to 
+%cope with long input sequences.
+%%This is accomplished by setting
+%%$\MB{s}$ to be the set of encoder hidden states already computed. % $[\hb{1}, \dots, \hb{n}]$
+%\newcite{luong15attn} further extend the attention mechanism to different
+%scoring functions, used to compare source and target
+%hidden states, as well as different
+%strategies to place the attention.
+%%{\it global} -- utilize all source hidden
+%%states at all target timesteps and {\it local} -- focus on a small subset of
+%%source hidden states per target timestep.
+%In all my models, I utilize the {\it global} attention mechanism and the {\it
+%bilinear form} for the attention scoring function similar to 
+%\cite{luong15attn}.
+%
+%
+%Specifically, I set $\MB{s}$ in \eq{e:s2s} to
+%the set of source hidden states at the top layer, $[\hb{1}, \dots, \hb{n}]$. 
+%As illustrated in Figure~\ref{f:attn}, the attention mechanism consists of two stages: (a) {\it
+%context vector} -- the current hidden state $\hd{t}$ is compared with
+%individual source hidden states in $\MB{s}$ to learn an alignment vector, which
+%is then used to compute the context vector $\co$ as a weighted average of
+%$\MB{s}$; and (b) {\it
+%attentional hidden state} -- the context vector $\co$ is then used to derive a
+%new attentional hidden state:
+%\begin{equation}
+%\hs = \tanh(\W{}[\co; \hi])
+%\label{e:hs}
+%\end{equation} 
+%The attentional vector $\hs$ then replaces $\hd{t}$ in \eq{e:softmax} in
+%predicting the next word.
 
 \section{Hybrid Neural Machine Translation}
 \label{sec:hybrid}
@@ -216,54 +195,32 @@ originally produced as \unk{}.
 
 \subsection{Word-based Translation as a Backbone}
 \label{subsec:hybrid_word}
-%\begin{figure}%[tbh]
-%\centering
-%\includegraphics[width=0.4\textwidth, clip=true, trim= 0 0 0 0]{nmt_word.\imgExt}
-%\caption{{\bf Word-based NMT} -- the backbone of my hybrid architecture. Boxes
-%mark the character-level components for: (a) computing source word
-%representations and (b) generating target words.}
-%%to take advantages of the
-%%original forms of the rare words.}
-%\label{f:word}
-%\end{figure}
-
 The core of my hybrid NMT is a deep LSTM encoder-decoder that translates at
-the {\it word} level as described in Section~\ref{sec:nmt}. I maintain a
+the {\it word} level as described in Chapter~\ref{c:background}. I maintain a
 vocabulary of $|V|$ frequent words for each language. Other words not inside these
 lists are represented by a universal symbol \unk{}, one per language.
 I translate just like a word-based NMT system with respect to these source and
 target vocabularies, except for cases that involve \unk{} in the source input or 
 the target output. These correspond to the character-level components 
-%that I will expand next to accomplish the full architecture as 
 illustrated in Figure~\ref{f:hybrid}.
-%and are highlighted by the two boxes in 
-%Figure~\ref{f:word}.
-%Note that I leave \unk{} on the target input which helps simplify the training
-%and testing phases as detailed in Section~\ref{subsubsec:strategy}.
-
 A nice property of my hybrid approach is that by varying the vocabulary size,
  one can control how much to blend the
 word- and character-based models; hence, taking the best of both
 worlds. 
-%I illustrate that unified view in Figure~\ref{f:vocabulary}.
 
 
 \subsection{Source Character-based Representation}
 \label{subsec:src}
-%I now describe box (a) in Figure~\ref{f:word}. 
 In regular word-based
 NMT, for all rare words outside the source vocabulary, one feeds the
 universal embedding representing \unk{} as input to the encoder. This is
 problematic because it discards valuable information about the source word. To
 fix that, I learn a deep LSTM model over characters
 of source words. 
-%In my running example, % for the word \word{cute}, 
 For example, in Figure~\ref{f:hybrid}, I run
 my deep character-based LSTM over `c', `u', `t', `e', and `\_' (the boundary
 symbol). The final hidden state at the top layer will be used as the on-the-fly
 representation for the current rare word.
-%as illustrated in the bottom-left part of Figure~\ref{f:hybrid}.
-
 The layers of the deep character-based LSTM are always initialized with {\it
 zero} states. One might propose to connect hidden
 states of the word-based LSTM to the character-based model; however, I chose this design
@@ -272,30 +229,12 @@ for efficiency through {\it precomputation}: before each mini-batch, I can compu
 representations for rare source words all at once. All instances of the same
 word share the same embedding, so the computation is per {\it type}.\footnote{While \newcite{ling15char} found that it is slow and difficult to train
 source character-level models and had to resort to pretraining, I demonstrate
-later that I can train my deep character-level LSTM %in the experiment section 
+later that I can train my deep character-level LSTM
 perfectly fine in an end-to-end fashion.} 
-
-%This approach is inspired by the work
-%of \cite{luong13} which also computes on-the-fly representations
-%for rare words. Their work, however, is different from mine in that the representations
-%are derived from morphemes, with recursive neural networks, and for
-%the language modeling task.
-
-%\begin{figure}%[tbh]
-%\centering
-%\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0 0]{vocabulary.\imgExt}
-%\caption{{\bf A unified view of hybrid NMT} -- as the word vocabulary size
-%approaches zero, I obtain character-based NMT; whereas, large vocabulary
-%sizes lead to word-based NMT.}
-%\label{f:vocabulary}
-%\end{figure}
-
 
 \subsection{Target Character-level Generation}
 \label{subsec:tgt}
-%Next, I describe box (b) in Figure~\ref{f:word}.
 General word-based NMT allows generation of \unk{} in the target output.
-%will accept the fact when generating target words, \unk{} can be emitted. 
 Afterwards, there is usually a post-processing step that handles
 these unknown tokens by utilizing the
 alignment information derived from the attention mechanism and then performing
@@ -303,19 +242,16 @@ simple word dictionary lookup or identity copy \cite{luong15attn,jean15}.
 While this approach works, it suffers from various problems such as alphabet
 mismatches between the source and target vocabularies and multi-word
 alignments.
-%, as detailed in Section~\ref{subsec:rare}. 
 My goal is to address all
 these issues and create a
 coherent framework that handles an unlimited output vocabulary.
-%virtually has the ``post-processing'' step baked in and
-%learned automatically end-to-end. 
 
 My solution is to have a separate deep LSTM that ``translates'' at the
 character level given the current word-level state. I train my system such
 that whenever the word-level NMT
 produces an \unk{}, I can consult this character-level decoder to recover the correct surface form of the
 unknown target word. This is illustrated in Figure~\ref{f:hybrid}.
-The training objective in \eq{e:obj} now becomes: %consists of two components:
+The training objective for the hybrid models consists of two components:
 \begin{equation}
 J = J_{w} + \alpha J_{c}
 \label{e:char_obj}
@@ -327,19 +263,38 @@ corresponds to the loss incurred by the character-level
 decoder when predicting characters, e.g., $\{\mbox{`j', `o', `l', `i',
 `\_'}\}$, of those rare words not in the
 target vocabulary. 
-%In my running example, the predicted characters are .
 
 
-\paragraph{Hidden-state Initialization} %Separated-path Target Generation}
+\paragraph{Hidden-state Initialization}
 \label{subsubsec:h}
+\begin{figure}
+\centering
+%\psgrid
+\rput(5.6,8.3){$\tgt{t}$}
+\rput(1.8,7.2){$\co$}
+\rput(1.0,4.1){$\hb{1}$}
+\rput(3.7,4.1){$\hb{n}$}
+\rput(6.4,4.1){$\hd{t}$}
+\rput(6.4,7.8){$\hs$}
+%\rput(4.0,3.8){$\hd{t-1}$}
+\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0 0]{img/5-attn} % , angle=-90
+\caption[Attention mechanism]{{\bf Attention mechanism} -- shown are the two steps of the
+attention mechanism I described in Chapter~\ref{c:attention} \cite{luong15attn}: first, compute a 
+{\it context vector} $\co$ based on the current target hidden state $\hd{t}$ and all the source hidden
+states $[\hb{1}, \dots, \hb{n}]$; second, use the context vector as an
+additional input to derive
+the {\it attentional} vector $\hs$.
+} 
+\label{f:attn}
+\end{figure}
+
 Unlike the source character-based representations, which are
 context-independent, the target character-level generation requires the
 current word-level context to produce meaningful translation.
 This brings up an important
 question about what can best represent the current context so as to
 initialize the character-level decoder. I answer this question in the context
-of the attention mechanism ($\S$\ref{sec:nmt}). 
-%, which has now become the defacto standard in NMT.
+of the attention mechanism described in Chapter~\ref{c:attention}. 
 
 The final vector $\hs$, just before the
 softmax as shown in Figure~\ref{f:attn}, seems to be a good candidate to initialize the character-level decoder.
@@ -358,8 +313,23 @@ that can be used to accomplish two tasks at the same time, that is to predict
 To address that concern, I propose another approach called
 the \textit{separate-path} target generation.
 
+\begin{figure}%[tbh]
+\centering
+%\psgrid
+\rput(1.8,4.9){$\co$}
+\rput(3.2,4.6){$\Wc$}
+\rput(5.4,4.6){$\Ww$}
+\rput(6.25,1.8){$\hi$}
+\rput(3.75,6){$\hc$}
+\rput(6.25,6){$\hs$}
+\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0 0]{img/5-tgtGen}
+\caption{{\bf Separate-path Target Generation} -- two separate attentional vectors are creating:
+$\hs$ for predicting target words and $\hc$ to seed the target-side character model.}
+\label{f:tgtGen}
+\end{figure}
+
 My separate-path target generation approach works as follows. I mimic the
-process described in \eq{e:hs} to create a counterpart vector $\hc$ that will be
+process described in \eq{e:hs} of the attention mechanism to create a counterpart vector $\hc$ that will be
 used to seed the character-level decoder:
 \begin{equation}
 \hc = \tanh(\Wc[\co; \hi])
@@ -368,55 +338,31 @@ used to seed the character-level decoder:
 Here, $\Wc$ is a new learnable parameter matrix, with which I
 hope to release $\W{}$ from the pressure of having to extract information
 relevant to both the word- and character-generation processes.
-%This approach is illustrated in Figure~\ref{f:tgtGen}.
+This approach is illustrated in Figure~\ref{f:tgtGen}.
 Only the hidden
 state of the first layer is initialized as discussed above. The other components
 in the character-level decoder such as the
 LSTM cells of all layers and the hidden states of higher layers, all start with zero values.
 
-%\begin{figure}%[tbh]
-%\centering
-%%\psgrid
-%\rput(1.5,4.0){$\co$}
-%\rput(2.6,3.75){$\Wc$}
-%\rput(3.07,4.9){$\hc$}
-%\rput(4.4,3.7){$\Ww$}
-%\rput(5.1,1.5){$\hi$}
-%\rput(5.1,4.9){$\hs$}
-%%\rput(0.9,1.9){$\his$}
-%\includegraphics[width=0.35\textwidth, clip=true, trim= 0 0 0 0]{tgtGen.\imgExt}
-%\caption{{\bf Target generation for rare words} -- the backbone of my hybrid architecture. Boxes
-%mark the character-level components for: (a) computing source word
-%representations and (b) generating target words.}
-%%to take advantages of the
-%%original forms of the rare words.}
-%\label{f:tgtGen}
-%\end{figure}
-
 Implementation-wise, the computation in the
 character-level decoder is done per word {\it token} instead of per {\it type} as in the source
 character component ($\S$\ref{subsec:src}). 
 This is because of the context-dependent nature of the decoder.
-%\footnote{For memory efficiency, the character-level backward pass can be executed right
-%after the character-level forward pass
-%and I can split these computations into
-%mini-batches if the number of \unk{} is large.}
-
-%initialized hidden states are different across time steps and across sentences even if the surface
-%forms to be generated are the same. 
-
+\footnote{To be memory efficient, the character-level backward pass can be executed right
+after the character-level forward pass
+and we can split these computations into
+mini-batches if the number of \unk{} is large.}
 %For speed efficiency, I run a forward pass
 %over the word-level decoder first. Then, I invoke, in batch mode, a forward
 %pass over the character-level decoder for the surface forms of all the \unk{} tokens.
 
 \paragraph{Word-Character Generation Strategy}
 \label{subsubsec:strategy}
-With the character-level decoder, I can view the final hidden states as representations for
+With the character-level decoder, we can view the final hidden states as representations for
 the surface forms of unknown tokens and could have fed these to the next
 time step. However, I chose not to do so for the efficiency reason explained
 next; instead, \unk{} is fed to the word-level decoder
 ``as is'' using its corresponding word embedding.
-% as illustrated in Figure~\ref{f:word}. 
 
 During {\it training}, this design choice decouples all executions over \unk{} instances of the
 character-level decoder as soon the word-level NMT
@@ -424,45 +370,8 @@ completes. As such, the forward and backward passes of the character-level
 decoder over rare words can be invoked in batch mode. At {\it test} time,
 my strategy is to first run a beam search decoder at the word level to
 find the best translations given by the
-word-level NMT. Such translations contains \unk{} tokens, so I utilize my
+word-level NMT. Such translations contains \unk{} tokens, so I utilize the 
 character-level decoder with beam search to generate actual words for these \unk{}.
-%I aggregate the word- and charater-level
-%decoding scores according to the formula in \eq{e:char_obj} and find the best
-%translation according to the combined scores.
-% \todo{Implement this scheme to take
-%into account the combined scores.}
-
-\hide{
-\subsection{Sampling for Better Rare Word Learning}
-When the vocabulary size is large, i.e., when my hybrid NMT system is closer to a
-word-based one, it is often the case that a frequent word appears in
-the vocabulary but not its derived forms. In
-these cases, character-level models will only be able to learn to represent
-rare words, e.g., ``distinctiveness'', but not their related but frequent forms, e.g.,
-``distinct''. This implies
-that my hybrid NMT may have ignored valuable information about the
-relationship among many words. 
-
-To tackle this problem, I
-propose a sampling approach to occasionally select frequent words in a
-training mini-batch and view them as rare
-words so that character-level models can learn from them.
-The number of frequent words I sample per 
-mini-batch is counted by {\it type} on the source side  and by {\it
-token} on the target side. This is in accordance with how I sample rare words
-to build character-based representations and perform character-level generation in
-Section~\ref{subsec:src} and \ref{subsec:tgt} respectively. 
-
-As a result of this sampling approach, each
-frequent word in the {\it source} vocabulary will have two
-representations, one from the character-based model and one from the
-word embeddings. For these two representations to cooperate with the recurrent
-connections, the source character-level model is virtually encouraged to produce
-similar word embeddings. \todo{Test this by visualization.} On the {\it target}
-side, this approach helps force the word-level NMT to produce relevant top
-hidden states that can readily be used to generate sensible character sequences
-even if the target words to be predicted are not \unk{}.
-}
 
 \section{Experiments}
 \label{sec:exp}
@@ -530,7 +439,7 @@ in frequent words.}
 \label{t:data}
 \end{table}
 
-In terms of preprocessing, I apply only the standard tokenization practice.\footnote{Use \texttt{tokenizer.perl} in Moses with
+In terms of preprocessing, I apply only the standard tokenization practice.\footnote{I use \texttt{tokenizer.perl} in Moses with
 default settings.} I choose for each language a list of 200
 characters found in frequent words, which, as shown in Table~\ref{t:data}, can
 represent more than 98\% of the vocabulary. 
@@ -598,7 +507,7 @@ categories, word (w) and character (c).
 % For BLEU scores, I report results before \unk{} tokens are handled in parentheses. 
 {\bf Best} and
 \biformat{important} results per
-metric are highlighed.
+metric are highlighted.
 % and give {\it progressive} improvements in italic between
 % consecutive systems.  
 }
@@ -613,7 +522,7 @@ Common to these architectures is a word-based NMT since the
 character-based systems are essentially word-based ones with
 longer sequences and the core of hybrid models is also a word-based NMT.
 
-In training word-based NMT, I follow \newcite{luong15attn} to use the global attention mechanism together with
+In training word-based NMT, I proceed as in Chapter~\ref{c:attention} \cite{luong15attn} to use the global attention mechanism together with
 similar hyperparameters: (a) deep LSTM models, 4 layers, 1024
 cells, and 1024-dimensional embeddings, (b) uniform initialization of
 parameters in $[-0.1, 0.1]$, (c) 6-epoch training with plain SGD and a simple learning
@@ -622,42 +531,33 @@ halve the learning rate every 0.5 epoch, (d) mini-batches are of
 size 128 and shuffled, (e) the gradient is rescaled whenever its norm exceeds 5, and (f)
 dropout is used with probability $0.2$ according to 
 \cite{pham2014dropout}.
-%Unless otherwise stated, the above settings are used for most of my systems. 
 I now detail differences across the three architectures.
-%My code is implemented in MATLAB. %\footnote{Publicly available at \url{http://annonymized}.} 
-%When running on a single GPU device Tesla K40, I achieve a speed of 1K {\it
-%target} words per second. It takes 7--10 days to completely train a model.
-
 
 {\bf Word-based NMT} -- I constrain my source and target sequences to
 have a maximum length of 50 each; words that go past the boundary are ignored.
-The vocabularies are limited to the top $|V|$ most % 50K most
+The vocabularies are limited to the top $|V|$ most
 frequent words in both languages. Words not in these vocabularies
 are converted into \unk{}. After translating, I will perform
 dictionary\footnote{Obtained from the alignment links produced by the Berkeley
 aligner \cite{liang06alignment} over
 the training corpus.} lookup or
 identity copy for \unk{} using the alignment information from the
-attention models. Such procedure is referred as the {\it unk replace}
-technique \cite{luong15,jean15}.
+attention models. Such a procedure is referred to as the {\it unk replace}
+technique as in Chapter~\ref{c:copy} \cite{luong15,jean15}.
 
 {\bf Character-based NMT} -- The source and
 target sequences at the character level are often about 5 times longer than their counterparts in the
-word-based models as I can infer from the statistics in
-Table~\ref{t:data}. Due to memory constraint in GPUs, I limit my source and
+word-based models as can be inferred from the statistics in
+Table~\ref{t:data}. Due to the memory constraint in GPUs, I limit my source and
 target sequences to a maximum length of 150 each, i.e., I backpropagate
 through at most 300 timesteps from the decoder to the encoder. With
 smaller 512-dimensional models, I can afford to have longer sequences with up
 to 600-step backpropagation. 
-%The vocabularies are limited to the first 200 characters appearing in top frequent
-%words of each language.
 
 {\bf Hybrid NMT} -- The {\it word}-level component uses the
 same settings as the purely word-based NMT. For the {\it character}-level source
 and target components, I experiment with both shallow and deep 1024-dimensional models of
 1 and 2 LSTM layers. 
-%Similar to the purely
-%character-based NMT, I use a vocabulary of 200 characters per language. 
 I
 set the weight $\alpha$ in \eq{e:char_obj} for my character-level loss to
 $1.0$.
@@ -678,18 +578,12 @@ systems, a phrase-based Moses model and a deep-syntactic transfer-based model.
 Additionally, there is  an automatic
 post-editing system with hand-crafted rules to correct errors
 in morphological agreement and semantic meanings, e.g., loss of negation.}
-% 14.83 + 0.65 + 33.25 + 3.82 = 52.55
-% 305.41 + 38.42 + 0.2 + 4.81 + 44.08 = 392.92M
 In contrast, I merely use the
-provided parallel corpus of 15.8M sentences. % as shown in Table~\ref{t:data}.
+provided parallel corpus of 15.8M sentences.
 For NMT, to the best of my knowledge, \cite{jean15wmt} has
 the best published performance on English-Czech.
-%I present results for some of my models and 
-%analyze the rest in Section~\ref{sec:analysis} later. 
 
 As shown in Table~\ref{t:encs}, for a purely {\it word-based} approach, 
-%I achieve
-%progressive improvements when using attention and performing unk replacement.
 my single NMT model outperforms the best single model in \cite{jean15wmt} by
 +$1.8$ points despite
 using a smaller vocabulary of only 50K words versus 200K words. 
@@ -710,34 +604,15 @@ recognition \cite{chan16}. Second, long time-step backpropagation is more import
 as reflected by the fact that the larger $1024$-dimensional model {\it (h)} with shorter
 backprogration is inferior to \modelchar{}. 
 
-%Lastly, % for my {\it hybrid} models, 
-%results in Table~\ref{t:encs} justify why my proposed {\it hybrid} 
-%architecture is needed. With only 1K words, the model {\it (j)} achieves a
-%non-trivial performance of $12.9$ BLEU thanks to an improvement of +$7.9$ points
-%given by the character-level components when replacing \unk{}.\footnote{A purely word-based model with 1K words (trained
-%for 4 epochs with attention and unk replacement) gives $<\!1$ BLEU.}
-%In terms of vocabulary sizes, hybrid models with larger vocabulary
-%sizes are clearly better. % than the one with only 1K words. 
-%This suggests
-%that an extreme hybrid system with $W\!=\!0$, a close approximation to those of
-%\cite{ling15char}, will not work well. As such, among similar hierarchical
-%models, my word-character approach is preferred.
-
-
 My {\it hybrid} models achieve the best results. 
 At 10K words, I demonstrate that my {\it
 separate-path} strategy for the character-level target generation
 ($\S$\ref{subsubsec:h}) is effective, yielding an improvement of +$1.5$ BLEU
 points when comparing systems {\it (j)} vs. {\it (i)}. A {\it deeper} character-level architecture of 2 LSTM
 layers provides another significant
-boost of +$2.1$ BLEU. % for the system \modelsmall{}, 
-%with the lowest character-level perplexity of $1.59$.
+boost of +$2.1$ BLEU.
 With $17.7$ BLEU points, my hybrid system \modelsmall{} has
 surpassed word-level NMT models.
-%This proves that my hybrid model has successfully replaced the
-%standard unk replacement
-%process, offering a large improvement of +$6.2$ BLEU over the case
-%when \unk{} is not handled.
 
 When extending to 50K words, I further improve the translation quality.
 My best single model, system \model{} with $19.6$ BLEU, is already better than all
@@ -746,32 +621,6 @@ My ensemble model {\it (m)} further advances the SOTA
 result to \biformat{\ensbleu} BLEU, outperforming
 the winning entry in the WMT'15 English-Czech translation task by a large margin
 of +$1.9$ points. My ensemble model is also best in terms of \chr{} with \biformat{47.5} points.
-%\footnote{Note that, my other models
-%combining both the separate-path approach and the 2-layer character-level
-%components have not converged yet. I expect to obtain even better results in
-%the next version of my paper.}
-
-\begin{figure}%[tbh]
-\centering
-\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/5-vocab}
-\caption[Vocabulary size effect]{{\bf Vocabulary size effect} -- shown are the performances of different
-systems as I vary their vocabulary sizes. I highlight the improvements obtained
-by my hybrid models over word-based systems which already handle unknown words.}
-\label{f:vocab}
-\end{figure}
-
-
-\begin{figure*}%[tbh]
-\centering
-\includegraphics[width=\textwidth, clip=true, trim= 100 50 0 20]{img/5-emb}
-\caption[Barnes-Hut-SNE visualization of source word representations]{{\bf Barnes-Hut-SNE visualization of source word representations} --
-shown are sample words from the {\it Rare Word} dataset. I differentiate two types of
-embeddings: {\color{blue} frequent} words in which encoder embeddings are looked up directly and {\it {\color{magenta} rare}} words
-where I build representations from characters. Boxes highlight examples that
-I will discuss in the text. I use the hybrid model \model{} in this visualization.}
-\label{f:visual}
-\end{figure*}
-
 
 \section{Analysis}
 \label{sec:analysis}
@@ -789,9 +638,15 @@ vocabularies. While it appears from the plot that gains diminish as I
 increase the vocabulary size, I argue that my hybrid models are still
 preferable since they understand word structures and can handle new complex
 words at test time as illustrated in Section~\ref{subsec:samples}.
-%Lastly, it is desirable to continue increasing the
-%vocabulary size to see at which point I stop benefiting from the hybrid
-%approach. It is also very interesting to  
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth, clip=true, trim= 0 0 0 0]{img/5-vocab}
+\caption[Vocabulary size effect]{{\bf Vocabulary size effect} -- shown are the performances of different
+systems as I vary their vocabulary sizes. I highlight the improvements obtained
+by my hybrid models over word-based systems which already handle unknown words.}
+\label{f:vocab}
+\end{figure}
+
 
 
 \subsection{Rare Word Embeddings}
@@ -856,25 +711,22 @@ word-based ones, e.g., \word{impossibilities} vs.\ \word{impossible} and \word{a
 vs.\ \word{antagonist}. All of this evidence strongly supports that the source
 character-level models are useful and effective.
 
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth, clip=true, trim= 100 50 0 20]{img/5-emb}
+\caption[Barnes-Hut-SNE visualization of source word representations]{{\bf Barnes-Hut-SNE visualization of source word representations} --
+shown are sample words from the {\it Rare Word} dataset. I differentiate two types of
+embeddings: {\color{blue} frequent} words in which encoder embeddings are looked up directly and {\it {\color{magenta} rare}} words
+where I build representations from characters. Boxes highlight examples that
+I will discuss in the text. I use the hybrid model \model{} in this visualization.}
+\label{f:visual}
+\end{figure*}
+
+
 \begin{table*}%[tbh!]
 \centering
-\resizebox{15.5cm}{!}{
+\resizebox{15cm}{!}{
 \begin{tabular}{c|c|p{15.5cm}}
-%\multicolumn{2}{l}{{\bf English-German translations}}\\
-%  \hline
-% sent 0
-%\multirow{7}{*}{1} & source & Petr \u{C}ech : \source{Transfer at} the last minute ? \\
-%& human & Petr \u{C}ech : \correct{P\u{r}estup} \correct{na} posledn\'{i} chv\'{i}li ? \\
-%  \cline{2-3}
-%& \multirow{2}{*}{\it{word}} & Petr \u{C}ech : \unk{} na posledn\'{i} chv\'{i}li ? \\
-%&  & Petr \u{C}ech : \wrong{Transfer} \correct{na} posledn\'{i} chv\'{i}li ? \\
-%  \cline{2-3}
-%& \it{char} & Petr \u{C}ech : \close{P\u{r}esnos} \wrong{v} posledn\'{i} chv\'{i}li ? \\
-%  \cline{2-3}
-%& \multirow{2}{*}{\it{hybrid}} & Petr \unk{} : \unk{} na posledn\'{i} chv\'{i}li ? \\
-%&  & Petr \u{C}ech : \close{P\u{r}esnos} \correct{na} posledn\'{i} chv\'{i}li ? \\
-%  \hline
-%  \hline
 % sent 1046 
 \multirow{7}{*}{1} & source & The author \source{Stephen Jay Gould} died 20 years after
 \source{diagnosis} . \\
@@ -913,51 +765,26 @@ p\u{r}ed pades\'ati lety : \\
 Luther King} \close{Jr.} : \\
   \hline
   \hline
-% sent 56 
-%\multirow{7}{*}{2} & source &  George Webster , 28 , faced the \source{charges} during a hearing at the
-%\source{High} Court in \source{Glasgow} . \\
-%& human & George Webster , 28 , byl s \correct{obvin\u{e}n\'im} sezn\'amen
-%b\u{e}hem sly\u{s}en\'i u \correct{Nejvy\u{s}\u{s}\'iho} soudu v \correct{Glasgow} .\\
-%  \cline{2-3}
-%%& \multirow{2}{*}{\it{word}} & George Webster , 28 , \u{c}elil obvin\u{e}n\'i b\u{e}hem sly\u{s}en\'i u Vrchn\'iho soudu v Glasgow . \\
-%& \it{word} & George Webster , 28 , \u{c}elil \close{obvin\u{e}n\'i} b\u{e}hem
-%sly\u{s}en\'i u \close{Vrchn\'iho} soudu v \correct{Glasgow} .  \\
-%  \cline{2-3}
-%& \it{char} & George Webster , 28 \u{c}elil \close{poplatk\r{u}m} b\u{e}hem sly\u{s}en\'i
-%u \close{Vrchn\'iho} soudu v \close{Glasgowu} . \\
-%  \cline{2-3}
-%& \multirow{2}{*}{\it{hybrid}} & George \unk{} , 28 , \unk{} obvin\u{e}n\'i b\u{e}hem sly\u{s}en\'i u \unk{} soudu v \unk{} .\\
-%&  & George Webster , 28 , \u{c}elil \close{obvin\u{e}n\'i} b\u{e}hem
-%sly\u{s}en\'i u \close{Vrchn\'iho} soudu v \correct{Glasgow} . \\
-%%& \multirow{2}{*}{\it{hybrid}} & George \unk{} , 28 , st\'al p\u{r}ed \unk{} p\u{r}i sly\u{s}en\'i u \unk{} soudu v \unk{} .\\
-%%&  & George Webster , 28 , st\'al p\u{r}ed \correct{obvin\u{e}n\'im} p\u{r}i sly\u{s}en\'i u \close{Vrchn\'iho soudu} v \correct{Glasgow} . \\
-%%&  \it{hybrid} & George Webster , 28 , \u{c}elil \close{obvin\u{e}n\'i} b\u{e}hem sly\u{s}en\'i u \correct{Nejvy\u{s}\u{s}\'iho} soudu v \correct{Glasgow} . \\
-%  \hline
-%  \hline
 % sent 198
 \multirow{7}{*}{3} & source & Her \source{11-year-old} daughter , \source{Shani Bart} , said it felt a " little bit
-\source{weird} " [..] back to school . \\ %to suddenly be going 
+\source{weird} " [..] back to school \\
 & human & Jej\'{i} \correct{jeden\'{a}ctilet\'{a}} dcera \correct{Shani Bartov\'{a}} prozradila
 , \u{z}e " je to trochu \correct{zvl\'{a}\u{s}tn\'{i}} " [..] znova do
-\u{s}koly . \\ %chodit najednou
+\u{s}koly \\
   \cline{2-3}
 & \multirow{2}{*}{\it{word}} & Jej\'i \unk{} dcera \unk{} \unk{} \u{r}ekla , \u{z}e je to " trochu
-divn\'e " , [..] vrac\'i do \u{s}koly .\\ %\u{z}e se najednou
+divn\'e " , [..] vrac\'i do \u{s}koly \\
 &  & Jej\'i \wrong{11-year-old} dcera \correct{Shani} \wrong{,} \u{r}ekla , \u{z}e je to " trochu
-\close{divn\'e} " , [..] vrac\'i do \u{s}koly . \\ %\u{z}e se najednou
+\close{divn\'e} " , [..] vrac\'i do \u{s}koly \\
   \cline{2-3}
 & \it{char} & Jej\'i \correct{jeden\'actilet\'a} dcera , \correct{Shani
 Bartov\'a} , \u{r}\'ikala ,
-\u{z}e c\'it\'i trochu \close{divn\u{e}} , [..] vr\'atila do \u{s}koly .\\ %aby se
+\u{z}e c\'it\'i trochu \close{divn\u{e}} , [..] vr\'atila do \u{s}koly \\
   \cline{2-3}
-%& \multirow{2}{*}{\it{hybrid}} & Jej\'i \unk{} dcera , \unk{} \unk{} , \u{r}ekla
-%, \u{z}e je to " \unk{} \unk{} " , [..] vr\'atila do \u{s}koly .\\ %aby se najednou
-%&  & Jej\'i \close{jedenadvac\'at\'e} dcera , \wrong{p\u{r}\'itelkyn\u{e} Barth} , \u{r}ekla , \u{z}e je to " mali\u{c}kost 
-%\close{divn\'a} " , [..] vr\'atila do \u{s}koly . \\ %aby se najednou
 & \multirow{2}{*}{\it{hybrid}} & Jej\'i \unk{} dcera , \unk{} \unk{} , \u{r}ekla , \u{z}e c\'it\'i " trochu
-\unk{} " , [..] vr\'atila do \u{s}koly .\\ %aby se najednou
+\unk{} " , [..] vr\'atila do \u{s}koly \\
 &  & Jej\'i \correct{jeden\'actilet\'a} dcera , \wrong{Graham} \close{Bart} , \u{r}ekla , \u{z}e c\'it\'i " trochu
-\close{divn\'y} " , [..] vr\'atila do \u{s}koly . \\ %aby se najednou
+\close{divn\'y} " , [..] vr\'atila do \u{s}koly \\
 \end{tabular}
 }
 \caption[Sample translations on newstest2015]{{\bf Sample translations on newstest2015} -- %examples in both translation directions.
@@ -992,8 +819,6 @@ Lastly, both the character-based and hybrid models impress us by
 their ability to translate compound words exactly, e.g., \word{11-year-old} and
 \word{jeden\'actilet\'a}; whereas the identity copy
 strategy of the word-based model fails.
-%The hybrid model is better than the character-based models in many translation
-%examples, e.g., ``na'', ``obvin\u{e}n\'im'', ``Glasgow'' etc. 
 Of course, my hybrid model does make mistakes, e.g., it fails to translate the name
 \word{Shani Bart}. 
 Overall, these examples highlight how challenging translating
@@ -1018,10 +843,7 @@ in NMT with my character-level components, yielding an improvement of
 not only generate well-formed words for
 Czech, a highly inflected language with an enormous and complex vocabulary, but
 also build accurate representations for English source words.
-
 Additionally, I have demonstrated the potential of purely character-based
 models in producing good translations;
-they have outperformed past word-level NMT models. For future work, I hope to be able to improve the memory usage and
-speed of purely character-based models.
-
-
+they have outperformed past word-level NMT models. 
+I will further discuss the potential of these models in Chapter~\ref{c:conclude}.

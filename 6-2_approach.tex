@@ -1,7 +1,7 @@
-%We first give a brief overview of Neural Machine Translation before describing
+%I first give a brief overview of Neural Machine Translation before describing
 %the model architecture of interest, the deep multi-layer recurrent model with
-%LSTM. We then explain the different types of NMT weights
-%together with our approaches to pruning and retraining.
+%LSTM. I then explain the different types of NMT weights
+%together with my approaches to pruning and retraining.
 %
 %\subsection{Neural Machine Translation}
 %Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
@@ -32,17 +32,17 @@
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{img/6-2_nmt_complex} %trim = 27mm 60mm 45mm 35mm, clip, 
-\caption[Weights of NMT architecture]{NMT architecture. This example has two layers, but our system has four. The different weight classes are indicated by arrows of different color (the black arrows in the top right represent simply choosing the highest-scoring word, and thus require no parameters).
+\caption[Weights of NMT architecture]{NMT architecture. This example has two layers, but my system has four. The different weight classes are indicated by arrows of different color (the black arrows in the top right represent simply choosing the highest-scoring word, and thus require no parameters).
 Best viewed in color.
 }
 \label{fig:nmt_complex}
 \end{figure*}
 
-In this work, we specifically consider the {\it deep multi-layer recurrent} architecture with {\it
+In this work, I specifically consider the {\it deep multi-layer recurrent} architecture with {\it
 LSTM} as the hidden unit type.
 Figure~\ref{fig:nmt_complex} shows the system in detail,
 highlighting the different types of parameters, or weights, in the model.
-We will go through the architecture from bottom to top.
+I will go through the architecture from bottom to top.
 First, a vocabulary is chosen for each language, assuming that the top $V$ frequent
 words are selected.
 Thus, every word in the source or target vocabulary can be represented by a one-hot vector of length $V$.
@@ -67,10 +67,10 @@ for more information see \cite{bog15} or Section 3 of \cite{luong15attn}.
 Finally, for each target word, the top layer hidden unit is transformed by the
 \emph{softmax} weights into a score vector of length $V$. The target word with the highest score is selected as the output translation.
 
-{\it Weight Subgroups in LSTM} -- For the aforementioned RNN block, we choose to
-use LSTM as the hidden unit type. To facilitate our later discussion 
+{\it Weight Subgroups in LSTM} -- For the aforementioned RNN block, I choose to
+use LSTM as the hidden unit type. To facilitate my later discussion 
 on the different subgroups of weights
-within LSTM, we first review the details of LSTM as formulated by 
+within LSTM, I first review the details of LSTM as formulated by 
 \newcite{zaremba14} as follows:
 \begin{align}
 \begin{pmatrix}
@@ -106,7 +106,7 @@ input signal $\hat{h}\} \times \{$feed-forward input $h_t^{l-1}$, recurrent
 input $h_{t-1}^l\}$.
 
 %\subsection{Evaluation metrics}
-%We evaluate our models by two measures: BLEU score and perplexity. 
+%I evaluate my models by two measures: BLEU score and perplexity. 
 %BLEU compares the output target sentence with the human-translated target sentence, and is measured on a scale from 0 (worst) to 100 (best).
 %Perplexity is the exponential of the average loss per word, measured on a scale from 1 (best) to infinity (worst). 
 %%For each output target word, the model produces scores for each word in the vocabulary, which are converted to a probability distribution over the vocabulary. 
@@ -115,14 +115,14 @@ input $h_{t-1}^l\}$.
 %Both evaluation metrics are valuable. 
 %BLEU measures a system's performance on the end-goal of machine translation, translation quality, whereas perplexity is the quantity minimized during training.
 %BLEU is a `hard' measure of performance, as it is calculated based on the sentences produced by the network, whereas perplexity is a `softer', more fine-grained measure that takes into account not just whether the correct target word was produced, but the probability of producing the correct target word.
-%We use both BLEU and perplexity in this paper, as appropriate.
+%I use both BLEU and perplexity in this paper, as appropriate.
 
 \subsubsection{Pruning Schemes}
 \label{subsubsec:approach_schemes}
-We follow the general magnitude-based approach of \cite{han2015learning}, which consists of pruning weights with smallest absolute value. However, we question the authors' pruning scheme with respect to the different weight classes, and experiment with three pruning schemes.
-Suppose we wish to prune $x$\% of the total parameters in the model. 
-How do we distribute the pruning over the different weight classes (illustrated in Figure~\ref{fig:nmt_complex}) of our model? 
-We propose to examine three different pruning schemes:
+I follow the general magnitude-based approach of \cite{han2015learning}, which consists of pruning weights with smallest absolute value. However, I question the authors' pruning scheme with respect to the different weight classes, and experiment with three pruning schemes.
+Suppose I wish to prune $x$\% of the total parameters in the model. 
+How do I distribute the pruning over the different weight classes (illustrated in Figure~\ref{fig:nmt_complex}) of my model? 
+I propose to examine three different pruning schemes:
 \begin{enumerate}
 \item \textit{Class-blind}: 
 Take all parameters, sort them by magnitude and prune the $x$\% with smallest magnitude, regardless of weight class.
@@ -142,18 +142,18 @@ those weights are small, regardless of their locations in the architecture.
 Class-uniform pruning and class-distribution pruning both seek to prune
 proportionally within each weight class, either absolutely, or relative to the
 standard deviation of that class.
-We find that class-blind pruning outperforms both other schemes (see
+I find that class-blind pruning outperforms both other schemes (see
 Section~\ref{subsubsec:exp_schemes}).
 
 \subsubsection{Retraining}
 \label{subsubsec:approach_retraining}
-In order to prune NMT models aggressively without performance loss, we retrain our pruned networks. 
-That is, we continue to train the remaining weights, but maintain the sparse structure introduced by pruning.
-In our implementation, pruned weights are represented by zeros in the weight matrices, 
-and we use binary `mask' matrices, which represent the sparse structure of a network, 
+In order to prune NMT models aggressively without performance loss, I retrain my pruned networks. 
+That is, I continue to train the remaining weights, but maintain the sparse structure introduced by pruning.
+In my implementation, pruned weights are represented by zeros in the weight matrices, 
+and I use binary `mask' matrices, which represent the sparse structure of a network, 
 to ignore updates to weights at pruned locations.
 This implementation has the advantage of simplicity as it requires minimal changes to the training and deployment code, 
-but we note that a more complex implementation utilizing sparse matrices and sparse matrix multiplication could potentially yield speed improvements.
+but I note that a more complex implementation utilizing sparse matrices and sparse matrix multiplication could potentially yield speed improvements.
 However, such an implementation is beyond the scope of this paper.
 
 \begin{figure}
