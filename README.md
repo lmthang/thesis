@@ -4,5 +4,4 @@ Following my advisor Chris Manning's recent preference towards <a href="https://
 The latest state of the thesis can be found <a
 href="https://github.com/lmthang/thesis/blob/master/thesis.pdf">here</a>. You can find all of the edits made by my advisor, page by page <a href="https://github.com/lmthang/thesis/issues">here</a>. Thanks Chris!
 
-Acknowledgment: thanks to <a href="http://stanford.edu/~angeli/">Gabor
-Angeli</a> for sharing the thesis setup!
+Acknowledgment: thanks to Gabor Angeli for sharing the thesis setup!
