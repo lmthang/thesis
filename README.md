@@ -1,6 +1,8 @@
 Thang Luong's Thesis on Neural Machine Translation
 ====================================================================
-This repository contains the latest version of my <a href="https://github.com/lmthang/thesis/blob/master/thesis.pdf">thesis</a>. Motivated by advisor's suggestion on <a href="https://speakerdeck.com/jakevdp/in-defense-of-extreme-openness">extreme openness</a>, I set this up from day 1 when starting my thesis writing. You can find all of the edits made by my advisor, page by page <a href="https://github.com/lmthang/thesis/issues">here</a>. Thanks Chris!
+This repository contains the latest version of my <a href="https://github.com/lmthang/thesis/blob/master/thesis.pdf">thesis</a>. 
+
+Motivated by advisor, Chris Manning, 's suggestion on <a href="https://speakerdeck.com/jakevdp/in-defense-of-extreme-openness">extreme openness</a>, I started sharing my thesis writing since day 1. While it is not yet clear how useful it is (smile), you can at least find all of the edits made by my advisor, page by page <a href="https://github.com/lmthang/thesis/issues">here</a>. Thanks Chris!
 
 Code, data, and models described in this thesis can be found at our <a href="http://nlp.stanford.edu/projects/nmt/">Stanford NMT Project Page</a>.
 
