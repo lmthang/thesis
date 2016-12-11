@@ -49,7 +49,7 @@ outputs.
 \section{Attention-based Models}
 \label{sec:attn}
 Unlike the basic NMT systems \cite{kal13,sutskever14,cho14,luong15}, in which the source representation is only used once to initialize the decoder hidden state, the idea of the {\it attention mechanism} explored in \cite{bog15,jean15} and this work is to provide a ``random access memory'' of source hidden states which one can constantly refer to as translation progresses.
-The various attention-based models proposed in this work can be classifed into two broad categories, {\it global} and {\it local}. These classes differ in terms of whether the ``attention'' is placed on all source positions or on only a few source positions. I illustrate these two model types in Figure~\ref{f:soft_attn} and \ref{f:hard_attn} respectively.
+The various attention-based models proposed in this work can be classified into two broad categories, {\it global} and {\it local}. These classes differ in terms of whether the ``attention'' is placed on all source positions or on only a few source positions. I illustrate these two model types in Figure~\ref{f:soft_attn} and \ref{f:hard_attn} respectively.
 
 Common to these two types of models is the fact that at each time step $t$ in the decoding phase, both approaches first take as input the hidden state $\hi$ at the top layer of a stacking LSTM. The goal is then to derive a context vector $\co$ that captures relevant source-side information to help predict the current target word $\tgt{t}$. While these models differ in how the context vector $\co$ is derived, they share the same subsequent steps. 
 Specifically, given the target hidden state $\hi$ and the source-side context vector $\co$, I employ a simple concatenation layer to combine the information from both vectors to produce an attentional hidden state as follows:
@@ -309,7 +309,7 @@ the perplexities (ppl) and the {\it tokenized} BLEU scores of various systems on
 best} system in bold and give {\it progressive} improvements in italic between
 consecutive systems. {\it local-p} referes to the local attention with 
 predictive alignments. I indicate for each attention model the
-alignment score function used in pararentheses. 
+alignment score function used in parentheses. 
 }
 \label{t:ende}
 \end{table*}
@@ -333,7 +333,7 @@ Additionally, I also use dropout with probability $0.2$ for my LSTMs as suggeste
 the learning rate after 8 epochs. For local
 attention models, I empirically set the window size $D=10$.
 
-My code is implemented in MATLAB. %\footnote{Publicly available at \url{http://annonymized}.} 
+My code is implemented in MATLAB.
 When running on a single GPU device Tesla K40, I achieve a speed of 1K {\it
 target} words per second. It takes 7--10 days to completely train a model.
 
@@ -577,11 +577,7 @@ lower AERs than those of the global one. The AER obtained by the ensemble, while
 good, is not better than the local-m AER, suggesting the well-known
 observation that AER and translation scores are not well correlated \cite{fraser07}.
 
-%Due to space constraint, I can only show alignment visualizations in the arXiv version of our
-%paper.\footnote{\url{http://arxiv.org/abs/1508.04025}}
-%I show some alignment visualizations in Appendix~\ref{sec:visual}.
 \subsection{Alignment Visualization}
-%\label{sec:visual}
 I visualize the alignment weights produced by my different attention
 models in Figure~\ref{i:alignment}. The visualization of the local
 attention model is much sharper than that of the global one. This contrast matches

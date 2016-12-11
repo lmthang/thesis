@@ -127,7 +127,7 @@ I insert a positional token \postext{d} after every word. Here, $d$ indicates a 
 ($d=-7,\ldots,-1,0,1,\ldots,7$) to denote that a target word at position $j$ is aligned 
 to a source word 
 at position $i=j-d$. Aligned words that are too far apart are considered unaligned, and 
-unaligned words rae annotated
+unaligned words are annotated
 with a null token \postext{n}. My annotation is illustrated in 
 Figure~\ref{f:pos_all}.
 
@@ -177,7 +177,6 @@ However, I show that this is not the case (see $\S$\ref{subsec:rare_model_compar
 \label{sec:exp}
 I evaluate the effectiveness of my OOV models on the WMT'14 English-to-French translation 
 task. Translation quality is measured with the BLEU metric \cite{Papineni02bleu} on the newstest2014 test set (which has 3003 sentences).
-%\footnote{\url{http://www.statmt.org/wmt14/translation-task.html}} 
 
 \subsection{Training Data}
 
@@ -298,10 +297,8 @@ word with greater accuracy, making the post-processing more useful.
 It is interesting to observe that our approach is more useful for ensemble models as compared to the individual ones. 
 This is because the usefulness of the PosUnk model directly
 depends on the ability of the NMT to correctly locate, for a given OOV target word, its corresponding word in the source sentence.  An ensemble of large models identifies these source words with greater accuracy.  This is why for the same vocabulary size, better models obtain a greater performance gain our post-processing step. 
-Except for the very recent work of \newcite{jean15} that employs a similar unknown treatment strategy\footnote{Their unknown replacement method and mine both track the locations of target unknown words and use a word dictionary to post-process the translation. However, the mechanism used to achieve the ``tracking'' behavior is different. \newcite{jean15}'s uses the attentional mechanism to track the origins of all target words, not just the unknown ones. In contrast, I only focus on tracking unknown words using unsupervised alignments. My method can be easily applied to any sequence-to-sequence models since I treat any model as a blackbox and manipulate only at the input and output levels.} as mine, our best result of \bestbleuunk{} BLEU outperforms all other NMT systems by a 
-arge margin, and 
-%in particular, it outperforms the current best NMT system \cite{sutskever14} by \unkimpilya{} BLEU points.
-more importanly, our system has established a new record on the WMT'14 English to French translation.
+Except for the very recent work of \newcite{jean15} that employs a similar unknown treatment strategy\footnote{Their unknown replacement method and mine both track the locations of target unknown words and use a word dictionary to post-process the translation. However, the mechanism used to achieve the ``tracking'' behavior is different. \newcite{jean15}'s uses the attentional mechanism to track the origins of all target words, not just the unknown ones. In contrast, I only focus on tracking unknown words using unsupervised alignments. My method can be easily applied to any sequence-to-sequence models since I treat any model as a blackbox and manipulate only at the input and output levels.} as mine, our best result of \bestbleuunk{} BLEU outperforms all other NMT systems by a large margin, and 
+more importantly, our system has established a new record on the WMT'14 English to French translation.
 
 \section{Analysis}
 \label{sec:analysis}

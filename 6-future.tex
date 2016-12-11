@@ -34,9 +34,6 @@ and speech \cite{heigold13,huang2013cross}.
 As we have seen in earlier chapters, sequence to sequence (\ssl{}) learning
 \cite{kal13,sutskever14,cho14} has emerged as an effective paradigm for dealing with
 variable-length inputs and outputs. 
-%\ssl{} learning, at its core, uses
-%recurrent neural networks to map variable-length input sequences to
-%variable-length output sequences.  
 While relatively new, the \ssl{}
 approach has achieved state-of-the-art results in not only its original
 application -- machine translation --
@@ -114,8 +111,6 @@ related sequence of English words for the skip-thought objective
 is useful for either multi-target translation as
 in \cite{dong15} or between different tasks. Here, English and
 German imply sequences of words in the respective languages. 
-%The $\alpha$ values
-%give the proportions of parameter updates that are allocated for the different tasks.
 } 
 \label{f:otm}
 \end{figure}
@@ -145,12 +140,6 @@ is handy for tasks in which only the decoders can be shared.}
 %\label{subsec:mtm}
 Lastly, as the name describes, this category is the most general one,
 consisting of multiple encoders and multiple decoders.
-%However, such
-%flexibility also makes it difficult to determine which tasks should
-%share which components. ---- Is it true? IS. 
-%To simplify sharing, I consider a special use
-%case in machine translation which involves two encoders and two
-%decoders shared over three tasks.
 I will explore this scheme in a translation setting that involves sharing multiple
 encoders and multiple decoders.  In addition to the machine
 translation task, I will include two unsupervised 
@@ -201,7 +190,6 @@ the {\it mixing} ratio values $\alpha_i$ (for each task $i$). Each
 parameter update consists of training data from one task only. When
 switching between tasks, I select randomly a new task $i$ with
 probability $\frac{\alpha_i}{\sum_j \alpha_j}$.
-%{\bf [Thang, make sure that it is correct]} 
 
 
 My convention is that the first task is the
@@ -633,9 +621,6 @@ for translation and unsupervised learning tasks. I experiment with both {\it
 autoencoders} and {\it skip-thought vectors} for the unsupervised objectives. Numbers in {\it
 mean (stddev)} format are the average results of 2 runs; others are for 1 run
 only.}
-%shown are perplexities
-%for translation and unsupervised learning tasks. I follow the same format as in
-%Table~\ref{t:unsupervised_en_de}.}
 \label{t:unsupervised_de_en}
 \end{table}
 
@@ -801,18 +786,6 @@ The core of a LSTM block is the weight matrix $T_{4n,2n}$ of size $4n \times
 interactions between $\{$input gate $i$, forget gate $f$, output gate $o$,
 input signal $\hat{h}\} \times \{$feed-forward input $h_t^{l-1}$, recurrent
 input $h_{t-1}^l\}$.
-
-%\subsection{Evaluation metrics}
-%I evaluate my models by two measures: BLEU score and perplexity. 
-%BLEU compares the output target sentence with the human-translated target sentence, and is measured on a scale from 0 (worst) to 100 (best).
-%Perplexity is the exponential of the average loss per word, measured on a scale from 1 (best) to infinity (worst). 
-%%For each output target word, the model produces scores for each word in the vocabulary, which are converted to a probability distribution over the vocabulary. 
-%The \emph{loss} is the negative log probability of the correct word --- that is, the lower the system's certainty in choosing the correct word, the higher the loss.
-%
-%Both evaluation metrics are valuable. 
-%BLEU measures a system's performance on the end-goal of machine translation, translation quality, whereas perplexity is the quantity minimized during training.
-%BLEU is a `hard' measure of performance, as it is calculated based on the sentences produced by the network, whereas perplexity is a `softer', more fine-grained measure that takes into account not just whether the correct target word was produced, but the probability of producing the correct target word.
-%I use both BLEU and perplexity in this paper, as appropriate.
 
 \subsubsection{Pruning Schemes}
 \label{subsubsec:approach_schemes}

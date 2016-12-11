@@ -1,8 +1,3 @@
-%Neural Machine Translation (NMT) is a simple new architecture for getting
-%machines to translate. At its core, NMT is a single deep 
-%neural network that is trained end-to-end with several advantages such as
-%simplicity and generalization. 
-
 \begin{sloppypar}
 In the previous chapters, I showed that despite being relatively new, NMT has already
 achieved state-of-the-art translation results for several language pairs 
@@ -72,7 +67,6 @@ My analysis demonstrates that my character models can successfully learn to not
 only generate well-formed words for Czech, a
 highly-inflected language with a very complex vocabulary, but also build correct
 representations for English source words.
-% I provide code, data, and models at \url{http://nlp.stanford.edu/projects/nmt}.
 
 \section{Related Work}
 There has been a recent line of work on end-to-end character-based neural models
@@ -101,93 +95,12 @@ is also a hierarchical sequence-to-sequence model, but operates at a different
 granularity level, word-character. In contrast, \newcite{li15} build
 hierarchical models at the sentence-word level for paragraphs and documents.
 
-%\section{Background \& My Models}
-%\label{sec:nmt}
-%\begin{sloppypar}
-%Neural machine translation aims to directly model the conditional probability $p(\tgt{}|\src{})$ of translating
-%a source sentence, $\src{1},\ldots,\src{n}$, to a target sentence, $\tgt{1},\ldots,\tgt{m}$.
-%It accomplishes this goal through an {\it encoder-decoder} framework
-%\cite{kal13,sutskever14,cho14}. The {\it encoder} computes a representation $\MB{s}$
-%for each source sentence. Based on that source representation,
-%the {\it decoder} generates a translation, one target word at a time, and hence,
-%decomposes the log conditional probability as:
-%\end{sloppypar}
-%
-%\begin{equation}
-%\log p(\tgt{}|\src{}) = \sum_{t=1}^m \nolimits \log
-%p\open{\tgt{t}|\tgt{<t},\MB{s}}
-%\label{e:s2s}
-%\end{equation}
-%
-%A natural model for sequential data is the recurrent
-%neural network (RNN), used by most of the recent NMT work.
-%Papers, however, differ in terms of: (a) architecture -- from unidirectional, to
-%bidirectional, and deep multi-layer RNNs; and (b) RNN type -- which are long
-%short-term memory (LSTM)
-%\cite{lstm97} and the gated recurrent unit \cite{cho14}. 
-%All my models utilize the {\it deep multi-layer} architecture with {\it
-%LSTM} as the recurrent unit; detailed formulations are in \cite{zaremba14}.
-%
-%Considering the top recurrent layer in a deep LSTM, 
-%with $\hd{t}$ being the current target hidden state as in Figure~\ref{f:attn}, one can compute the probability of decoding each target word $y_t$ as:
-%\begin{equation}
-%p\left(\tgt{t}|\tgt{<t},\MB{s}\right) = \softmax\open{\hd{t}}
-%\label{e:softmax}
-%\end{equation}
-%
-%For a parallel corpus $\mathbb{D}$, I train my model by minimizing the below
-%cross-entropy loss:
-%\begin{equation}
-%J = \sum_{(\src{},\tgt{}) \in \mathbb{D}} \nolimits -\log p(\tgt{}|\src{})
-%\label{e:obj}
-%\end{equation}
-%
-%\noindent {\bf Attention Mechanism} -- 
-%%Another important difference between NMT work lies in what constitutes the
-%%input representation $\MB{s}$.
-%The early NMT approaches \cite{sutskever14,cho14}, which I have described above, use only the last encoder state
-% to initialize the decoder, i.e., setting the input representation $\MB{s}$ in
-% \eq{e:s2s} to $[\hb{n}]$. Recently, \newcite{bog15} propose an {\it attention
-% mechanism}, a form of random access memory for NMT to 
-%cope with long input sequences.
-%%This is accomplished by setting
-%%$\MB{s}$ to be the set of encoder hidden states already computed. % $[\hb{1}, \dots, \hb{n}]$
-%\newcite{luong15attn} further extend the attention mechanism to different
-%scoring functions, used to compare source and target
-%hidden states, as well as different
-%strategies to place the attention.
-%%{\it global} -- utilize all source hidden
-%%states at all target timesteps and {\it local} -- focus on a small subset of
-%%source hidden states per target timestep.
-%In all my models, I utilize the {\it global} attention mechanism and the {\it
-%bilinear form} for the attention scoring function similar to 
-%\cite{luong15attn}.
-%
-%
-%Specifically, I set $\MB{s}$ in \eq{e:s2s} to
-%the set of source hidden states at the top layer, $[\hb{1}, \dots, \hb{n}]$. 
-%As illustrated in Figure~\ref{f:attn}, the attention mechanism consists of two stages: (a) {\it
-%context vector} -- the current hidden state $\hd{t}$ is compared with
-%individual source hidden states in $\MB{s}$ to learn an alignment vector, which
-%is then used to compute the context vector $\co$ as a weighted average of
-%$\MB{s}$; and (b) {\it
-%attentional hidden state} -- the context vector $\co$ is then used to derive a
-%new attentional hidden state:
-%\begin{equation}
-%\hs = \tanh(\W{}[\co; \hi])
-%\label{e:hs}
-%\end{equation} 
-%The attentional vector $\hs$ then replaces $\hd{t}$ in \eq{e:softmax} in
-%predicting the next word.
-
 \section{Hybrid Neural Machine Translation}
 \label{sec:hybrid}
 My hybrid architecture, illustrated in Figure~\ref{f:hybrid}, leverages the power of both words
 and characters to achieve the goal of open vocabulary NMT. The core of the
 design is a {\it word}-level NMT with the advantage of being fast and easy to
 train.
-%, whereas purely character-based NMT has to deal with very
-%long sequences. 
 The {\it character} components empower the 
 word-level system with the abilities to compute any source word representation on the fly from 
 characters and to recover character-by-character unknown target words
@@ -352,9 +265,6 @@ This is because of the context-dependent nature of the decoder.
 after the character-level forward pass
 and we can split these computations into
 mini-batches if the number of \unk{} is large.}
-%For speed efficiency, I run a forward pass
-%over the word-level decoder first. Then, I invoke, in batch mode, a forward
-%pass over the character-level decoder for the surface forms of all the \unk{} tokens.
 
 \paragraph{Word-Character Generation Strategy}
 \label{subsubsec:strategy}
@@ -390,7 +300,6 @@ been argued to be a better metric for translation tasks out of English.
 
 \subsection{Data}
 Among the available language pairs in WMT'15, all involving English, 
-%between English and German, French, Finnish, Czech, and Russian, 
 I choose {\it Czech} as a target language for several reasons. First and
 foremost, Czech is a Slavic language with not only rich
 and complex inflection,
@@ -421,19 +330,11 @@ diacritics. % than Russian
   \# Types & 1,172K & 2003 & 1,760K & 2053\\ 
   \hline
   200-char & \multicolumn{2}{c|}{98.1\%} & \multicolumn{2}{c}{98.8\%} \\
-% \hline
-% \multicolumn{5}{c}{\biformat{Filtered} (top 500K words)} \\
-% \hline
-%  Vocab & 500K & 818 & 500K & 525\\ 
-%  \hdashline
-%  200-char & \multicolumn{2}{c|}{98.7\%} & \multicolumn{2}{c}{99.5\%}
 \end{tabular}
 %}
 \caption[WMT'15 English-Czech data]{{\bf WMT'15 English-Czech data} -- shown are various statistics of my training
 data such as {\it sentence}, {\it token} (word and character counts), as well as
 {\it type} (sizes of the word and character vocabularies).
-%under two conditions, {\it
-%full} (all words) and {\it filtered} (top 500K frequent words). 
 I show in addition the amount of words in a vocabulary expressed by a list of 200 characters found
 in frequent words.}
 \label{t:data}
@@ -443,12 +344,6 @@ In terms of preprocessing, I apply only the standard tokenization practice.\foot
 default settings.} I choose for each language a list of 200
 characters found in frequent words, which, as shown in Table~\ref{t:data}, can
 represent more than 98\% of the vocabulary. 
-
-%In my current experiments, I only consider
-%the top 500K frequent words per language.\footnote{All remaining words are
-%represented by a \rare{} token. This is mostly historical when
-%training my early models. Better models trained on full vocabularies are under
-%the way and I will report results in the next version.}
 
 \begin{table*}%[tbh!]
 \centering

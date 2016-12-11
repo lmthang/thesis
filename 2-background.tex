@@ -1,5 +1,4 @@
 \epigraph{Give me a place to stand and I will move the earth.}{Archimedes.}
-%\epigraph{For neural machine translation, it all started from language modeling.}{Thang Luong.}
 
 In this chapter, I provide background knowledge on three main topics, namely
 language model (LM), recurrent neural network (RNN), and neural machine
@@ -26,7 +25,6 @@ system as well as tips and tricks for better training and testing NMT.
 \section{Language Model}
 As I have discussed in \secref{sec:mt}, language modeling plays an indispensable
 role in MT to ensure that systems produce fluent translations.
-% and has always been an active area of research.
 Specifically, the job of an LM is to specify a probability distribution over
 sequences of symbols (often, words) so that one can judge if a sequence of
 words is more likely or ``fluent'' than another. To accomplish that, an LM
@@ -48,8 +46,6 @@ quickly becomes enormous. As a result,
 despite much research in this area 
 \cite{rosenfeld2000,srilm,teh2006,irstlm,kenlm}, inter alia, %,pauls2011,heafield13
 \ngram{} LMs can only handle short contexts of about 4 to 6 words,  
-%As a result, existing MT systems often limit
-%themselves to use only short, e.g., $5$-gram, LMs \cite{kenlm}, which capture little context
 and does not generalize well to unseen \ngram{}s. 
 
 Neural language models (NLMs), first proposed by \newcite{Bengio2003} and enhanced by
@@ -90,7 +86,6 @@ bank}.
 \word{promenade le long de la} as in
 traditional \nlms{} \cite{Bengio2003}, but also utilizes source context \word{along the
 South Bank} to lower uncertainty in its prediction.
-%\error{Plot a figure on NPLMs?}
 } 
 \label{f:nnjm}
 \end{figure}
@@ -104,27 +99,6 @@ translation with a goal of redesigning the entire MT pipeline completely. To sta
 first learn about recurrent neural network, a
 building block for NMT as well as a key component to address the local
 translation problem in statistical MT systems.
-
-%Approaches to building \nlmtext{} (\nlms) using
-%feed-forward networks such as those initiated by \newcite{Bengio2003} and
-%enhanced by others \cite{Morin2005,Bengio08,MnihHinton2009,MnihTeh2012} have %,Mnih2007
-%addressed that drawback to model longer contexts.
-
-%% worked great compared to traditional \ngram{} language models. 
-%Still, \nlms{} can only capture fixed-length contexts and is
-%incapable of handling variable-length sequences, which is the case for sentences.
-
-%Early success of feed-forward \nlms{} has led to widespread adoption of \nlms{}
-%as an additional component in the machine translation pipeline
-%such as \cite{schwenk07,vaswani13decode,luong15nlm}, inter alia.
-%\cite{Schwenk12continuous,Son:2012:CST,Auli13,devlin14}
-
-%An important part in the machine translation pipeline is the ability to model language
-%coherence at the target side. 
-%As such, a significant amount of effort in
-%improving MT has centered around enhancing language modeling -- more specifically, the need to capture long-range
-%dependencies better. I start out with efforts to scale up traditional \ngram{} language models 
-
 
 \section{Recurrent Neural Network}
 \label{sec:rnn}
@@ -223,18 +197,6 @@ Throughout this thesis, RNNs will be discussed from a language
 learning perspective. For more details on general RNNs, I refer readers to the
 following resources \cite{sutskever12,mikolov12,karpathy15rnn}.
 
-
-
-%By viewing RNNs as generative models \cite{Sutskever11} that can produce texts 
-%and by pushing another step towards conditioning RNNs on source sentences, recent works
-%\cite{kal13,sutskever14,cho14} have started a new line of research in machine translation, namely Neural
-%Machine Translation (NMT). NMT is technically a source-conditioned \nlm{} that
-%can be trained end-to-end.
-
-%An RNN-based language model naturally lends itself to model the full
-%history as we shall see now.
-
-
 \paragraph{Recurrent Language Models}
 %\label{subsec:rlm}
 \edit{
@@ -278,14 +240,6 @@ $\W{e} \inR{d_e \times |V|}$ is looked up for each word $x_i$ to retrieve a
 representation $\x{i} \inR{d_e}$. As a result, a vanilla recurrent language model
 will generally have $\theta = \{\W{xh}, \W{hh}, \W{hy}, \W{e}\}$ as its
 weights. % as illustrated in Figure~\ref{f:rlm}. 
-% \error{Mention that we want to learn the embedding matrix}.
-
-
-%i.e., $x=\{$
-%\sos{}, $y_1, \dots, y_n\}$. In our example, $x=\{$ \sos, ``I'', ``am'', ``a'',
-%``student''$\}$, whereas $y=\{$ ``I'', ``am'', ``a'',
-%``student'', \eos$\}$
-
 
 \subsection{Training \& Backpropagation}
 Given a training dataset of $N$ discrete output sequences $\ytop{1}, \ldots,
@@ -369,7 +323,7 @@ d\bm{w}_i &= \fracder{z_i}{\bm{w}_i} \cdot \fracder{v_i}{z_i}
 &= \fracder{\tp{\bm{w}_i}\bm{h}}{\bm{w}_i} \cdot f'(z_i) \cdot dv_i \\
 &= \bm{h} \cdot f'(z_i) \cdot dv_i \\ 
 d\tp{\bm{w}_i} &= \paren{f'(z_i) \cdot dv_i} \cdot
-\tp{\bm{h}} && \text{[Tranposing]} \\
+\tp{\bm{h}} && \text{[Transposing]} \\
 \der{W} &= \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}}
 && \text{[Concatenating row derivatives]}
 \end{align*}
@@ -394,24 +348,14 @@ respect to the corresponding vectors. We have:
 \begin{align}
 d\bm{u} = f(\bm{v}) \edot d\bm{s} \\
 d\bm{v} = f'(\bm{v}) \edot \bm{u} \edot d\bm{s} 
-%d\bm{u} = \diag \paren{f(\bm{v})} \cdot d\bm{s} \\
-%d\bm{v} = \diag \paren{f'(\bm{v}} \edot \bm{u}} \cdot d\bm{s} 
 \end{align}
 \end{remark}
-
-%\begin{proof}
-%\begin{align}
-%d\bm{u} &= \parder{\diag \paren{f(\bm{v})} \cdot d\bm{s} \\
-%\end{align}
-%\end{proof}
 
 \begin{remark}
 \label{r:edot_der2}
 As a special case of \remarkref{r:edot_der} when $f$ is an identity function,
 i.e.,  $\bm{s} = \bm{u} \edot \bm{v}$. We have:
 \begin{align}
-%d\bm{u} = \diag (\bm{v}) \cdot d\bm{s} \\
-%d\bm{v} = \diag (\bm{u}) \cdot d\bm{s} 
 d\bm{u} = \bm{v} \edot d\bm{s} \\
 d\bm{v} = \bm{u} \edot d\bm{s} 
 \end{align}
@@ -432,12 +376,9 @@ Starting with the loss $l_t$, we employ backpropagation through structures
 \cite{goller96} to derive each gradient one by one in the following
 order: $l_t \rightarrow \s{t} \rightarrow \{\hid{t}, \W{hy}\} \rightarrow
 \{\x{t}, \hid{t-1}, \W{xh}, \W{hh}\}$. 
-%To simplify the math, we will utilize
-%several lemmas and corollaries provided in \secref{ss:misc}.
 
 First, from \eq{e:softmax}, with $\prob{t}(y) = \dfrac{e^{\s{t}(y)}}{\sum_{y' \in Y}
 e^{\s{t}(y')}}$, we have:
-% $l_t = -\log \prob{t}(y_t) = \log \sum_{y'} e^{\s{t}(y')} - \s{t}(y_t)$. As a result:
 \begin{align}
 d\s{t} = \fracder{\l_t}{\s{t}} = \parfrac{\s{t}} \paren{\log \sum_{y'} e^{\s{t}(y')} - \s{t}(y_t)}
 \end{align}
@@ -475,10 +416,6 @@ applied to any hidden unit type, e.g., the aforementioned vanilla RNN or the
 LSTM unit that I will describe shortly in the next section. 
 
 {\it Vanilla RNN Backpropagation} \indent 
-%For the vanilla RNN formulation in \eq{e:vanilla_rnn}, we further backpropagate
-%the loss as follows.
-%For simplicity and convenience, one can set the embedding size to be equal to the
-%hidden size, so $\W{xh}, \W{hh} \inR{d \times d}$. We can further 
 First of all, we can simplify the notation to have $\rnn\!=\![\MB{W_{xh}}
 \MB{W_{hh}}]$ and $\z{t}\!=\![\x{t};
 \hid{t-1}]$, so the RNN formulation in \eq{e:vanilla_rnn} % \inR{2d}
@@ -631,7 +568,7 @@ flow smoothly through time. In addition, there are gating units that control how
 much an RNN wants to reuse memory ({\it forget} gates), receive input signal ({\it
 input} gates), and extract information ({\it output} gates) at each timestep.
 There are many implementation instances of LSTM, differing in terms of
-whether and which biases are used, how gates are built, etc; however, it turns
+whether and which biases are used, how gates are built, etc.; however, it turns
 out that these different choices do not matter much for most cases
 \cite{jozefowicz15,greff15}. As such, in this section and throughout this
 thesis, I will stick to the formulation described in \cite{zaremba14}.
@@ -669,10 +606,6 @@ Note that, in \eq{e:lstm_output},
 the memory cell $\mem{t}$ is passed through a nonlinear function $\sigma$ before the output
 gate $\og$ is used to extract relevant information in the hope for better
 information retrieval.
-%or the cell 
-%before extracting information for $\hid{t}$ using the output gate $\og$,
-%we introduce some non-linearity through $\sigma$ to better retrieve information
-%from the memory or the cell $\mem{t}$. 
 As evidence, \newcite{greff15} have
 shown that such an output nonlinearity is critical to the performance of an LSTM. Moving on, to ensure that the
 gates are adaptive, we build them from the information given by the current
@@ -709,8 +642,6 @@ of these desiderata lead to the below LSTM formulation described in
 \hid{t} &= \og \edot \tanh(\mem{t}) \label{e:lstm_detailed_output}
 \end{align}
 
-%In similar spirit as \eq{e:rnn_simplified}, we can be GPU-efficient with
-%equations later, we can rewrite \eq{e:lstm_detailed} as:
 Following the same spirit as \eq{e:rnn_simplified}, we can be GPU-efficient with
 \eq{e:lstm_detailed} since the 8 different submatrices are grouped into a single big matrix,
 which we call $\lstm$. Let $\z{t}\!=\![\x{t}; \hid{t-1}]$. What we do is
@@ -723,27 +654,6 @@ equations later, we can rewrite \eq{e:lstm_detailed} as:
 \label{e:lstm simplified}
 \end{align}
 Here, $g$ is a non-linear function applied element-wise and we define $g$ loosely in the sense that it uses $\tanh$ only for the vector part corresponding to $\hg$ and $\sigm$ for the rest.
-
-
-%\begin{align}
-%\label{e:lstm simplified}
-%\begin{pmatrix}
-%\ig \\
-%\fg \\
-%\og \\
-%\hg
-%\end{pmatrix}
-%&= 
-%\begin{pmatrix}
-%\sigm \paren{\iparam \z{t}} \\
-%\sigm \paren{\fparam \z{t}} \\
-%\sigm \paren{\oparam \z{t}} \\
-%\tanh \paren{\hparam \z{t}}
-%\end{pmatrix}
-%\end{align}
-%Note that $\hparam\!=\![\MB{W_{xh}} \MB{W_{hh}}]$ is the same as $\rnn$ in
-%\eq{e:rnn_simplified}; we define $\iparam, \fparam, \oparam$ similarly for the
-%input, forget, and output gates.
 
 \paragraph{LSTM Training}
 In the LSTM training pipeline, there are many components that are exactly the
@@ -784,13 +694,6 @@ d\mem{t-1} = \fg \edot d\mem{t} \\
 d\ig = \hg \edot d\mem{t} \\
 d\hg = \ig \edot d\mem{t}
 \end{align} 
-
-%For \eq{e:lstm simplified}, by applying \lemmaref{l:chain_rule} repeatedly for $\ig, \fg, \og, \hg$, we arrive at:
-%\begin{align}
-%\der{h} = \tp{\bm{W}} \cdot \paren{f'(\bm{Wh}) \edot \der{v}}
-%\\
-%\der{W} = \paren{f'(\bm{Wh}) \edot \der{v}} \cdot \tp{\bm{h}} 
-%\end{align}
 
 Let $d\ut = [d\ig; d\fg; d\og; d\hg]$ (vertical concatenation), we are now ready to backpropagate through \eq{e:lstm simplified}. In a similar manner as RNNs, Eq.~\ref{e:grad_xt}-\ref{e:grad_Whh}, we arrive at:
 \begin{align}
@@ -905,7 +808,6 @@ translating a source sentence \word{I am a student} into a target sentence
 In this thesis, all my NMT models are deep multi-layer RNNs which are 
 unidirectional and have an LSTM as the recurrent unit. I show an example of
 such model in Figure~\ref{f:nmt_details}.
-%though it should be easy to extend to other RNN architectures. 
 In this example, I train my model to translate a source sentence
 \word{I am a student} into a target one \word{Je suis \'{e}tudiant}.
 At a high level, my NMT models consist of two recurrent neural networks as
@@ -922,18 +824,11 @@ Given these discrete words, the model looks up the source and target
 embeddings to retrieve the corresponding word representations.
 For this {\it embedding layer} to work, a vocabulary is chosen for each language, and
 often the top $V$ frequent words are selected.
-%Thus, every word in the source or target vocabulary can be represented by a one-hot vector of length $V$.
-%The source input sentence and target input sentence, represented as a sequence
-%of one-hot vectors, are transformed into a sequence of word embeddings by the
-%\emph{embedding} weights. 
 These embedding weights, one set per language, are learned during training.
 While one can choose to initialize embedding weights with pretrained word
 representations, such as word2vec \cite{mikolov13nips} and Glove
 \cite{pennington2014}, I found, in this thesis, that these
 embeddings can be initialized randomly and learned from scratch given large training datasets.
-
-%, are different for the source words and the target words.
-%The word embeddings and all hidden layers are vectors of length $n$ (a chosen hyperparameter).
 
 Once retrieved, the word embeddings are then fed as input into the main network, which consists
 of two multi-layer RNNs `stuck together' --- an encoder for the source
@@ -956,9 +851,6 @@ Often, different weights can be used across the encoder and decoder as well as
 across different layers; in the current example, I have 4 different LSTM
 weight sets $\lstm$, detailed in \eq{e:lstm_notation}, over $\{\text{encoder,
 decoder}\} \times \{1^{\text{st}}, 2^{\text{nd}} \text{ layer}\}$.
-%The hidden state at the top layer of the decoder is fed through an
-%\textit{attention} layer, which guides the translation by `paying attention' to relevant parts of the source sentence; 
-%for more information see \cite{bahdanau2014neural} or Section 3 of \cite{luong2015effective}.
 Finally, for each target word, the hidden state at the top layer is transformed by the
 \emph{softmax} weights into a probability distribution over the target
 vocabulary of size $V$ according to \eq{e:score} and \eq{e:prob}. 
@@ -996,8 +888,6 @@ $m_x + 1$ (line~5). The same LSTM codebase (lines~8-11) is used for both the
 encoder and decoder in which embeddings are first looked up for the input
 $s_t$; after that, hidden states as well as LSTM cell memories are built from the
 bottom layer to the top one (the $L^{\text{th}}$ layer). 
-%The hidden state computed at one layer is used
-%as input to the upper one according to Line~13. 
 In Line~10, \texttt{LSTM} refers
 to the entire formulation in
 Eq~\ref{e:lstm_detailed}-\ref{e:lstm_detailed_output}, which one can easily
@@ -1017,11 +907,6 @@ m_y + 1$}
 $\W{e}, \lstm^{(1..L)} \leftarrow \W{e}^{\text{encoder}},
 \lstm^{\text{encoder}}$ \tcp*{Encoder weights}
 $\hid{0}^{(1..L)}, \mem{0}^{(1..L)} \leftarrow \bm{0}$ \tcp*{Zero init} %^{(1..L)}, \bm{0}^{(1..L)}$ \tcp*{Starting states and memories}
-% Multi-layer 
-%\For{$l=1 \rightarrow L$}{
-%$\hid{0}^{(l)}, \mem{0}^{(l)} \leftarrow \bm{0}, \bm{0}$ \tcp*{Starting states and
-%memories}
-%}
 
 \For{$t=1 \rightarrow (m_x + 1 + m_y)$}
 {

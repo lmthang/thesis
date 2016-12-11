@@ -1,10 +1,5 @@
 \epigraph{The Babel fish is small, yellow, leech-like, and probably the oddest
 thing in the universe. 
-%It feeds on brainwave energy  ...
-%absorbing all unconscious
-%frequencies and then excreting telepathically a matrix formed from the conscious
-%frequencies and nerve signals picked up from the speech centres of the brain,
-%the practical upshot of which is that 
 If you stick a Babel fish in your ear, you can
 instantly understand anything in any form of language.}{{\it The Hitchhiker's
 Guide to the Galaxy}. Douglas Adams.}
@@ -238,19 +233,6 @@ For more information on evaluation metrics, tree-based models, and other
 topics in statistical machine translation, we refer the audience to an 
 excellent book by \newcite{koehn10smt}.
 
-
-%For over twenty years since the IBM seminal paper, approaches in MT
-%such as
-%\cite{Koehn:2003:SMT,och03,Liang:2006:EDA,koehn2007moses,chiang07hiero,dyer10cdec,cer10phrasal},
-%%inter alia, 
-%are, by and large, similar according to the following two-stage
-%process (see Figure~\ref{f:phrase_mt}). First, source sentences are broken into
-%chunks which can be translated in isolation by looking up a ``dictionary'', or
-%more formally a {\it translation model}. Translated target words and phrases
-%are then put together to form coherent and natural-sounding sentences by consulting a
-%{\it language model} (LM) on which sequences of words, i.e., {\it \ngram{}s}, are
-%likely to go with one another.
-
 \section{Neural Machine Translation}
 While statistical machine translation (SMT) has been successfully deployed in many
 commercial systems, it does not work very well and suffers from the following
@@ -417,7 +399,7 @@ state-of-the-art performance for English-German and English-Vietnamese \cite{iws
 \subsubsection{Hybrid Models} 
 Nearly all previous NMT work has used quite restricted
 vocabularies, perhaps with a subsequent method to patch in unknown words such as
-the copy mechanisms mentioned earlier. While effective, the copy mechanims cannot deal with all the
+the copy mechanisms mentioned earlier. While effective, the copy mechanisms cannot deal with all the
 complexity of human languages such as rich morphology, neologisms, and informal
 spellings.
 Chapter~\ref{c:hybrid} presents a novel word-character solution to that {\it
@@ -474,7 +456,6 @@ objectives, autoencoder and skip-thought, in the MTL context: an autoencoder hel
 perplexity but more on BLEU scores compared to skip-thought.
 {\it This section is based on the following paper \cite{luong16iclr}.}
 
-%Neural Machine Translation (NMT), like many other deep learning domains, typically suffers from over-parameterization, resulting in large storage sizes.
 For the second question, I examine three simple magnitude-based pruning schemes to compress NMT models, namely {\it class-blind}, {\it class-uniform}, and {\it class-distribution}, which differ in terms of how pruning thresholds are computed for the different classes of weights in the NMT architecture.
 I demonstrate the efficacy of weight pruning as a compression technique for a state-of-the-art NMT system. 
 I show that an NMT model with over 200 million parameters can be pruned by 40\% with very little performance loss as measured on the WMT'14 English-German translation task. 
