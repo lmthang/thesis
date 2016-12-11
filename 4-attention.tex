@@ -71,13 +71,13 @@ I now detail how each model type computes the source-side context vector $\co$.
 \begin{figure}
 \centering
 %\psgrid
-\rput(6.3,6.2){$\tgt{t}$}
-\rput(6.6,5.7){$\hs$}
-\rput(2.2,3.5){$\co$}
-\rput(4.3,2.5){$\al$}
-\rput(6.75,1.7){$\hi$}
-\rput(0.2,2.1){$\his$}
-\includegraphics[width=0.5\textwidth, clip=true, trim= 0 0 0 0]{img/4-attn_soft} % , angle=-90
+\rput(7.1,6.6){$\tgt{t}$}
+\rput(2.7,4){$\co$}
+\rput(5,3.1){$\al$}
+\rput(7.9,1.9){$\hi$}
+\rput(7.9,6){$\hs$}
+\rput(0.3,2.3){$\his$}
+\includegraphics[width=0.55\textwidth, clip=true, trim= 0 0 0 0]{img/4-attn_soft} % , angle=-90
 \caption[Global attentional model]{{\bf Global attentional model} -- at each time step $t$, the model infers a {\it variable-length} alignment weight vector $\al$ based on the current target state $\hi$ and all source states $\his$. A global context vector $\co$ is then computed as the weighted average, according to $\al$, over all the source states. 
 } 
 \label{f:soft_attn}
@@ -135,15 +135,14 @@ Figure~\ref{f:soft_attn}. On the other hand, at any time $t$, \newcite{bog15} bu
 \begin{figure}
 \centering
 %\psgrid
-\rput(6.3,6.2){$\tgt{t}$}
-\rput(6.6,5.7){$\hs$}
-\rput(2.2,3.5){$\co$}
-\rput(3.0,2.4){$\al$}
-\rput(6.75,1.7){$\hi$}
-\rput(5.5,2.8){$p_t$}
-\rput(0.2,2.1){$\his$}
-%\rput(2.55,1.8){$p_t$}
-\includegraphics[width=0.45\textwidth, clip=true, trim= 0 0 0 0]{img/4-attn_hard} % , angle=-90
+\rput(7.1,6.6){$\tgt{t}$}
+\rput(2.7,4){$\co$}
+\rput(3.8,2.9){$\al$}
+\rput(7.9,1.9){$\hi$}
+\rput(7.9,6){$\hs$}
+\rput(6.5,3.4){$p_t$}
+\rput(0.3,2.3){$\his$}
+\includegraphics[width=0.55\textwidth, clip=true, trim= 0 0 0 0]{img/4-attn_hard} % , angle=-90
 \caption[Local attention model]{{\bf Local attention model} -- the model first predicts a single
 aligned position $p_t$ for the current target word. A window centered around the
 source position $p_t$ is then used to compute a context vector $\co$, a weighted
@@ -237,8 +236,8 @@ I create a very deep network spanning both horizontally and vertically.
 \begin{figure}
 \centering
 %\psgrid
-\rput(3,5.6){$\hs$}
-\includegraphics[width=0.4\textwidth, clip=true, trim= 0 0 0 0]{img/4-attn_input} % , angle=-90
+\rput(3.5,6){$\hs$}
+\includegraphics[width=0.5\textwidth, clip=true, trim= 0 0 0 0]{img/4-attn_input} % , angle=-90
 \caption[Input-feeding approach]{{\bf Input-feeding approach} -- Attentional vectors $\hs$ are fed as inputs to the next time steps to inform the model about past alignment decisions.
 } 
 \label{f:input}
