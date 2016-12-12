@@ -260,8 +260,7 @@ LSTM cells of all layers and the hidden states of higher layers, all start with 
 Implementation-wise, the computation in the
 character-level decoder is done per word {\it token} instead of per {\it type} as in the source
 character component ($\S$\ref{subsec:src}). 
-This is because of the context-dependent nature of the decoder.
-\footnote{To be memory efficient, the character-level backward pass can be executed right
+This is because of the context-dependent nature of the decoder.\footnote{To be memory efficient, the character-level backward pass can be executed right
 after the character-level forward pass
 and we can split these computations into
 mini-batches if the number of \unk{} is large.}
@@ -273,7 +272,6 @@ the surface forms of unknown tokens and could have fed these to the next
 time step. However, I chose not to do so for the efficiency reason explained
 next; instead, \unk{} is fed to the word-level decoder
 ``as is'' using its corresponding word embedding.
-
 During {\it training}, this design choice decouples all executions over \unk{} instances of the
 character-level decoder as soon the word-level NMT
 completes. As such, the forward and backward passes of the character-level

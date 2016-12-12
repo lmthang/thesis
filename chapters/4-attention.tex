@@ -331,7 +331,6 @@ Additionally, I also use dropout with probability $0.2$ for my LSTMs as suggeste
 \cite{zaremba14}. For dropout models, I train for 12 epochs and start halving
 the learning rate after 8 epochs. For local
 attention models, I empirically set the window size $D=10$.
-
 My code is implemented in MATLAB.
 When running on a single GPU device Tesla K40, I achieve a speed of 1K {\it
 target} words per second. It takes 7--10 days to completely train a model.

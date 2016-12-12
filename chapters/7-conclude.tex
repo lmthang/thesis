@@ -80,9 +80,9 @@ already handle unknown words. Recently, there is a new trend of translating at
 purely subword level \cite{sennrich16sub,gnmt16} in which a segmentation
 algorithm is run over the data and a black-box NMT model is used in a similar
 spirit to the copy mechanism. While that new trend works very well for NMT, I
-think that the hybrid models that I propose will remain useful for new
+think that the hybrid models that I have proposed will remain useful for new
 applications where segmentation of units, such as predicates in semantic
-parsing, is not desirable or when I want to incorporate more complex structures
+parsing, is not desirable or when there is a need to incorporate more complex structures
 such as semantic representations (instead of sequences of characters) for
 unknown entities to existing systems.
 
@@ -92,7 +92,7 @@ and whether NMT models can be compressed. The former question is important
 because of the fact that the first NMT systems only utilize parallel corpora
 despite an abundant amount of available data from monolingual and multi-lingual
 corpora as well as data from related tasks. To answer, I demonstrate that
-translation quality can be improved with data from parsing, image caption, and
+translation quality can be improved with data from parsing, image caption generation, and
 unsupervised learning. My work motivates subsequent papers in building
 multi-lingual NMT models \cite{zoph16,firat16,gnmt16multi,ha16}. The latter
 question arises from the indispensable role of mobile devices in society

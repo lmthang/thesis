@@ -9,7 +9,7 @@ thesis.pdf: thesis.ps
 thesis.ps: thesis.dvi
 	dvips -t a4 -o thesis.ps thesis.dvi 
 
-thesis.dvi: thesis.bib *.tex img/*.eps 
+thesis.dvi: thesis.bib *.tex chapters/*.tex img/*.eps 
 	-latex thesis.tex
 	bibtex thesis
 	latex thesis.tex
